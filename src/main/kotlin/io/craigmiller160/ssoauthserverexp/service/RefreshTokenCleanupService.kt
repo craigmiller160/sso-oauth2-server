@@ -12,7 +12,7 @@ class RefreshTokenCleanupService (
 
     @Scheduled(fixedRate = 1 * 60 * 60 * 1000) // Run every hour
     fun cleanupRefreshTokens() {
-        val maxTimestamp = LocalDateTime.now().minusDays(1)
+        val maxTimestamp = LocalDateTime.now().minusDays(1) // TODO make this based on configuration
         refreshTokenRepo.removeOldTokens(maxTimestamp)
     }
 

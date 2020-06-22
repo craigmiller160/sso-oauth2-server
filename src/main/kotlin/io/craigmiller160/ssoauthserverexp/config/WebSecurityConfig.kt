@@ -28,7 +28,6 @@ class WebSecurityConfig(
                     .antMatchers("/oauth/**/*")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/oauth/token").permitAll()
                     .anyRequest().fullyAuthenticated()
                     .and()
                     .requiresChannel().anyRequest().requiresSecure()

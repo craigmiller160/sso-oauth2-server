@@ -15,5 +15,8 @@ data class Client (
         val name: String,
         val clientKey: String,
         val clientSecret: String,
-        val enabled: Boolean
+        val enabled: Boolean,
+        val allowClientCredentials: Boolean,
+        val allowPassword: Boolean,
+        val allowAuthCode: Boolean
 )

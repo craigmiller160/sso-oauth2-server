@@ -28,6 +28,9 @@ CREATE TABLE clients (
     client_key VARCHAR(255) NOT NULL,
     client_secret VARCHAR(255) NOT NULL,
     enabled BOOLEAN DEFAULT false,
+    allow_client_credentials BOOLEAN DEFAULT false,
+    allow_password BOOLEAN DEFAULT false,
+    allow_auth_code BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
 

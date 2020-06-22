@@ -42,3 +42,10 @@ CREATE TABLE client_users (
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (client_id) REFERENCES clients (id)
 );
+
+CREATE TABLE refresh_tokens (
+    id BIGSERIAL NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP DEFAULT current_timestamp,
+    PRIMARY KEY (id)
+);

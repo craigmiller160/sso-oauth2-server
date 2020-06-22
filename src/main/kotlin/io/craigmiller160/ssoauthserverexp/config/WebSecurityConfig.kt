@@ -23,6 +23,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
                     .authorizeRequests()
                     .antMatchers("/oauth/token").permitAll()
                     .anyRequest().fullyAuthenticated()
+                    .and()
+                    .requiresChannel().anyRequest().requiresSecure()
         }
     }
 

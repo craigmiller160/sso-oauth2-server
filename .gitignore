@@ -29,3 +29,5 @@ build/
 
 ### VS Code ###
 .vscode/
+sql/create-schema.sql
+sql/drop-schema.sql

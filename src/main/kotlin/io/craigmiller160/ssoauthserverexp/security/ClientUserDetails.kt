@@ -2,11 +2,25 @@ package io.craigmiller160.ssoauthserverexp.security
 
 import io.craigmiller160.ssoauthserverexp.entity.Client
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 data class ClientUserDetails(private val client: Client): UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf()
+        val authorities = mutableListOf<GrantedAuthority>()
+        if (client.allowClientCredentials) {
+            authorities += SimpleGrantedAuthority(ClientAuthorities.CLIENT_CREDENTIALS)
+        }
+
+        if(client.allowPassword) {
+            authorities += SimpleGrantedAuthority(ClientAuthorities.PASSWORD)
+        }
+
+        if (client.allowAuthCode) {
+            authorities += SimpleGrantedAuthority(ClientAuthorities.AUTH_CODE)
+        }
+
+        return authorities
     }
 
     override fun isEnabled(): Boolean {

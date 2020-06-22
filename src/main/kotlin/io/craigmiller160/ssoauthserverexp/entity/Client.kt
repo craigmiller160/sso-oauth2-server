@@ -14,5 +14,6 @@ data class Client (
         val id: Long,
         val name: String,
         val clientKey: String,
-        val clientSecret: String
+        val clientSecret: String,
+        val enabled: Boolean
 )

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/oauth")
 class OAuth2Controller {
 
-    @GetMapping("/hello")
+    @GetMapping("/token")
     fun hello(): String {
         return "Hello World"
     }

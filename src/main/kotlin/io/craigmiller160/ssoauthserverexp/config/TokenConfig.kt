@@ -2,6 +2,9 @@ package io.craigmiller160.ssoauthserverexp.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import java.security.KeyPairGenerator
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.util.Base64
 import javax.annotation.PostConstruct
 import javax.crypto.KeyGenerator
@@ -15,15 +18,17 @@ class TokenConfig (
         var keySizeBits: Int = 0
 ) {
 
-    lateinit var keyString: String
-    lateinit var secretKey: SecretKey
+    lateinit var publicKey: PublicKey
+    lateinit var privateKey: PrivateKey
 
     @PostConstruct
-    fun createKey() {
-        val keyGen = KeyGenerator.getInstance("AES")
-        keyGen.init(keySizeBits)
-        this.secretKey = keyGen.generateKey()
-        this.keyString = Base64.getEncoder().encodeToString(secretKey.encoded)
+    fun createKeys() {
+        val keyGen = KeyPairGenerator.getInstance("RSA")
+        keyGen.initialize(keySizeBits)
+
+        val keyPair = keyGen.genKeyPair()
+        publicKey = keyPair.public
+        privateKey = keyPair.private
     }
 
 }

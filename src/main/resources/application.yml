@@ -27,4 +27,4 @@ security:
   token:
     accessExpSecs: 300
     refreshExpSecs: 3600
-    keySizeBits: 256
+    keySizeBits: 2048

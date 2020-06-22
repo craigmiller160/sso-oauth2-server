@@ -26,13 +26,21 @@ class JwtCreator(
 
     fun createAccessToken(): String {
         // TODO add claims
-        val claims = JWTClaimsSet.Builder()
-                .issueTime(Date())
-                .expirationTime(generateExp(tokenConfig.accessExpSecs))
-                .jwtID(UUID.randomUUID().toString())
-                .notBeforeTime(Date())
+        val claims = createDefaultClaims(tokenConfig.accessExpSecs)
                 .build()
 
+        return createToken(claims)
+    }
+
+    private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
+        return JWTClaimsSet.Builder()
+                .issueTime(Date())
+                .expirationTime(generateExp(expSecs))
+                .jwtID(UUID.randomUUID().toString())
+                .notBeforeTime(Date())
+    }
+
+    private fun createToken(claims: JWTClaimsSet): String {
         val header = JWSHeader.Builder(JWSAlgorithm.RS256)
                 .build()
         val jwt = SignedJWT(header, claims)
@@ -40,6 +48,13 @@ class JwtCreator(
 
         jwt.sign(signer)
         return jwt.serialize()
+    }
+
+    fun createRefreshToken(): String {
+        val claims = createDefaultClaims(tokenConfig.refreshExpSecs)
+                .build()
+
+        return createToken(claims)
     }
 
 }

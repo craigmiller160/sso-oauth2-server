@@ -22,3 +22,9 @@ spring:
     url: jdbc:postgresql://localhost:30001/exp_auth_server
     username: user
     password: password
+
+security:
+  token:
+    accessExpSecs: 300
+    refreshExpSecs: 3600
+    keySizeBits: 256

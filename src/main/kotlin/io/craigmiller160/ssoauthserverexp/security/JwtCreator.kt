@@ -25,6 +25,7 @@ class JwtCreator(
         return legacyDateConverter.convertLocalDateTimeToDate(exp)
     }
 
+    // TODO update unit tests
     fun createAccessToken(): String {
         val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         // TODO add claims

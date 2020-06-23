@@ -1,5 +1,10 @@
 package io.craigmiller160.ssoauthserverexp.repository
 
+import io.craigmiller160.ssoauthserverexp.entity.Client
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,20 +15,38 @@ class ClientRepositoryTest {
 
     @Autowired
     private lateinit var clientRepo: ClientRepository
+    private val client = Client(
+            id = 1L,
+            name = "Name",
+            clientKey = "Key",
+            clientSecret = "Secret",
+            enabled = true,
+            allowClientCredentials = true,
+            allowAuthCode = true,
+            allowPassword = true
+    )
 
     @BeforeEach
     fun setup() {
-        println(clientRepo) // TODO delete this
+        clientRepo.save(client)
+    }
+
+    @AfterEach
+    fun clean() {
+        clientRepo.deleteAll()
     }
 
     @Test
     fun test_findByClientKey() {
-        TODO("Finish this")
+        val result = clientRepo.findByClientKey("Key")
+        assertNotNull(result)
+        assertEquals(client.clientSecret, result!!.clientSecret)
     }
 
     @Test
     fun test_findByClientKey_noResults() {
-        TODO("Finish this")
+        val result = clientRepo.findByClientKey("abc")
+        assertNull(result)
     }
 
 }

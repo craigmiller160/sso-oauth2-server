@@ -27,9 +27,7 @@ security:
   token:
     access-exp-secs: 300
     refresh-exp-secs: 3600
-    key-size-bits: 2048
-    key-store:
-      path: classpath:keys/jwt.jks
-      type: JKS
-      password: password
-      alias: jwt
+    key-store-path: classpath:keys/jwt.jks
+    key-store-type: JKS
+    key-store-password: password
+    key-store-alias: jwt

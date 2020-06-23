@@ -22,7 +22,10 @@ import javax.crypto.SecretKey
 class TokenConfig (
         var accessExpSecs: Int = 0,
         var refreshExpSecs: Int = 0,
-        var keySizeBits: Int = 0
+        var keyStorePath: String = "",
+        var keyStoreType: String = "",
+        var keyStorePassword: String = "",
+        var keyStoreAlias: String = ""
 ) {
 
     // TODO delete all of this
@@ -33,13 +36,14 @@ class TokenConfig (
     @PostConstruct
     fun createKeys() {
         println("Access Exp: $accessExpSecs") // TODO delete this
+        println("Path: $keyStorePath") // TODO delete this
 
-        val keyGen = KeyPairGenerator.getInstance("RSA")
-        keyGen.initialize(keySizeBits)
-
-        keyPair = keyGen.genKeyPair()
-        publicKey = keyPair.public
-        privateKey = keyPair.private
+//        val keyGen = KeyPairGenerator.getInstance("RSA")
+//        keyGen.initialize(keySizeBits)
+//
+//        keyPair = keyGen.genKeyPair()
+//        publicKey = keyPair.public
+//        privateKey = keyPair.private
     }
 
     fun jwkSet(): JWKSet {

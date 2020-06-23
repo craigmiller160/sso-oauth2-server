@@ -12,6 +12,7 @@
 	<artifactId>sso-auth-server-exp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sso-auth-server-exp</name>
+	<packaging>jar</packaging>
 	<description>Experimental SSO Auth Server</description>
 
 	<properties>

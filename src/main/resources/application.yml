@@ -31,3 +31,4 @@ security:
     key-store-type: JKS
     key-store-password: password
     key-store-alias: jwt
+    delete-older-than-secs: 86400

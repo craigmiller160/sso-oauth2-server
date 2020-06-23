@@ -31,7 +31,8 @@ class TokenConfig (
         var keyStorePath: String = "",
         var keyStoreType: String = "",
         var keyStorePassword: String = "",
-        var keyStoreAlias: String = ""
+        var keyStoreAlias: String = "",
+        var deleteOlderThanSecs: Long = 0
 ) {
 
     lateinit var publicKey: PublicKey

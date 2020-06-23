@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class OAuth2ServiceTest {
 
-    private val oAuth2Service = OAuth2Service()
+    private lateinit var oAuth2Service: OAuth2Service
 
     @Test
     fun test_clientCredentials() {

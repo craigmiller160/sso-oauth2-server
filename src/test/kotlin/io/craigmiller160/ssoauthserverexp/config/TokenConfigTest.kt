@@ -1,15 +1,13 @@
 package io.craigmiller160.ssoauthserverexp.config
 
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.BeforeEachCallback
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
-import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
 import java.io.FileNotFoundException
 
-class TokenConfigTest : BeforeTestExecutionCallback, BeforeEachCallback {
+class TokenConfigTest {
 
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
@@ -19,8 +17,8 @@ class TokenConfigTest : BeforeTestExecutionCallback, BeforeEachCallback {
 
     private lateinit var tokenConfig: TokenConfig
 
-    override fun beforeTestExecution(ctx: ExtensionContext?) {
-        println("BeforeExecution") // TODO delete this
+    @BeforeEach
+    fun setup() {
         tokenConfig = TokenConfig(
                 accessExpSecs,
                 refreshExpSecs,
@@ -29,10 +27,6 @@ class TokenConfigTest : BeforeTestExecutionCallback, BeforeEachCallback {
                 keyStorePassword,
                 keyStoreAlias
         )
-    }
-
-    override fun beforeEach(ctx: ExtensionContext?) {
-        println("BeforeEach") // TODO delete this
     }
 
     @Test

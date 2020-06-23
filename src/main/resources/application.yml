@@ -2,7 +2,7 @@ server:
   port: 7003
   ssl:
     key-store-type: PKCS12
-    key-store: classpath:cert/auth-server.p12
+    key-store: classpath:keys/auth-server.p12
     key-store-password: auth-server-pass
 
 spring:
@@ -22,3 +22,13 @@ spring:
     url: jdbc:postgresql://localhost:30001/exp_auth_server
     username: user
     password: password
+
+security:
+  token:
+    access-exp-secs: 300
+    refresh-exp-secs: 3600
+    key-store-path: classpath:keys/jwt.jks
+    key-store-type: JKS
+    key-store-password: password
+    key-store-alias: jwt
+    delete-older-than-secs: 86400

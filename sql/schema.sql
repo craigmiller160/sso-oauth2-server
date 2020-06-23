@@ -27,6 +27,10 @@ CREATE TABLE clients (
     name VARCHAR(255),
     client_key VARCHAR(255) NOT NULL,
     client_secret VARCHAR(255) NOT NULL,
+    enabled BOOLEAN DEFAULT false,
+    allow_client_credentials BOOLEAN DEFAULT false,
+    allow_password BOOLEAN DEFAULT false,
+    allow_auth_code BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
 
@@ -37,4 +41,11 @@ CREATE TABLE client_users (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (client_id) REFERENCES clients (id)
+);
+
+CREATE TABLE refresh_tokens (
+    id BIGSERIAL NOT NULL,
+    refresh_token VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP DEFAULT current_timestamp,
+    PRIMARY KEY (id)
 );

@@ -7,8 +7,14 @@ import com.nimbusds.jose.jwk.RSAKey
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.io.ClassPathResource
+import java.io.File
+import java.io.FileNotFoundException
+import java.net.URL
+import java.nio.file.Paths
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.interfaces.RSAPublicKey
@@ -28,22 +34,33 @@ class TokenConfig (
         var keyStoreAlias: String = ""
 ) {
 
-    // TODO delete all of this
     lateinit var publicKey: PublicKey
     lateinit var privateKey: PrivateKey
     lateinit var keyPair: KeyPair
 
     @PostConstruct
-    fun createKeys() {
-        println("Access Exp: $accessExpSecs") // TODO delete this
-        println("Path: $keyStorePath") // TODO delete this
+    fun loadKeys() {
+        val keyStoreFile = evaluatePath()
+        if (!keyStoreFile.exists()) {
+            throw FileNotFoundException(keyStorePath)
+        }
 
-//        val keyGen = KeyPairGenerator.getInstance("RSA")
-//        keyGen.initialize(keySizeBits)
-//
-//        keyPair = keyGen.genKeyPair()
-//        publicKey = keyPair.public
-//        privateKey = keyPair.private
+        val keyStore = KeyStore.getInstance(keyStoreType)
+        keyStoreFile.inputStream()
+                .use { stream -> keyStore.load(stream, keyStorePassword.toCharArray()) }
+        privateKey = keyStore.getKey(keyStoreAlias, keyStorePassword.toCharArray()) as PrivateKey
+        publicKey = keyStore.getCertificate(keyStoreAlias).publicKey
+        keyPair = KeyPair(publicKey, privateKey)
+    }
+
+    private fun evaluatePath(): File {
+        if (keyStorePath.startsWith("classpath:")) {
+            val path = keyStorePath.replace(Regex("^classpath:"), "")
+            val url = javaClass.classLoader.getResource(path) ?: throw FileNotFoundException(keyStorePath)
+            return Paths.get(url.toURI()).toFile()
+        }
+
+        return File(keyStorePath)
     }
 
     fun jwkSet(): JWKSet {

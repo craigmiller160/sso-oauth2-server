@@ -25,9 +25,9 @@ spring:
 
 security:
   token:
-    accessExpSecs: 300
-    refreshExpSecs: 3600
-    keySizeBits: 2048
+    access-exp-secs: 300
+    refresh-exp-secs: 3600
+    key-size-bits: 2048
     key-store:
       path: classpath:keys/jwt.jks
       type: JKS

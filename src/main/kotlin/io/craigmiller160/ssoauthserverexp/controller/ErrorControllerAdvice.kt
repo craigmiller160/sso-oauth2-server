@@ -13,9 +13,9 @@ class ErrorControllerAdvice {
     fun exception(req: HttpServletRequest, ex: Exception): Error {
         val annotation = ex.javaClass.getAnnotation(ResponseStatus::class.java)
         return Error(
-                status = annotation.code.value(),
-                error = annotation.code.reasonPhrase,
-                message = "${annotation.reason} - ${ex.message}",
+                status = annotation?.code?.value() ?: 500,
+                error = annotation?.code?.reasonPhrase ?: "Internal Server Error",
+                message = "${annotation?.reason ?: "Error"} - ${ex.message}",
                 path = req.requestURI
         )
     }

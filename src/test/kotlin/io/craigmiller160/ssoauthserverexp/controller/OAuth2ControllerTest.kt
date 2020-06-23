@@ -24,33 +24,37 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_clientCredentials() {
-        `when`(oAuth2Service.clientCredentials()).thenReturn("Success")
-        val request = TokenRequest(grant_type = GrantTypes.CLIENT_CREDENTIALS)
-        val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+//        `when`(oAuth2Service.clientCredentials()).thenReturn("Success")
+//        val request = TokenRequest(grant_type = GrantTypes.CLIENT_CREDENTIALS)
+//        val result = oAuth2Controller.token(request)
+//        assertEquals("Success", result)
+        TODO("Finish this")
     }
 
     @Test
     fun test_token_password() {
-        `when`(oAuth2Service.password()).thenReturn("Success")
-        val request = TokenRequest(grant_type = GrantTypes.PASSWORD)
-        val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+//        `when`(oAuth2Service.password()).thenReturn("Success")
+//        val request = TokenRequest(grant_type = GrantTypes.PASSWORD)
+//        val result = oAuth2Controller.token(request)
+//        assertEquals("Success", result)
+        TODO("Finish this")
     }
 
     @Test
     fun test_token_authCode() {
-        `when`(oAuth2Service.authCode()).thenReturn("Success")
-        val request = TokenRequest(grant_type = GrantTypes.AUTH_CODE)
-        val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+//        `when`(oAuth2Service.authCode()).thenReturn("Success")
+//        val request = TokenRequest(grant_type = GrantTypes.AUTH_CODE)
+//        val result = oAuth2Controller.token(request)
+//        assertEquals("Success", result)
+        TODO("Finish this")
     }
 
     @Test
     fun test_token_unsupported() {
-        val request = TokenRequest(grant_type = "foo")
-        val ex = assertThrows<UnsupportedGrantTypeException> { oAuth2Controller.token(request) }
-        assertEquals("foo", ex.message)
+//        val request = TokenRequest(grant_type = "foo")
+//        val ex = assertThrows<UnsupportedGrantTypeException> { oAuth2Controller.token(request) }
+//        assertEquals("foo", ex.message)
+        TODO("Finish this")
     }
 
 }

@@ -1,5 +1,6 @@
 package io.craigmiller160.ssoauthserverexp.config
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,8 +41,10 @@ class TokenConfigTest {
 
     @Test
     fun test_loadKeys_classpath_notFound() {
-        tokenConfig.keyStorePath = "classpath:not/real.jks"
-        assertThrows<FileNotFoundException> { tokenConfig.loadKeys() }
+        val path = "classpath:not/real.jks"
+        tokenConfig.keyStorePath = path
+        val ex = assertThrows<FileNotFoundException> { tokenConfig.loadKeys() }
+        assertEquals(path, ex.message)
     }
 
     @Test
@@ -54,11 +57,12 @@ class TokenConfigTest {
         assertNotNull(tokenConfig.keyPair)
     }
 
-//    @Test(expected = FileNotFoundException::class)
-//    fun test_loadKeys_file_notFound() {
-//        val file = File("not/exists.jks")
-//        tokenConfig.keyStorePath = file.absolutePath
-//        tokenConfig.loadKeys()
-//    }
+    @Test
+    fun test_loadKeys_file_notFound() {
+        val file = File("not/exists.jks")
+        tokenConfig.keyStorePath = file.absolutePath
+        val ex = assertThrows<FileNotFoundException> { tokenConfig.loadKeys() }
+        assertEquals(file.absolutePath, ex.message)
+    }
 
 }

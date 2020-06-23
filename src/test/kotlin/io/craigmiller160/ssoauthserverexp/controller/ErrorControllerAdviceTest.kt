@@ -17,8 +17,6 @@ import javax.servlet.http.HttpServletRequest
 @RunWith(MockitoJUnitRunner::class)
 class ErrorControllerAdviceTest {
 
-    // TODO make sure this one runs with the full test suite
-
     @Mock
     private lateinit var req: HttpServletRequest
 

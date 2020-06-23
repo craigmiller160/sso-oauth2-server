@@ -28,3 +28,8 @@ security:
     accessExpSecs: 300
     refreshExpSecs: 3600
     keySizeBits: 2048
+    key-store:
+      path: classpath:keys/jwt.jks
+      type: JKS
+      password: password
+      alias: jwt

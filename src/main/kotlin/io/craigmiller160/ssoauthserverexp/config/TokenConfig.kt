@@ -4,6 +4,7 @@ import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.KeyUse
 import com.nimbusds.jose.jwk.RSAKey
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import java.security.KeyPair
@@ -24,12 +25,15 @@ class TokenConfig (
         var keySizeBits: Int = 0
 ) {
 
+    // TODO delete all of this
     lateinit var publicKey: PublicKey
     lateinit var privateKey: PrivateKey
     lateinit var keyPair: KeyPair
 
     @PostConstruct
     fun createKeys() {
+        println("Access Exp: $accessExpSecs") // TODO delete this
+
         val keyGen = KeyPairGenerator.getInstance("RSA")
         keyGen.initialize(keySizeBits)
 

@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.ssoauthserverexp.config.TokenConfig
 import io.craigmiller160.ssoauthserverexp.util.LegacyDateConverter
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import java.util.Date
@@ -25,8 +26,10 @@ class JwtCreator(
     }
 
     fun createAccessToken(): String {
+        val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         // TODO add claims
         val claims = createDefaultClaims(tokenConfig.accessExpSecs)
+                .claim("clientKey", userDetails.username)
                 .build()
 
         return createToken(claims)

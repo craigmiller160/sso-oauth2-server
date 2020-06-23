@@ -1,42 +1,64 @@
 package io.craigmiller160.ssoauthserverexp.config
 
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import java.io.File
+import java.io.FileNotFoundException
 
 
 class TokenConfigTest {
 
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
-    private val keyStoreType = "type"
-    private val keyStorePassword = "pass"
-    private val keyStoreAlias = "alias"
+    private val keyStoreType = "JKS"
+    private val keyStorePassword = "password"
+    private val keyStoreAlias = "jwt"
 
     private lateinit var tokenConfig: TokenConfig
 
     @Before
     fun setup() {
-        tokenConfig = TokenConfig()
+        tokenConfig = TokenConfig(
+                accessExpSecs,
+                refreshExpSecs,
+                "",
+                keyStoreType,
+                keyStorePassword,
+                keyStoreAlias
+        )
     }
 
     @Test
     fun test_loadKeys_classpath() {
-        TODO("Finish this")
+        tokenConfig.keyStorePath = "classpath:keys/jwt.jks"
+        tokenConfig.loadKeys()
+        assertNotNull(tokenConfig.publicKey)
+        assertNotNull(tokenConfig.privateKey)
+        assertNotNull(tokenConfig.keyPair)
     }
 
-    @Test
+    @Test(expected = FileNotFoundException::class)
     fun test_loadKeys_classpath_notFound() {
-        TODO("Finish this")
+        tokenConfig.keyStorePath = "classpath:not/real.jks"
+        tokenConfig.loadKeys()
     }
 
     @Test
     fun test_loadKeys_file() {
-        TODO("Finish this")
+        val keystore = File("src/main/resources/keys/jwt.jks")
+        tokenConfig.keyStorePath = keystore.absolutePath
+        tokenConfig.loadKeys()
+        assertNotNull(tokenConfig.publicKey)
+        assertNotNull(tokenConfig.privateKey)
+        assertNotNull(tokenConfig.keyPair)
     }
 
-    @Test
+    @Test(expected = FileNotFoundException::class)
     fun test_loadKeys_file_notFound() {
-        TODO("Finish this")
+        val file = File("not/exists.jks")
+        tokenConfig.keyStorePath = file.absolutePath
+        tokenConfig.loadKeys()
     }
 
 }

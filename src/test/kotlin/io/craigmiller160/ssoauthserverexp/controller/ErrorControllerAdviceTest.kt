@@ -11,10 +11,13 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
+import java.lang.RuntimeException
 import javax.servlet.http.HttpServletRequest
 
 @RunWith(MockitoJUnitRunner::class)
 class ErrorControllerAdviceTest {
+
+    // TODO make sure this one runs with the full test suite
 
     @Mock
     private lateinit var req: HttpServletRequest

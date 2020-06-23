@@ -41,9 +41,6 @@ class TokenConfig (
     @PostConstruct
     fun loadKeys() {
         val keyStoreFile = evaluatePath()
-        if (!keyStoreFile.exists()) {
-            throw FileNotFoundException(keyStorePath)
-        }
 
         val keyStore = KeyStore.getInstance(keyStoreType)
         keyStoreFile.inputStream()
@@ -60,7 +57,12 @@ class TokenConfig (
             return Paths.get(url.toURI()).toFile()
         }
 
-        return File(keyStorePath)
+        val file = File(keyStorePath)
+        if (!file.exists()) {
+            throw FileNotFoundException(keyStorePath)
+        }
+
+        return file
     }
 
     fun jwkSet(): JWKSet {

@@ -1,6 +1,7 @@
 package io.craigmiller160.ssoauthserverexp.controller
 
 import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
+import io.craigmiller160.ssoauthserverexp.exception.UnsupportedGrantTypeException
 import io.craigmiller160.ssoauthserverexp.security.GrantTypes
 import io.craigmiller160.ssoauthserverexp.service.OAuth2Service
 import org.springframework.http.MediaType
@@ -20,7 +21,7 @@ class OAuth2Controller(
             GrantTypes.CLIENT_CREDENTIALS -> oAuth2Service.clientCredentials()
             GrantTypes.PASSWORD -> oAuth2Service.password()
             GrantTypes.AUTH_CODE -> oAuth2Service.authCode()
-            else -> throw Exception("Unsupported grant type") // TODO assign a better exception type
+            else -> throw UnsupportedGrantTypeException(tokenRequest.grant_type)
         }
     }
 

@@ -3,7 +3,7 @@ package io.craigmiller160.ssoauthserverexp.controller
 import com.nimbusds.jose.jwk.JWKSet
 import io.craigmiller160.ssoauthserverexp.config.TokenConfig
 import net.minidev.json.JSONObject
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks

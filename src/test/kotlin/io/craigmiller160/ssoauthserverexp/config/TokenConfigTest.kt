@@ -3,10 +3,12 @@ package io.craigmiller160.ssoauthserverexp.config
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.junit.MockitoJUnitRunner
 import java.io.File
 import java.io.FileNotFoundException
 
-
+@RunWith(MockitoJUnitRunner::class)
 class TokenConfigTest {
 
     private val accessExpSecs = 10

@@ -1,15 +1,15 @@
 package io.craigmiller160.ssoauthserverexp.config
 
-import org.junit.Assert.assertNotNull
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
+import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
 import java.io.FileNotFoundException
 
-@RunWith(MockitoJUnitRunner::class)
-class TokenConfigTest {
+class TokenConfigTest : BeforeTestExecutionCallback, BeforeEachCallback {
 
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
@@ -19,8 +19,8 @@ class TokenConfigTest {
 
     private lateinit var tokenConfig: TokenConfig
 
-    @Before
-    fun setup() {
+    override fun beforeTestExecution(ctx: ExtensionContext?) {
+        println("BeforeExecution") // TODO delete this
         tokenConfig = TokenConfig(
                 accessExpSecs,
                 refreshExpSecs,
@@ -29,6 +29,10 @@ class TokenConfigTest {
                 keyStorePassword,
                 keyStoreAlias
         )
+    }
+
+    override fun beforeEach(ctx: ExtensionContext?) {
+        println("BeforeEach") // TODO delete this
     }
 
     @Test
@@ -40,10 +44,10 @@ class TokenConfigTest {
         assertNotNull(tokenConfig.keyPair)
     }
 
-    @Test(expected = FileNotFoundException::class)
+    @Test
     fun test_loadKeys_classpath_notFound() {
         tokenConfig.keyStorePath = "classpath:not/real.jks"
-        tokenConfig.loadKeys()
+        assertThrows<FileNotFoundException> { tokenConfig.loadKeys() }
     }
 
     @Test
@@ -56,11 +60,11 @@ class TokenConfigTest {
         assertNotNull(tokenConfig.keyPair)
     }
 
-    @Test(expected = FileNotFoundException::class)
-    fun test_loadKeys_file_notFound() {
-        val file = File("not/exists.jks")
-        tokenConfig.keyStorePath = file.absolutePath
-        tokenConfig.loadKeys()
-    }
+//    @Test(expected = FileNotFoundException::class)
+//    fun test_loadKeys_file_notFound() {
+//        val file = File("not/exists.jks")
+//        tokenConfig.keyStorePath = file.absolutePath
+//        tokenConfig.loadKeys()
+//    }
 
 }

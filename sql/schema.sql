@@ -25,13 +25,16 @@ CREATE TABLE clients (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE user_roles (
+CREATE TABLE client_user_roles (
     id BIGSERIAL NOT NULL,
+    client_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (role_id) REFERENCES roles (id)
+    FOREIGN KEY (role_id) REFERENCES roles (id),
+    FOREIGN KEY (client_id) REFERENCES clients (id),
+    UNIQUE (client_id, user_id, role_id)
 );
 
 CREATE TABLE client_users (

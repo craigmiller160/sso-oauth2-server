@@ -6,7 +6,6 @@ import io.craigmiller160.ssoauthserverexp.repository.RefreshTokenRepository
 import io.craigmiller160.ssoauthserverexp.security.ClientAuthorities
 import io.craigmiller160.ssoauthserverexp.security.JwtCreator
 import org.springframework.security.access.annotation.Secured
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 

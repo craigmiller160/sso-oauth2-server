@@ -12,6 +12,7 @@ import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
+import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -100,40 +101,38 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_clientCredentials() {
-//        setupSecurityContext()
-//        `when`(jwtHandler.createAccessToken(clientUserDetails))
-//                .thenReturn(accessToken)
-//        `when`(jwtHandler.createRefreshToken())
-//                .thenReturn(refreshToken)
-//
-//        val result = oAuth2Service.clientCredentials()
-//        assertEquals(TokenResponse(accessToken, refreshToken), result)
-//
-//        verify(refreshTokenRepo, times(1))
-//                .save(isA<RefreshToken>())
-        TODO("Finish this")
+        setupSecurityContext()
+        `when`(jwtHandler.createAccessToken(clientUserDetails))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, client.id))
+                .thenReturn(Pair(refreshToken, "ABC"))
+
+        val result = oAuth2Service.clientCredentials()
+        assertEquals(TokenResponse(accessToken, refreshToken), result)
+
+        verify(refreshTokenRepo, times(1))
+                .save(isA<RefreshToken>())
     }
 
     @Test
     fun test_password() {
-//        setupSecurityContext()
-//        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
-//                .thenReturn(accessToken)
-//        `when`(jwtHandler.createRefreshToken())
-//                .thenReturn(refreshToken)
-//
-//        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
-//                .thenReturn(user)
-//        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
-//                .thenReturn(roles)
-//
-//        val tokenRequest = TokenRequest("password", user.email, "password", null)
-//        val result = oAuth2Service.password(tokenRequest)
-//        assertEquals(TokenResponse(accessToken, refreshToken), result)
-//
-//        verify(refreshTokenRepo, times(1))
-//                .save(isA<RefreshToken>())
-        TODO("Finish this")
+        setupSecurityContext()
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(GrantType.PASSWORD, client.id, user.id))
+                .thenReturn(Pair(refreshToken, "ABC"))
+
+        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+                .thenReturn(user)
+        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+                .thenReturn(roles)
+
+        val tokenRequest = TokenRequest("password", user.email, "password", null)
+        val result = oAuth2Service.password(tokenRequest)
+        assertEquals(TokenResponse(accessToken, refreshToken), result)
+
+        verify(refreshTokenRepo, times(1))
+                .save(isA<RefreshToken>())
     }
 
     @Test

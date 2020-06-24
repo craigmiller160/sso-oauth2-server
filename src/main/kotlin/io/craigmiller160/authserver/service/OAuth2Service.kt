@@ -53,7 +53,7 @@ class OAuth2Service (
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 
         val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
-        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, clientUserDetails.client.id, user.id)
+        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.PASSWORD, clientUserDetails.client.id, user.id)
         saveRefreshToken(refreshToken, tokenId)
         return TokenResponse(accessToken, refreshToken)
     }

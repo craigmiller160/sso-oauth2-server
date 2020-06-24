@@ -61,11 +61,15 @@ class JwtHandler(
     }
 
     fun createRefreshToken(grantType: String, clientId: Long, userId: Long = 0): Pair<String,String> {
-        val claims = createDefaultClaims(tokenConfig.refreshExpSecs)
+        var claimBuilder = createDefaultClaims(tokenConfig.refreshExpSecs)
                 .claim("grantType", grantType)
                 .claim("clientId", clientId)
-                .claim("userId", userId)
-                .build()
+
+        if (userId > 0) {
+            claimBuilder = claimBuilder.claim("userId", userId)
+        }
+
+        val claims = claimBuilder.build()
 
         val token = createToken(claims)
         return Pair(token, claims.jwtid)

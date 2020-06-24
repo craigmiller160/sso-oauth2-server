@@ -4,5 +4,5 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 import java.lang.RuntimeException
 
-@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Unsupported OAuth2 Grant Type")
-class UnsupportedGrantTypeException(msg: String) : RuntimeException(msg)
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad Request")
+class BadRequestException(msg: String) : RuntimeException(msg)

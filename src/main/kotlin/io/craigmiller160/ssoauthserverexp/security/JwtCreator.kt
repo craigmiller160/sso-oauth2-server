@@ -6,6 +6,8 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.ssoauthserverexp.config.TokenConfig
+import io.craigmiller160.ssoauthserverexp.entity.Role
+import io.craigmiller160.ssoauthserverexp.entity.User
 import io.craigmiller160.ssoauthserverexp.util.LegacyDateConverter
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -25,13 +27,20 @@ class JwtCreator(
         return legacyDateConverter.convertLocalDateTimeToDate(exp)
     }
 
-    fun createAccessToken(): String {
-        val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
-        val claims = createDefaultClaims(tokenConfig.accessExpSecs)
-                .claim("clientKey", userDetails.username)
-                .build()
+    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): String {
+        val roleNames = roles.map { it.name }
 
-        return createToken(claims)
+        var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
+                .claim("clientKey", clientUserDetails.username)
+                .claim("clientName", clientUserDetails.client.name)
+                .claim("roles", roleNames)
+
+        claimBuilder = user?.let {
+            claimBuilder.subject(user.email)
+                    .claim("userEmail", user.email)
+        } ?: claimBuilder.subject(clientUserDetails.client.name)
+
+        return createToken(claimBuilder.build())
     }
 
     private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
@@ -53,6 +62,7 @@ class JwtCreator(
     }
 
     fun createRefreshToken(): String {
+        // TODO probably need a subject for this one too
         val claims = createDefaultClaims(tokenConfig.refreshExpSecs)
                 .build()
 

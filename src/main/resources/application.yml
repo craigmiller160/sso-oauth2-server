@@ -10,6 +10,8 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
+      hibernate:
+        default_schema: auth_server
       hibernate.jdbc.lob.non_contextual_creation: true
       hibernate.hbm2ddl.delimiter: ';'
       hibernate.dialect: org.hibernate.dialect.PostgreSQL9Dialect

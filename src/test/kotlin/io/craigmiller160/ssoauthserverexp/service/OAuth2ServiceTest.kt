@@ -31,8 +31,8 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_clientCredentials() {
-        `when`(jwtCreator.createAccessToken())
-                .thenReturn(accessToken)
+//        `when`(jwtCreator.createAccessToken())
+//                .thenReturn(accessToken)
         `when`(jwtCreator.createRefreshToken())
                 .thenReturn(refreshToken)
 
@@ -41,6 +41,7 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
+        TODO("Finish this")
     }
 
     @Test

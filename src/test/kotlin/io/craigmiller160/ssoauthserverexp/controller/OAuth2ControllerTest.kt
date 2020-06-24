@@ -27,7 +27,7 @@ class OAuth2ControllerTest {
     fun test_token_clientCredentials() {
         val tokenResponse = TokenResponse("clientCredentials", "")
         `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)
-        val request = TokenRequest(grant_type = GrantTypes.CLIENT_CREDENTIALS)
+        val request = TokenRequest(GrantTypes.CLIENT_CREDENTIALS, null, null, null)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }
@@ -46,14 +46,14 @@ class OAuth2ControllerTest {
     fun test_token_authCode() {
         val tokenResponse = TokenResponse("authCode", "")
         `when`(oAuth2Service.authCode()).thenReturn(tokenResponse)
-        val request = TokenRequest(grant_type = GrantTypes.AUTH_CODE)
+        val request = TokenRequest(GrantTypes.AUTH_CODE, null, null, null)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }
 
     @Test
     fun test_token_unsupported() {
-        val request = TokenRequest(grant_type = "foo")
+        val request = TokenRequest("foo", null, null, null)
         val ex = assertThrows<UnsupportedGrantTypeException> { oAuth2Controller.token(request) }
         assertEquals("foo", ex.message)
     }

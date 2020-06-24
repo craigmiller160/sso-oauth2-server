@@ -3,7 +3,7 @@ package io.craigmiller160.ssoauthserverexp.controller
 import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
 import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.exception.UnsupportedGrantTypeException
-import io.craigmiller160.ssoauthserverexp.security.GrantTypes
+import io.craigmiller160.ssoauthserverexp.security.GrantType
 import io.craigmiller160.ssoauthserverexp.service.OAuth2Service
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ class OAuth2ControllerTest {
     fun test_token_clientCredentials() {
         val tokenResponse = TokenResponse("clientCredentials", "")
         `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)
-        val request = TokenRequest(GrantTypes.CLIENT_CREDENTIALS, null, null, null)
+        val request = TokenRequest(GrantType.CLIENT_CREDENTIALS, null, null, null)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }
@@ -35,7 +35,7 @@ class OAuth2ControllerTest {
     @Test
     fun test_token_password() {
         val tokenResponse = TokenResponse("password", "")
-        val request = TokenRequest(GrantTypes.PASSWORD, null, null, null)
+        val request = TokenRequest(GrantType.PASSWORD, null, null, null)
         `when`(oAuth2Service.password(request))
                 .thenReturn(tokenResponse)
 
@@ -47,7 +47,7 @@ class OAuth2ControllerTest {
     fun test_token_authCode() {
         val tokenResponse = TokenResponse("authCode", "")
         `when`(oAuth2Service.authCode()).thenReturn(tokenResponse)
-        val request = TokenRequest(GrantTypes.AUTH_CODE, null, null, null)
+        val request = TokenRequest(GrantType.AUTH_CODE, null, null, null)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }

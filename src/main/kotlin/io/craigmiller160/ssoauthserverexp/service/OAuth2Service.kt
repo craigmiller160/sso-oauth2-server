@@ -12,6 +12,7 @@ import io.craigmiller160.ssoauthserverexp.security.ClientUserDetails
 import io.craigmiller160.ssoauthserverexp.security.JwtCreator
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -20,7 +21,8 @@ class OAuth2Service (
         private val jwtCreator: JwtCreator,
         private val refreshTokenRepo: RefreshTokenRepository,
         private val userRepo: UserRepository,
-        private val roleRepo: RoleRepository
+        private val roleRepo: RoleRepository,
+        private val passwordEncoder: PasswordEncoder
 ) {
 
     private fun saveRefreshToken(refreshToken: String) {
@@ -43,7 +45,9 @@ class OAuth2Service (
         val user = userRepo.findByEmailAndClientId(tokenRequest.username ?: "", clientUserDetails.client.id)
                 ?: throw InvalidLoginException("User does not exist for client")
 
-        // TODO validate password
+        if (!passwordEncoder.matches(tokenRequest.password, user.password)) {
+            throw InvalidLoginException("Invalid credentials")
+        }
 
         val accessToken = jwtCreator.createAccessToken(clientUserDetails, user)
         val refreshToken = jwtCreator.createRefreshToken()

@@ -34,12 +34,13 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_password() {
-//        val tokenResponse = TokenResponse("password", "")
-//        `when`(oAuth2Service.password()).thenReturn(tokenResponse)
-//        val request = TokenRequest(grant_type = GrantTypes.PASSWORD)
-//        val result = oAuth2Controller.token(request)
-//        assertEquals(tokenResponse, result)
-        TODO("Finish this")
+        val tokenResponse = TokenResponse("password", "")
+        val request = TokenRequest(GrantTypes.PASSWORD, null, null, null)
+        `when`(oAuth2Service.password(request))
+                .thenReturn(tokenResponse)
+
+        val result = oAuth2Controller.token(request)
+        assertEquals(tokenResponse, result)
     }
 
     @Test

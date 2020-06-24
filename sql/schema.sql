@@ -101,4 +101,10 @@ CREATE FUNCTION validate_client_user_role()
 
         RETURN NEW;
     END
-    $BODY$;
+    $BODY$ LANGUAGE plpgsql;
+
+CREATE TRIGGER client_user_role_validation
+    BEFORE INSERT OR UPDATE
+    ON auth_server.client_user_roles
+    FOR EACH ROW
+    EXECUTE PROCEDURE validate_client_user_role();

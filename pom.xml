@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.craigmiller160</groupId>
-	<artifactId>sso-auth-server-exp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>sso-auth-server-exp</name>
+	<artifactId>sso-oauth2</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
-	<description>Experimental SSO Auth Server</description>
+	<description>SSO Auth Server</description>
 
 	<properties>
 		<java.version>11</java.version>

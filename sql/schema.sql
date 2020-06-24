@@ -25,7 +25,7 @@ CREATE TABLE user_roles (
 CREATE TABLE clients (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255),
-    client_key VARCHAR(255) NOT NULL,
+    client_key VARCHAR(255) UNIQUE NOT NULL,
     client_secret VARCHAR(255) NOT NULL,
     enabled BOOLEAN DEFAULT false,
     allow_client_credentials BOOLEAN DEFAULT false,

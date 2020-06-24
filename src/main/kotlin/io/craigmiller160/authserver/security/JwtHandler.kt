@@ -79,7 +79,7 @@ class JwtHandler(
         return Pair(token, claims.jwtid)
     }
 
-    fun parseRefreshToken(refreshToken: String) {
+    fun parseRefreshToken(refreshToken: String, clientId: Long) {
         val jwt = SignedJWT.parse(refreshToken)
         val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey) // TODO make sure this doesn't blow up
         if (!jwt.verify(verifier)) {
@@ -91,6 +91,11 @@ class JwtHandler(
         val exp = legacyDateConverter.convertDateToLocalDateTime(claims.expirationTime)
         if(exp >= now) {
             throw InvalidRefreshTokenException("Expired")
+        }
+
+        val refreshClientId = claims.getLongClaim("clientId")
+        if (refreshClientId != clientId) {
+            throw InvalidRefreshTokenException("Invalid Client ID")
         }
 
         // TODO finish this

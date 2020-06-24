@@ -5,6 +5,7 @@ import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
 import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.entity.Client
 import io.craigmiller160.ssoauthserverexp.entity.RefreshToken
+import io.craigmiller160.ssoauthserverexp.entity.Role
 import io.craigmiller160.ssoauthserverexp.entity.User
 import io.craigmiller160.ssoauthserverexp.exception.InvalidLoginException
 import io.craigmiller160.ssoauthserverexp.repository.RefreshTokenRepository
@@ -67,12 +68,18 @@ class OAuth2ServiceTest {
     )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = User(
-            id = 0,
+            id = 1L,
             email = "craig@gmail.com",
             firstName = "Craig",
             lastName = "Miller",
             password = password
     )
+    private val role = Role(
+            id = 1L,
+            name = "Role",
+            clientId = 1L
+    )
+    private val roles = listOf(role)
 
     private fun setupSecurityContext() {
         `when`(securityContext.authentication)
@@ -109,13 +116,15 @@ class OAuth2ServiceTest {
     @Test
     fun test_password() {
         setupSecurityContext()
-        `when`(jwtCreator.createAccessToken(clientUserDetails, user))
+        `when`(jwtCreator.createAccessToken(clientUserDetails, user, roles))
                 .thenReturn(accessToken)
         `when`(jwtCreator.createRefreshToken())
                 .thenReturn(refreshToken)
 
         `when`(userRepo.findByEmailAndClientId(user.email, client.id))
                 .thenReturn(user)
+        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+                .thenReturn(roles)
 
         val tokenRequest = TokenRequest("password", user.email, "password", null)
         val result = oAuth2Service.password(tokenRequest)

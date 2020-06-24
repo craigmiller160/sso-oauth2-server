@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.craigmiller160</groupId>
-	<artifactId>sso-oauth2</artifactId>
+	<artifactId>sso-oauth2-server</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>

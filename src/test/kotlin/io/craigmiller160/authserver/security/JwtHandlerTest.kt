@@ -1,6 +1,11 @@
 package io.craigmiller160.authserver.security
 
 import com.nhaarman.mockito_kotlin.anyOrNull
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.RSASSASigner
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
@@ -12,14 +17,17 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import java.security.KeyPairGenerator
+import java.time.LocalDateTime
 import java.util.Base64
 import java.util.Date
 
@@ -28,8 +36,8 @@ class JwtHandlerTest {
 
     @Mock
     private lateinit var tokenConfig: TokenConfig
-    @Mock
-    private lateinit var legacyDateConverter: LegacyDateConverter
+    @Spy
+    private val legacyDateConverter = LegacyDateConverter()
 
     private val client = Client(
             id = 1L,
@@ -65,8 +73,8 @@ class JwtHandlerTest {
         val keyPair = keyPairGen.genKeyPair()
         `when`(tokenConfig.privateKey)
                 .thenReturn(keyPair.private)
-        `when`(legacyDateConverter.convertLocalDateTimeToDate(anyOrNull()))
-                .thenReturn(Date())
+        `when`(tokenConfig.publicKey)
+                .thenReturn(keyPair.public)
     }
 
     @Test
@@ -189,14 +197,53 @@ class JwtHandlerTest {
         assertThat(jsonObject.getLong("clientId"), equalTo(1L))
     }
 
+    private fun createJwt(withUser: Boolean, exp: Int): String {
+        val grantType = if (withUser) "password" else "client_credentials"
+        var claimBuilder = JWTClaimsSet.Builder()
+                .claim("clientId", client.id)
+                .claim("grantType", grantType)
+                .expirationTime(generateExp(exp))
+
+        if (withUser) {
+            claimBuilder = claimBuilder.claim("userId", user.id)
+        }
+
+        val claims = claimBuilder.build()
+        val header = JWSHeader.Builder(JWSAlgorithm.RS256)
+                .build()
+        val jwt = SignedJWT(header, claims)
+        val signer = RSASSASigner(tokenConfig.privateKey)
+
+        jwt.sign(signer)
+        return jwt.serialize()
+    }
+
+    private fun generateExp(expSecs: Int): Date {
+        val now = LocalDateTime.now()
+        val exp = now.plusSeconds(expSecs.toLong())
+        return legacyDateConverter.convertLocalDateTimeToDate(exp)
+    }
+
     @Test
     fun test_parseRefreshToken() {
-        TODO("Finish this")
+        val token = createJwt(false, 1000)
+
+        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(token, client.id)
+
+        assertEquals("client_credentials", grantType)
+        assertEquals(client.id, clientId)
+        assertNull(userId)
     }
 
     @Test
     fun test_parseRefreshToken_withUser() {
-        TODO("Finish this")
+        val token = createJwt(true, 1000)
+
+        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(token, client.id)
+
+        assertEquals("password", grantType)
+        assertEquals(client.id, clientId)
+        assertEquals(user.id, userId)
     }
 
     @Test

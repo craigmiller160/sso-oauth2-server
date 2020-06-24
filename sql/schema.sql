@@ -1,6 +1,10 @@
-CREATE SCHEMA auth_server;
+CREATE SCHEMA dev;
+CREATE SCHEMA prod;
 
-CREATE TABLE auth_server.users (
+-- SET search_path TO dev;
+-- SET search_path TO prod;
+
+CREATE TABLE users (
     id BIGSERIAL NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     first_name VARCHAR(255),
@@ -9,7 +13,7 @@ CREATE TABLE auth_server.users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE auth_server.clients (
+CREATE TABLE clients (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255),
     client_key VARCHAR(255) UNIQUE NOT NULL,
@@ -21,36 +25,36 @@ CREATE TABLE auth_server.clients (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE auth_server.roles (
+CREATE TABLE roles (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255) UNIQUE NOT NULL,
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
+    FOREIGN KEY (client_id) REFERENCES clients (id)
 );
 
-CREATE TABLE auth_server.client_users (
+CREATE TABLE client_users (
     id BIGSERIAL NOT NULL,
     user_id BIGINT NOT NULL,
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
-    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (client_id) REFERENCES clients (id)
 );
 
-CREATE TABLE auth_server.client_user_roles (
+CREATE TABLE client_user_roles (
     id BIGSERIAL NOT NULL,
     client_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
-    FOREIGN KEY (role_id) REFERENCES auth_server.roles (id),
-    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (role_id) REFERENCES roles (id),
+    FOREIGN KEY (client_id) REFERENCES clients (id),
     UNIQUE (client_id, user_id, role_id)
 );
 
-CREATE TABLE auth_server.refresh_tokens (
+CREATE TABLE refresh_tokens (
     id BIGSERIAL NOT NULL,
     refresh_token TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
@@ -79,13 +83,13 @@ CREATE OR REPLACE FUNCTION validate_client_user_role()
 
         SELECT COUNT(*)
         INTO role_has_client
-        FROM auth_server.roles
+        FROM roles
         WHERE id = NEW.role_id
         AND client_id = NEW.client_id;
 
         SELECT COUNT(*)
         INTO user_has_client
-        FROM auth_server.client_users
+        FROM client_users
         WHERE user_id = NEW.user_id
         AND client_id = NEW.client_id;
 
@@ -103,6 +107,6 @@ CREATE OR REPLACE FUNCTION validate_client_user_role()
 
 CREATE TRIGGER client_user_role_validation
     BEFORE INSERT OR UPDATE
-    ON auth_server.client_user_roles
+    ON client_user_roles
     FOR EACH ROW
     EXECUTE PROCEDURE validate_client_user_role();

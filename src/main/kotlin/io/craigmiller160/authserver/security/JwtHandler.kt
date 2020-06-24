@@ -15,7 +15,7 @@ import java.util.Date
 import java.util.UUID
 
 @Component
-class JwtCreator(
+class JwtHandler(
         private val tokenConfig: TokenConfig,
         private val legacyDateConverter: LegacyDateConverter
 ) {

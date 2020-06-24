@@ -9,7 +9,7 @@ import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
-import io.craigmiller160.authserver.security.JwtCreator
+import io.craigmiller160.authserver.security.JwtHandler
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 
 @Service
 class OAuth2Service (
-        private val jwtCreator: JwtCreator,
+        private val jwtHandler: JwtHandler,
         private val refreshTokenRepo: RefreshTokenRepository,
         private val userRepo: UserRepository,
         private val roleRepo: RoleRepository,
@@ -33,8 +33,8 @@ class OAuth2Service (
     @Secured(ClientAuthorities.CLIENT_CREDENTIALS)
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
-        val accessToken = jwtCreator.createAccessToken(clientUserDetails)
-        val refreshToken = jwtCreator.createRefreshToken()
+        val accessToken = jwtHandler.createAccessToken(clientUserDetails)
+        val refreshToken = jwtHandler.createRefreshToken()
         saveRefreshToken(refreshToken)
         return TokenResponse(accessToken, refreshToken)
     }
@@ -51,8 +51,8 @@ class OAuth2Service (
 
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 
-        val accessToken = jwtCreator.createAccessToken(clientUserDetails, user, roles)
-        val refreshToken = jwtCreator.createRefreshToken()
+        val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val refreshToken = jwtHandler.createRefreshToken()
         saveRefreshToken(refreshToken)
         return TokenResponse(accessToken, refreshToken)
     }

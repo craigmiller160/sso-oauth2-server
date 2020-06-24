@@ -23,7 +23,7 @@ import java.util.Base64
 import java.util.Date
 
 @ExtendWith(MockitoExtension::class)
-class JwtCreatorTest {
+class JwtHandlerTest {
 
     @Mock
     private lateinit var tokenConfig: TokenConfig
@@ -50,7 +50,7 @@ class JwtCreatorTest {
     )
 
     @InjectMocks
-    private lateinit var jwtCreator: JwtCreator
+    private lateinit var jwtHandler: JwtHandler
 
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
@@ -73,7 +73,7 @@ class JwtCreatorTest {
         `when`(tokenConfig.accessExpSecs)
                 .thenReturn(accessExpSecs)
 
-        val token = jwtCreator.createAccessToken(clientUserDetails)
+        val token = jwtHandler.createAccessToken(clientUserDetails)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -96,7 +96,7 @@ class JwtCreatorTest {
         `when`(tokenConfig.accessExpSecs)
                 .thenReturn(accessExpSecs)
 
-        val token = jwtCreator.createAccessToken(clientUserDetails, user)
+        val token = jwtHandler.createAccessToken(clientUserDetails, user)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -123,7 +123,7 @@ class JwtCreatorTest {
         val role = Role(1L, "Role1", 1L)
         val roles = listOf(role)
 
-        val token = jwtCreator.createAccessToken(clientUserDetails, user, roles)
+        val token = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -149,7 +149,7 @@ class JwtCreatorTest {
     fun test_createRefreshToken() {
         `when`(tokenConfig.refreshExpSecs)
                 .thenReturn(refreshExpSecs)
-        val token = jwtCreator.createRefreshToken()
+        val token = jwtHandler.createRefreshToken()
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))

@@ -12,7 +12,7 @@ import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
-import io.craigmiller160.authserver.security.JwtCreator
+import io.craigmiller160.authserver.security.JwtHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +35,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories
 class OAuth2ServiceTest {
 
     @Mock
-    private lateinit var jwtCreator: JwtCreator
+    private lateinit var jwtHandler: JwtHandler
     @Mock
     private lateinit var refreshTokenRepo: RefreshTokenRepository
     @Mock
@@ -101,9 +101,9 @@ class OAuth2ServiceTest {
     @Test
     fun test_clientCredentials() {
         setupSecurityContext()
-        `when`(jwtCreator.createAccessToken(clientUserDetails))
+        `when`(jwtHandler.createAccessToken(clientUserDetails))
                 .thenReturn(accessToken)
-        `when`(jwtCreator.createRefreshToken())
+        `when`(jwtHandler.createRefreshToken())
                 .thenReturn(refreshToken)
 
         val result = oAuth2Service.clientCredentials()
@@ -116,9 +116,9 @@ class OAuth2ServiceTest {
     @Test
     fun test_password() {
         setupSecurityContext()
-        `when`(jwtCreator.createAccessToken(clientUserDetails, user, roles))
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
                 .thenReturn(accessToken)
-        `when`(jwtCreator.createRefreshToken())
+        `when`(jwtHandler.createRefreshToken())
                 .thenReturn(refreshToken)
 
         `when`(userRepo.findByEmailAndClientId(user.email, client.id))

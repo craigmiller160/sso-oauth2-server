@@ -100,38 +100,40 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_clientCredentials() {
-        setupSecurityContext()
-        `when`(jwtHandler.createAccessToken(clientUserDetails))
-                .thenReturn(accessToken)
-        `when`(jwtHandler.createRefreshToken())
-                .thenReturn(refreshToken)
-
-        val result = oAuth2Service.clientCredentials()
-        assertEquals(TokenResponse(accessToken, refreshToken), result)
-
-        verify(refreshTokenRepo, times(1))
-                .save(isA<RefreshToken>())
+//        setupSecurityContext()
+//        `when`(jwtHandler.createAccessToken(clientUserDetails))
+//                .thenReturn(accessToken)
+//        `when`(jwtHandler.createRefreshToken())
+//                .thenReturn(refreshToken)
+//
+//        val result = oAuth2Service.clientCredentials()
+//        assertEquals(TokenResponse(accessToken, refreshToken), result)
+//
+//        verify(refreshTokenRepo, times(1))
+//                .save(isA<RefreshToken>())
+        TODO("Finish this")
     }
 
     @Test
     fun test_password() {
-        setupSecurityContext()
-        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
-                .thenReturn(accessToken)
-        `when`(jwtHandler.createRefreshToken())
-                .thenReturn(refreshToken)
-
-        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
-                .thenReturn(user)
-        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
-                .thenReturn(roles)
-
-        val tokenRequest = TokenRequest("password", user.email, "password", null)
-        val result = oAuth2Service.password(tokenRequest)
-        assertEquals(TokenResponse(accessToken, refreshToken), result)
-
-        verify(refreshTokenRepo, times(1))
-                .save(isA<RefreshToken>())
+//        setupSecurityContext()
+//        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+//                .thenReturn(accessToken)
+//        `when`(jwtHandler.createRefreshToken())
+//                .thenReturn(refreshToken)
+//
+//        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+//                .thenReturn(user)
+//        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+//                .thenReturn(roles)
+//
+//        val tokenRequest = TokenRequest("password", user.email, "password", null)
+//        val result = oAuth2Service.password(tokenRequest)
+//        assertEquals(TokenResponse(accessToken, refreshToken), result)
+//
+//        verify(refreshTokenRepo, times(1))
+//                .save(isA<RefreshToken>())
+        TODO("Finish this")
     }
 
     @Test

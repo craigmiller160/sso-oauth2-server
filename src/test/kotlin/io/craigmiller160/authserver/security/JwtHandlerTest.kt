@@ -147,19 +147,20 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken() {
-        `when`(tokenConfig.refreshExpSecs)
-                .thenReturn(refreshExpSecs)
-        val token = jwtHandler.createRefreshToken()
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
-        val jsonObject = JSONObject(body)
-        assertEquals(4, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
-        assertThat(jsonObject.getLong("exp"), notNullValue())
+//        `when`(tokenConfig.refreshExpSecs)
+//                .thenReturn(refreshExpSecs)
+//        val token = jwtHandler.createRefreshToken()
+//        val parts = token.split(".")
+//        val header = String(Base64.getDecoder().decode(parts[0]))
+//        val body = String(Base64.getDecoder().decode(parts[1]))
+//        assertEquals(expectedHeader, header)
+//        val jsonObject = JSONObject(body)
+//        assertEquals(4, jsonObject.length())
+//        assertThat(jsonObject.getLong("nbf"), notNullValue())
+//        assertThat(jsonObject.getLong("iat"), notNullValue())
+//        assertThat(jsonObject.getString("jti"), notNullValue())
+//        assertThat(jsonObject.getLong("exp"), notNullValue())
+        TODO("Finish this")
     }
 
 }

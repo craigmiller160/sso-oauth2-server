@@ -60,12 +60,15 @@ class JwtHandler(
         return jwt.serialize()
     }
 
-    fun createRefreshToken(): String {
-        // TODO probably need a subject for this one too
+    fun createRefreshToken(grantType: String, clientId: Long, userId: Long = 0): Pair<String,String> {
         val claims = createDefaultClaims(tokenConfig.refreshExpSecs)
+                .claim("grantType", grantType)
+                .claim("clientId", clientId)
+                .claim("userId", userId)
                 .build()
 
-        return createToken(claims)
+        val token = createToken(claims)
+        return Pair(token, claims.jwtid)
     }
 
 }

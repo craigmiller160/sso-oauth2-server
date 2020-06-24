@@ -9,6 +9,7 @@ import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
+import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -25,8 +26,8 @@ class OAuth2Service (
         private val passwordEncoder: PasswordEncoder
 ) {
 
-    private fun saveRefreshToken(refreshToken: String) {
-        val refreshTokenEntity = RefreshToken(0, refreshToken, LocalDateTime.now())
+    private fun saveRefreshToken(refreshToken: String, tokenId: String) {
+        val refreshTokenEntity = RefreshToken(tokenId, refreshToken, LocalDateTime.now())
         refreshTokenRepo.save(refreshTokenEntity)
     }
 
@@ -34,8 +35,8 @@ class OAuth2Service (
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val accessToken = jwtHandler.createAccessToken(clientUserDetails)
-        val refreshToken = jwtHandler.createRefreshToken()
-        saveRefreshToken(refreshToken)
+        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, clientUserDetails.client.id)
+        saveRefreshToken(refreshToken, tokenId)
         return TokenResponse(accessToken, refreshToken)
     }
 
@@ -52,8 +53,8 @@ class OAuth2Service (
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 
         val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
-        val refreshToken = jwtHandler.createRefreshToken()
-        saveRefreshToken(refreshToken)
+        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, clientUserDetails.client.id, user.id)
+        saveRefreshToken(refreshToken, tokenId)
         return TokenResponse(accessToken, refreshToken)
     }
 

@@ -1,9 +1,11 @@
 package io.craigmiller160.ssoauthserverexp.service
 
 import com.nhaarman.mockito_kotlin.isA
+import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
 import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.entity.Client
 import io.craigmiller160.ssoauthserverexp.entity.RefreshToken
+import io.craigmiller160.ssoauthserverexp.entity.User
 import io.craigmiller160.ssoauthserverexp.repository.RefreshTokenRepository
 import io.craigmiller160.ssoauthserverexp.repository.RoleRepository
 import io.craigmiller160.ssoauthserverexp.repository.UserRepository
@@ -19,10 +21,13 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @ExtendWith(MockitoExtension::class)
@@ -37,17 +42,18 @@ class OAuth2ServiceTest {
     @Mock
     private lateinit var roleRepo: RoleRepository
     @Mock
-    private lateinit var passwordEncoder: PasswordEncoder
-    @Mock
     private lateinit var securityContext: SecurityContext
     @Mock
     private lateinit var authentication: Authentication
+    @Spy
+    private val passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
     @InjectMocks
     private lateinit var oAuth2Service: OAuth2Service
 
     private val accessToken = "AccessToken"
     private val refreshToken = "RefreshToken"
+    private val password = "{bcrypt}\$2a\$10\$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe"
 
     private val client = Client(
             id = 1L,
@@ -60,6 +66,13 @@ class OAuth2ServiceTest {
             allowPassword = true
     )
     private val clientUserDetails = ClientUserDetails(client)
+    private val user = User(
+            id = 0,
+            email = "craig@gmail.com",
+            firstName = "Craig",
+            lastName = "Miller",
+            password = password
+    )
 
     private fun setupSecurityContext() {
         `when`(securityContext.authentication)
@@ -95,8 +108,30 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_password() {
-//        val result = oAuth2Service.password()
-//        assertEquals(TokenResponse("password", ""), result)
+        setupSecurityContext()
+        `when`(jwtCreator.createAccessToken(clientUserDetails, user))
+                .thenReturn(accessToken)
+        `when`(jwtCreator.createRefreshToken())
+                .thenReturn(refreshToken)
+
+        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+                .thenReturn(user)
+
+        val tokenRequest = TokenRequest("password", user.email, "password", null)
+        val result = oAuth2Service.password(tokenRequest)
+        assertEquals(TokenResponse(accessToken, refreshToken), result)
+
+        verify(refreshTokenRepo, times(1))
+                .save(isA<RefreshToken>())
+    }
+
+    @Test
+    fun test_password_noUserFound() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_password_wrongPassword() {
         TODO("Finish this")
     }
 

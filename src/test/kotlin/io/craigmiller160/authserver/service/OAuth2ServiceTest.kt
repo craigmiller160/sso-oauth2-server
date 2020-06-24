@@ -162,4 +162,9 @@ class OAuth2ServiceTest {
         assertEquals(TokenResponse("authCode", ""), result)
     }
 
+    @Test
+    fun test_refresh() {
+        TODO("Finish this")
+    }
+
 }

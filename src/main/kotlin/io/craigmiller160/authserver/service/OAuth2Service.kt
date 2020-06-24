@@ -63,4 +63,11 @@ class OAuth2Service (
         return TokenResponse("authCode", "")
     }
 
+    fun refresh(origRefreshToken: String): TokenResponse {
+        val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
+        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
+
+        TODO("Finish this")
+    }
+
 }

@@ -4,6 +4,9 @@ import io.craigmiller160.ssoauthserverexp.entity.Client
 import io.craigmiller160.ssoauthserverexp.entity.ClientUser
 import io.craigmiller160.ssoauthserverexp.entity.User
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,12 +66,15 @@ class UserRepositoryTest {
 
     @Test
     fun test_findByEmailAndClientId_found() {
-        TODO("Finish this")
+        val result = userRepo.findByEmailAndClientId(user.email, client.id)
+        assertNotNull(result)
+        assertEquals(user, result)
     }
 
     @Test
     fun test_findByEmailAndClientId_notFound() {
-        TODO("Finish this")
+        val result = userRepo.findByEmailAndClientId(user.email, 0)
+        assertNull(result)
     }
 
 }

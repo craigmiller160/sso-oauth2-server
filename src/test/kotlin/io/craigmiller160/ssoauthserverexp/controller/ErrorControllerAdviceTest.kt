@@ -51,4 +51,9 @@ class ErrorControllerAdviceTest {
         ))
     }
 
+    @Test
+    fun test_accessDeniedException() {
+        TODO("Finish this")
+    }
+
 }

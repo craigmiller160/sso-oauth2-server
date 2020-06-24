@@ -2,6 +2,7 @@ package io.craigmiller160.ssoauthserverexp.controller
 
 import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
 import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
+import io.craigmiller160.ssoauthserverexp.exception.BadRequestException
 import io.craigmiller160.ssoauthserverexp.exception.UnsupportedGrantTypeException
 import io.craigmiller160.ssoauthserverexp.security.GrantType
 import io.craigmiller160.ssoauthserverexp.service.OAuth2Service
@@ -35,12 +36,28 @@ class OAuth2ControllerTest {
     @Test
     fun test_token_password() {
         val tokenResponse = TokenResponse("password", "")
-        val request = TokenRequest(GrantType.PASSWORD, null, null, null)
+        val request = TokenRequest(GrantType.PASSWORD, "user", "pass", null)
         `when`(oAuth2Service.password(request))
                 .thenReturn(tokenResponse)
 
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
+    }
+
+    @Test
+    fun test_token_password_noUsername() {
+        val request = TokenRequest(GrantType.PASSWORD, null, "pass", null)
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_password_noPassword() {
+        val request = TokenRequest(GrantType.PASSWORD, "user", null, null)
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
     }
 
     @Test

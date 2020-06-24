@@ -30,7 +30,7 @@ class OAuth2Controller(
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {
-        if (GrantType.PASSWORD == tokenRequest.grant_type && (StringUtils.isBlank(tokenRequest.username) || StringUtils.isBlank(tokenRequest.username))) {
+        if (GrantType.PASSWORD == tokenRequest.grant_type && (StringUtils.isBlank(tokenRequest.username) || StringUtils.isBlank(tokenRequest.password))) {
             throw BadRequestException("Invalid token request")
         }
     }

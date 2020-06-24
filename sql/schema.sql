@@ -55,7 +55,7 @@ CREATE TABLE client_user_roles (
 );
 
 CREATE TABLE refresh_tokens (
-    id BIGSERIAL NOT NULL,
+    id VARCHAR(255) NOT NULL,
     refresh_token TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id)

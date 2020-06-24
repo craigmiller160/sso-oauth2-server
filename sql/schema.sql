@@ -7,12 +7,6 @@ CREATE TABLE users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE roles (
-    id BIGSERIAL NOT NULL,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE clients (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255),
@@ -23,6 +17,14 @@ CREATE TABLE clients (
     allow_password BOOLEAN DEFAULT false,
     allow_auth_code BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
+);
+
+CREATE TABLE roles (
+    id BIGSERIAL NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    client_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (client_id) REFERENCES clients (id)
 );
 
 CREATE TABLE client_user_roles (

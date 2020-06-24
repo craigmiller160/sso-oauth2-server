@@ -8,7 +8,5 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 class SsoAuthServerExpApplication
 
 fun main(args: Array<String>) {
-	println(BCryptPasswordEncoder().encode("password")) // TODO delete this
-
 	runApplication<SsoAuthServerExpApplication>(*args)
 }

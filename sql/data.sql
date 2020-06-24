@@ -14,5 +14,5 @@ VALUES (1, 'ROLE_READ', 2),
 INSERT INTO auth_server.client_users (id, user_id, client_id)
 VALUES (1, 1, 2);
 
-INSERT INTO auth_server.client_user_roles (id, user_id, client_id, role_id)
-VALUES (1, 1, 1), (1, 1, 2);
+INSERT INTO auth_server.client_user_roles (user_id, client_id, role_id)
+VALUES (1, 2, 1), (1, 2, 2);

@@ -3,13 +3,17 @@ package io.craigmiller160.authserver.security
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
+import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
+import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.springframework.stereotype.Component
+import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.Date
 import java.util.UUID
@@ -73,6 +77,23 @@ class JwtHandler(
 
         val token = createToken(claims)
         return Pair(token, claims.jwtid)
+    }
+
+    fun parseRefreshToken(refreshToken: String) {
+        val jwt = SignedJWT.parse(refreshToken)
+        val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey) // TODO make sure this doesn't blow up
+        if (!jwt.verify(verifier)) {
+            throw InvalidRefreshTokenException("Bad signature")
+        }
+
+        val claims = jwt.jwtClaimsSet
+        val now = LocalDateTime.now()
+        val exp = legacyDateConverter.convertDateToLocalDateTime(claims.expirationTime)
+        if(exp >= now) {
+            throw InvalidRefreshTokenException("Expired")
+        }
+
+        // TODO finish this
     }
 
 }

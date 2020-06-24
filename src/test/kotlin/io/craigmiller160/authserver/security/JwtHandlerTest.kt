@@ -189,4 +189,19 @@ class JwtHandlerTest {
         assertThat(jsonObject.getLong("clientId"), equalTo(1L))
     }
 
+    @Test
+    fun test_parseRefreshToken() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_parseRefreshToken_badSignature() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_parseRefreshToken_expired() {
+        TODO("Finish this")
+    }
+
 }

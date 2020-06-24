@@ -6,6 +6,8 @@ import io.craigmiller160.ssoauthserverexp.entity.ClientUserRole
 import io.craigmiller160.ssoauthserverexp.entity.Role
 import io.craigmiller160.ssoauthserverexp.entity.User
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -104,7 +106,10 @@ class RoleRepositoryTest {
 
     @Test
     fun test_findAllByUserIdAndClientId() {
-        TODO("Finish this")
+        val results = roleRepo.findAllByUserIdAndClientId(user.id, client.id)
+        assertEquals(2, results.size)
+        assertTrue(results.contains(role1))
+        assertTrue(results.contains(role2))
     }
 
 }

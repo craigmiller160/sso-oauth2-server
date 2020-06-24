@@ -1,6 +1,7 @@
 package io.craigmiller160.ssoauthserverexp.controller
 
 import io.craigmiller160.ssoauthserverexp.dto.TokenRequest
+import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.exception.UnsupportedGrantTypeException
 import io.craigmiller160.ssoauthserverexp.security.GrantTypes
 import io.craigmiller160.ssoauthserverexp.service.OAuth2Service
@@ -24,26 +25,29 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_clientCredentials() {
-        `when`(oAuth2Service.clientCredentials()).thenReturn("Success")
+        val tokenResponse = TokenResponse("clientCredentials", "")
+        `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)
         val request = TokenRequest(grant_type = GrantTypes.CLIENT_CREDENTIALS)
         val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+        assertEquals(tokenResponse, result)
     }
 
     @Test
     fun test_token_password() {
-        `when`(oAuth2Service.password()).thenReturn("Success")
+        val tokenResponse = TokenResponse("password", "")
+        `when`(oAuth2Service.password()).thenReturn(tokenResponse)
         val request = TokenRequest(grant_type = GrantTypes.PASSWORD)
         val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+        assertEquals(tokenResponse, result)
     }
 
     @Test
     fun test_token_authCode() {
-        `when`(oAuth2Service.authCode()).thenReturn("Success")
+        val tokenResponse = TokenResponse("authCode", "")
+        `when`(oAuth2Service.authCode()).thenReturn(tokenResponse)
         val request = TokenRequest(grant_type = GrantTypes.AUTH_CODE)
         val result = oAuth2Controller.token(request)
-        assertEquals("Success", result)
+        assertEquals(tokenResponse, result)
     }
 
     @Test

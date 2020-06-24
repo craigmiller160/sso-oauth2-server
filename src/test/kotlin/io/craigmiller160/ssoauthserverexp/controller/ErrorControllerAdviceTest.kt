@@ -22,7 +22,7 @@ class ErrorControllerAdviceTest {
     private val errorControllerAdvice = ErrorControllerAdvice()
 
     @Test
-    fun test_exception() {
+    fun test_exception_withAnnotation() {
         `when`(req.requestURI).thenReturn("uri")
         val ex = UnsupportedGrantTypeException("message")
 
@@ -31,6 +31,21 @@ class ErrorControllerAdviceTest {
                 hasProperty("status", equalTo(400)),
                 hasProperty("error", equalTo("Bad Request")),
                 hasProperty("message", equalTo("Unsupported OAuth2 Grant Type - message")),
+                hasProperty("timestamp", notNullValue()),
+                hasProperty("path", equalTo("uri"))
+        ))
+    }
+
+    @Test
+    fun test_exception() {
+        `when`(req.requestURI).thenReturn("uri")
+        val ex = Exception("message")
+
+        val error = errorControllerAdvice.exception(req, ex)
+        assertThat(error, allOf(
+                hasProperty("status", equalTo(500)),
+                hasProperty("error", equalTo("Internal Server Error")),
+                hasProperty("message", equalTo("Error - message")),
                 hasProperty("timestamp", notNullValue()),
                 hasProperty("path", equalTo("uri"))
         ))

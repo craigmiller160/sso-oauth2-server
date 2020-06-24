@@ -45,7 +45,7 @@ CREATE TABLE client_users (
 
 CREATE TABLE refresh_tokens (
     id BIGSERIAL NOT NULL,
-    refresh_token VARCHAR(255) NOT NULL,
+    refresh_token TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );

@@ -1,4 +1,6 @@
-CREATE TABLE users (
+CREATE SCHEMA auth_server;
+
+CREATE TABLE auth_server.users (
     id BIGSERIAL NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     first_name VARCHAR(255),
@@ -7,7 +9,7 @@ CREATE TABLE users (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE clients (
+CREATE TABLE auth_server.clients (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255),
     client_key VARCHAR(255) UNIQUE NOT NULL,
@@ -19,36 +21,36 @@ CREATE TABLE clients (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE roles (
+CREATE TABLE auth_server.roles (
     id BIGSERIAL NOT NULL,
     name VARCHAR(255) UNIQUE NOT NULL,
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (client_id) REFERENCES clients (id)
+    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
 );
 
-CREATE TABLE client_user_roles (
+CREATE TABLE auth_server.client_user_roles (
     id BIGSERIAL NOT NULL,
     client_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (role_id) REFERENCES roles (id),
-    FOREIGN KEY (client_id) REFERENCES clients (id),
+    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
+    FOREIGN KEY (role_id) REFERENCES auth_server.roles (id),
+    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id),
     UNIQUE (client_id, user_id, role_id)
 );
 
-CREATE TABLE client_users (
+CREATE TABLE auth_server.client_users (
     id BIGSERIAL NOT NULL,
     user_id BIGINT NOT NULL,
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (client_id) REFERENCES clients (id)
+    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
+    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
 );
 
-CREATE TABLE refresh_tokens (
+CREATE TABLE auth_server.refresh_tokens (
     id BIGSERIAL NOT NULL,
     refresh_token TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
@@ -79,13 +81,13 @@ CREATE FUNCTION validate_client_user_role()
 
         SELECT COUNT(*)
         INTO role_has_client
-        FROM roles
-        WHERE role_id = NEW.role_id
+        FROM auth_server.roles
+        WHERE id = NEW.role_id
         AND client_id = NEW.client_id;
 
         SELECT COUNT(*)
         INTO user_has_client
-        FROM user_clients
+        FROM auth_server.client_users
         WHERE user_id = NEW.user_id
         AND client_id = NEW.client_id;
 

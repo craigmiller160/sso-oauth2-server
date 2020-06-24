@@ -79,7 +79,7 @@ class JwtHandler(
         return Pair(token, claims.jwtid)
     }
 
-    fun parseRefreshToken(refreshToken: String, clientId: Long) {
+    fun parseRefreshToken(refreshToken: String, clientId: Long): Triple<String,Long,Long> {
         val jwt = SignedJWT.parse(refreshToken)
         val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey) // TODO make sure this doesn't blow up
         if (!jwt.verify(verifier)) {
@@ -98,7 +98,10 @@ class JwtHandler(
             throw InvalidRefreshTokenException("Invalid Client ID")
         }
 
-        // TODO finish this
+        val userId = claims.getLongClaim("userId")
+        val grantType = claims.getStringClaim("grantType")
+
+        return Triple(grantType, refreshClientId, userId)
     }
 
 }

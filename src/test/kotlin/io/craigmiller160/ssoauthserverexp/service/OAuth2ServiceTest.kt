@@ -6,6 +6,7 @@ import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.entity.Client
 import io.craigmiller160.ssoauthserverexp.entity.RefreshToken
 import io.craigmiller160.ssoauthserverexp.entity.User
+import io.craigmiller160.ssoauthserverexp.exception.InvalidLoginException
 import io.craigmiller160.ssoauthserverexp.repository.RefreshTokenRepository
 import io.craigmiller160.ssoauthserverexp.repository.RoleRepository
 import io.craigmiller160.ssoauthserverexp.repository.UserRepository
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -26,9 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
-import org.springframework.security.crypto.password.PasswordEncoder
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ServiceTest {
@@ -127,12 +127,22 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_password_noUserFound() {
-        TODO("Finish this")
+        setupSecurityContext()
+        val tokenRequest = TokenRequest("password", user.email, "password", null)
+
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
+        assertEquals("User does not exist for client", ex.message)
     }
 
     @Test
     fun test_password_wrongPassword() {
-        TODO("Finish this")
+        setupSecurityContext()
+
+        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+                .thenReturn(user)
+
+        val tokenRequest = TokenRequest("password", user.email, "password2", null)
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
     }
 
     @Test

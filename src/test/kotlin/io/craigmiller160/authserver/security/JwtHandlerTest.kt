@@ -198,9 +198,9 @@ class JwtHandlerTest {
         assertThat(jsonObject.getLong("clientId"), equalTo(1L))
     }
 
-    private fun createJwt(withUser: Boolean, exp: Int): String {
+    private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {
         `when`(tokenConfig.publicKey)
-                .thenReturn(keyPair.public)
+                .thenReturn(pair.public)
 
         val grantType = if (withUser) "password" else "client_credentials"
         var claimBuilder = JWTClaimsSet.Builder()
@@ -252,7 +252,13 @@ class JwtHandlerTest {
 
     @Test
     fun test_parseRefreshToken_badSignature() {
-        TODO("Finish this")
+        val keyPairGen = KeyPairGenerator.getInstance("RSA")
+        val keyPair = keyPairGen.genKeyPair()
+
+        val token = createJwt(true, 1000, keyPair)
+
+        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+        assertEquals("Bad Signature", ex.message)
     }
 
     @Test

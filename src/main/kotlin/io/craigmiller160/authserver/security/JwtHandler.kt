@@ -83,7 +83,7 @@ class JwtHandler(
         val jwt = SignedJWT.parse(refreshToken)
         val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey)
         if (!jwt.verify(verifier)) {
-            throw InvalidRefreshTokenException("Bad signature")
+            throw InvalidRefreshTokenException("Bad Signature")
         }
 
         val claims = jwt.jwtClaimsSet

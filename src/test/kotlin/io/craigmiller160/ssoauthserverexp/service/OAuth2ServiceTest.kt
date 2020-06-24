@@ -46,8 +46,9 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_password() {
-        val result = oAuth2Service.password()
-        assertEquals(TokenResponse("password", ""), result)
+//        val result = oAuth2Service.password()
+//        assertEquals(TokenResponse("password", ""), result)
+        TODO("Finish this")
     }
 
     @Test

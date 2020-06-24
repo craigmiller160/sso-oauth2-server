@@ -20,7 +20,7 @@ class OAuth2Controller(
     fun token(tokenRequest: TokenRequest): TokenResponse {
         return when (tokenRequest.grant_type) {
             GrantTypes.CLIENT_CREDENTIALS -> oAuth2Service.clientCredentials()
-            GrantTypes.PASSWORD -> oAuth2Service.password()
+            GrantTypes.PASSWORD -> oAuth2Service.password(tokenRequest)
             GrantTypes.AUTH_CODE -> oAuth2Service.authCode()
             else -> throw UnsupportedGrantTypeException(tokenRequest.grant_type)
         }

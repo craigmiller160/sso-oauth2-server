@@ -76,4 +76,14 @@ class OAuth2ControllerTest {
         assertEquals("foo", ex.message)
     }
 
+    @Test
+    fun test_token_refresh_noToken() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_token_refresh() {
+        TODO("Finish this")
+    }
+
 }

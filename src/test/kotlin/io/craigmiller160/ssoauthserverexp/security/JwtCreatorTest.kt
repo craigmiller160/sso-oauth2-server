@@ -3,6 +3,7 @@ package io.craigmiller160.ssoauthserverexp.security
 import com.nhaarman.mockito_kotlin.anyOrNull
 import io.craigmiller160.ssoauthserverexp.config.TokenConfig
 import io.craigmiller160.ssoauthserverexp.entity.Client
+import io.craigmiller160.ssoauthserverexp.entity.Role
 import io.craigmiller160.ssoauthserverexp.entity.User
 import io.craigmiller160.ssoauthserverexp.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
@@ -10,6 +11,7 @@ import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -79,7 +81,7 @@ class JwtCreatorTest {
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(7, jsonObject.length())
+        assertEquals(8, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
         assertThat(jsonObject.getString("jti"), notNullValue())
@@ -87,6 +89,7 @@ class JwtCreatorTest {
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(client.name))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertEquals(0, jsonObject.getJSONArray("roles").length())
     }
 
     @Test
@@ -101,7 +104,7 @@ class JwtCreatorTest {
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(8, jsonObject.length())
+        assertEquals(9, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
         assertThat(jsonObject.getString("jti"), notNullValue())
@@ -110,11 +113,37 @@ class JwtCreatorTest {
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
         assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertEquals(0, jsonObject.getJSONArray("roles").length())
     }
 
     @Test
     fun test_createAccessToken_clientUserAndRoles() {
-        TODO("Finish this")
+        `when`(tokenConfig.accessExpSecs)
+                .thenReturn(accessExpSecs)
+
+        val role = Role(1L, "Role1", 1L)
+        val roles = listOf(role)
+
+        val token = jwtCreator.createAccessToken(clientUserDetails, user, roles)
+        val parts = token.split(".")
+        val header = String(Base64.getDecoder().decode(parts[0]))
+        val body = String(Base64.getDecoder().decode(parts[1]))
+        assertEquals(expectedHeader, header)
+
+        val jsonObject = JSONObject(body)
+        assertEquals(9, jsonObject.length())
+        assertThat(jsonObject.getLong("nbf"), notNullValue())
+        assertThat(jsonObject.getLong("iat"), notNullValue())
+        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getLong("exp"), notNullValue())
+        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+        assertThat(jsonObject.getString("sub"), equalTo(user.email))
+        assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
+        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+
+        val rolesArray = jsonObject.getJSONArray("roles")
+        assertEquals(1, rolesArray.length())
+        assertEquals(role.name, rolesArray.getString(0))
     }
 
     @Test

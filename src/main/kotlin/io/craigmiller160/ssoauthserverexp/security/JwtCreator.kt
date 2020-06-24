@@ -28,10 +28,12 @@ class JwtCreator(
     }
 
     fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): String {
+        val roleNames = roles.map { it.name }
+
         var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
                 .claim("clientKey", clientUserDetails.username)
                 .claim("clientName", clientUserDetails.client.name)
-                .claim("roles", roles)
+                .claim("roles", roleNames)
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)

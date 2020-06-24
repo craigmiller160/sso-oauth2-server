@@ -57,7 +57,7 @@ CREATE TABLE auth_server.refresh_tokens (
     PRIMARY KEY (id)
 );
 
-CREATE FUNCTION validate_client_user_role()
+CREATE OR REPLACE FUNCTION validate_client_user_role()
     RETURNS trigger AS
     $BODY$
 
@@ -65,19 +65,17 @@ CREATE FUNCTION validate_client_user_role()
     DECLARE user_has_client INT;
 
     BEGIN
---         IF NEW.client_id IS NULL THEN
---             RAISE EXCEPTION 'client_id cannot be null';
---         END IF;
---
---         IF NEW.user_id IS NULL THEN
---             RAISE EXCEPTION 'user_id cannot be null';
---         END IF;
---
---         IF NEW.role_id IS NULL THEN
---             RAISE EXCEPTION 'role_id cannot be null';
---         END IF;
+        IF NEW.client_id IS NULL THEN
+            RAISE EXCEPTION 'client_id cannot be null';
+        END IF;
 
+        IF NEW.user_id IS NULL THEN
+            RAISE EXCEPTION 'user_id cannot be null';
+        END IF;
 
+        IF NEW.role_id IS NULL THEN
+            RAISE EXCEPTION 'role_id cannot be null';
+        END IF;
 
         SELECT COUNT(*)
         INTO role_has_client

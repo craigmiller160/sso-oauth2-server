@@ -1,6 +1,5 @@
 package io.craigmiller160.authserver.security
 
-import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
@@ -10,6 +9,7 @@ import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
@@ -20,12 +20,14 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
+import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.time.LocalDateTime
 import java.util.Base64
@@ -64,17 +66,16 @@ class JwtHandlerTest {
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
     private val expectedHeader = """{"alg":"RS256"}"""
+    private lateinit var keyPair: KeyPair
 
     @BeforeEach
     fun setup() {
         val keyPairGen = KeyPairGenerator.getInstance("RSA")
         keyPairGen.initialize(2048)
 
-        val keyPair = keyPairGen.genKeyPair()
+        keyPair = keyPairGen.genKeyPair()
         `when`(tokenConfig.privateKey)
                 .thenReturn(keyPair.private)
-        `when`(tokenConfig.publicKey)
-                .thenReturn(keyPair.public)
     }
 
     @Test
@@ -198,6 +199,9 @@ class JwtHandlerTest {
     }
 
     private fun createJwt(withUser: Boolean, exp: Int): String {
+        `when`(tokenConfig.publicKey)
+                .thenReturn(keyPair.public)
+
         val grantType = if (withUser) "password" else "client_credentials"
         var claimBuilder = JWTClaimsSet.Builder()
                 .claim("clientId", client.id)
@@ -253,12 +257,18 @@ class JwtHandlerTest {
 
     @Test
     fun test_parseRefreshToken_expired() {
-        TODO("Finish this")
+        val token = createJwt(true, -1000)
+
+        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+        assertEquals("Expired", ex.message)
     }
 
     @Test
     fun test_parseRefreshToken_badClientId() {
-        TODO("Finish this")
+        val token = createJwt(true, 1000)
+
+        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, 20) }
+        assertEquals("Invalid Client ID", ex.message)
     }
 
 }

@@ -27,7 +27,6 @@ class JwtCreator(
     }
 
     fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null): String {
-        val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
                 .claim("clientKey", clientUserDetails.username)
                 .claim("clientName", clientUserDetails.client.name)

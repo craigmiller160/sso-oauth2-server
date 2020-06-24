@@ -40,8 +40,10 @@ class OAuth2Service (
     @Secured(ClientAuthorities.PASSWORD)
     fun password(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
-        val user = userRepo.findByEmailAndClientId(tokenRequest.username, clientUserDetails.client.id)
+        val user = userRepo.findByEmailAndClientId(tokenRequest.username ?: "", clientUserDetails.client.id)
                 ?: throw InvalidLoginException("User does not exist for client")
+
+        // TODO validate password
 
         val accessToken = jwtCreator.createAccessToken(clientUserDetails, user)
         val refreshToken = jwtCreator.createRefreshToken()

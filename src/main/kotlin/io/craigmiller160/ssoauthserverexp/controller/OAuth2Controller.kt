@@ -18,6 +18,7 @@ class OAuth2Controller(
 
     @PostMapping("/token", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun token(tokenRequest: TokenRequest): TokenResponse {
+        // TODO add validation to TokenRequest
         return when (tokenRequest.grant_type) {
             GrantTypes.CLIENT_CREDENTIALS -> oAuth2Service.clientCredentials()
             GrantTypes.PASSWORD -> oAuth2Service.password(tokenRequest)

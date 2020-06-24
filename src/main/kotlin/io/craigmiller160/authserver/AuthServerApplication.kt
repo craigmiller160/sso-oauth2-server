@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SsoAuthServerExpApplication
+class AuthServerApplication
 
 fun main(args: Array<String>) {
-	runApplication<SsoAuthServerExpApplication>(*args)
+	runApplication<AuthServerApplication>(*args)
 }

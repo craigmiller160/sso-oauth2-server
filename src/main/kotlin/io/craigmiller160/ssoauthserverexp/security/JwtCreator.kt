@@ -30,12 +30,12 @@ class JwtCreator(
         val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
                 .claim("clientKey", clientUserDetails.username)
-                .claim("clientName", clientUserDetails.clientName)
+                .claim("clientName", clientUserDetails.client.name)
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)
                     .claim("userEmail", user.email)
-        } ?: claimBuilder.subject(clientUserDetails.clientName)
+        } ?: claimBuilder.subject(clientUserDetails.client.name)
 
         return createToken(claimBuilder.build())
     }

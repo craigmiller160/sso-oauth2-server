@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import java.lang.RuntimeException
 import java.security.KeyPairGenerator
 import java.util.Base64
 import java.util.Date
@@ -74,7 +75,7 @@ class JwtCreatorTest {
     }
 
     @Test
-    fun test_createAccessToken() {
+    fun test_createAccessToken_clientOnly() {
         `when`(securityContext.authentication)
                 .thenReturn(authentication)
         `when`(authentication.principal)
@@ -82,18 +83,24 @@ class JwtCreatorTest {
 
         `when`(tokenConfig.accessExpSecs)
                 .thenReturn(accessExpSecs)
-        val token = jwtCreator.createAccessToken()
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
-        val jsonObject = JSONObject(body)
-        assertEquals(5, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+//        val token = jwtCreator.createAccessToken()
+//        val parts = token.split(".")
+//        val header = String(Base64.getDecoder().decode(parts[0]))
+//        val body = String(Base64.getDecoder().decode(parts[1]))
+//        assertEquals(expectedHeader, header)
+//        val jsonObject = JSONObject(body)
+//        assertEquals(5, jsonObject.length())
+//        assertThat(jsonObject.getLong("nbf"), notNullValue())
+//        assertThat(jsonObject.getLong("iat"), notNullValue())
+//        assertThat(jsonObject.getString("jti"), notNullValue())
+//        assertThat(jsonObject.getLong("exp"), notNullValue())
+//        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_createAccessToken_clientAndUser() {
+        TODO("Finish this")
     }
 
     @Test

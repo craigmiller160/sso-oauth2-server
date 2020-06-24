@@ -154,6 +154,7 @@ class OAuth2ServiceTest {
 
         val tokenRequest = TokenRequest("password", user.email, "password2", null)
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
+        assertEquals("Invalid credentials", ex.message)
     }
 
     @Test

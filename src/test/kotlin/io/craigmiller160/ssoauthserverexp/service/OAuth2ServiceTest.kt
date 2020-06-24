@@ -4,6 +4,8 @@ import com.nhaarman.mockito_kotlin.isA
 import io.craigmiller160.ssoauthserverexp.dto.TokenResponse
 import io.craigmiller160.ssoauthserverexp.entity.RefreshToken
 import io.craigmiller160.ssoauthserverexp.repository.RefreshTokenRepository
+import io.craigmiller160.ssoauthserverexp.repository.RoleRepository
+import io.craigmiller160.ssoauthserverexp.repository.UserRepository
 import io.craigmiller160.ssoauthserverexp.security.JwtCreator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -14,6 +16,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ServiceTest {
@@ -22,6 +25,12 @@ class OAuth2ServiceTest {
     private lateinit var jwtCreator: JwtCreator
     @Mock
     private lateinit var refreshTokenRepo: RefreshTokenRepository
+    @Mock
+    private lateinit var userRepo: UserRepository
+    @Mock
+    private lateinit var roleRepo: RoleRepository
+    @Mock
+    private lateinit var passwordEncoder: PasswordEncoder
 
     @InjectMocks
     private lateinit var oAuth2Service: OAuth2Service

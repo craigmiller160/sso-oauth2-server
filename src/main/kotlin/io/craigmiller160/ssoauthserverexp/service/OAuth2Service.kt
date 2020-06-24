@@ -49,6 +49,8 @@ class OAuth2Service (
             throw InvalidLoginException("Invalid credentials")
         }
 
+        // TODO add roles
+
         val accessToken = jwtCreator.createAccessToken(clientUserDetails, user)
         val refreshToken = jwtCreator.createRefreshToken()
         saveRefreshToken(refreshToken)

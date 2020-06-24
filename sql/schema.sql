@@ -29,6 +29,15 @@ CREATE TABLE auth_server.roles (
     FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
 );
 
+CREATE TABLE auth_server.client_users (
+    id BIGSERIAL NOT NULL,
+    user_id BIGINT NOT NULL,
+    client_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
+    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
+);
+
 CREATE TABLE auth_server.client_user_roles (
     id BIGSERIAL NOT NULL,
     client_id BIGINT NOT NULL,
@@ -39,15 +48,6 @@ CREATE TABLE auth_server.client_user_roles (
     FOREIGN KEY (role_id) REFERENCES auth_server.roles (id),
     FOREIGN KEY (client_id) REFERENCES auth_server.clients (id),
     UNIQUE (client_id, user_id, role_id)
-);
-
-CREATE TABLE auth_server.client_users (
-    id BIGSERIAL NOT NULL,
-    user_id BIGINT NOT NULL,
-    client_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES auth_server.users (id),
-    FOREIGN KEY (client_id) REFERENCES auth_server.clients (id)
 );
 
 CREATE TABLE auth_server.refresh_tokens (

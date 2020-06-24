@@ -7,11 +7,11 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "roles")
-data class Role (
+@Table(name = "client_users")
+data class ClientUser (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
-        val name: String,
+        val userId: Long,
         val clientId: Long
 )

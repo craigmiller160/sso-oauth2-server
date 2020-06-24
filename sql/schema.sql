@@ -54,3 +54,49 @@ CREATE TABLE refresh_tokens (
     timestamp TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );
+
+CREATE FUNCTION validate_client_user_role()
+    RETURNS trigger AS
+    $BODY$
+
+    DECLARE role_has_client INT;
+    DECLARE user_has_client INT;
+
+    BEGIN
+--         IF NEW.client_id IS NULL THEN
+--             RAISE EXCEPTION 'client_id cannot be null';
+--         END IF;
+--
+--         IF NEW.user_id IS NULL THEN
+--             RAISE EXCEPTION 'user_id cannot be null';
+--         END IF;
+--
+--         IF NEW.role_id IS NULL THEN
+--             RAISE EXCEPTION 'role_id cannot be null';
+--         END IF;
+
+
+
+        SELECT COUNT(*)
+        INTO role_has_client
+        FROM roles
+        WHERE role_id = NEW.role_id
+        AND client_id = NEW.client_id;
+
+        SELECT COUNT(*)
+        INTO user_has_client
+        FROM user_clients
+        WHERE user_id = NEW.user_id
+        AND client_id = NEW.client_id;
+
+        IF role_has_client = 0 THEN
+            RAISE EXCEPTION 'Role is not allowed by client';
+        END IF;
+
+        IF user_has_client = 0 THEN
+            RAISE EXCEPTION 'User is not allowed by client';
+        END IF;
+
+        RETURN NEW;
+    END
+    $BODY$;

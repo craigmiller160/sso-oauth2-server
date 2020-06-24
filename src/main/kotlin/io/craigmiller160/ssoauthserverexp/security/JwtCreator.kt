@@ -29,6 +29,7 @@ class JwtCreator(
         val userDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val claims = createDefaultClaims(tokenConfig.accessExpSecs)
                 .claim("clientKey", userDetails.username)
+                .claim("clientName", userDetails.clientName)
                 .build()
 
         return createToken(claims)

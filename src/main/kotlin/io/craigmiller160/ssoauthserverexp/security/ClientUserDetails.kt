@@ -6,6 +6,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 data class ClientUserDetails(private val client: Client): UserDetails {
+
+    val clientName = client.name
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         val authorities = mutableListOf<GrantedAuthority>()
         if (client.allowClientCredentials) {

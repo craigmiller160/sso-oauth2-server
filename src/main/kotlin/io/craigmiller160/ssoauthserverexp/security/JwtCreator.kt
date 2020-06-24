@@ -6,6 +6,7 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.ssoauthserverexp.config.TokenConfig
+import io.craigmiller160.ssoauthserverexp.entity.Role
 import io.craigmiller160.ssoauthserverexp.entity.User
 import io.craigmiller160.ssoauthserverexp.util.LegacyDateConverter
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,10 +27,11 @@ class JwtCreator(
         return legacyDateConverter.convertLocalDateTimeToDate(exp)
     }
 
-    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null): String {
+    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): String {
         var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
                 .claim("clientKey", clientUserDetails.username)
                 .claim("clientName", clientUserDetails.client.name)
+                .claim("roles", roles)
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)

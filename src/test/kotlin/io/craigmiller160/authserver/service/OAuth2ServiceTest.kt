@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.service
 
 import com.nhaarman.mockito_kotlin.isA
+import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
@@ -8,6 +9,7 @@ import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -31,6 +33,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
+import java.time.LocalDateTime
+import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ServiceTest {
@@ -81,6 +85,12 @@ class OAuth2ServiceTest {
             clientId = 1L
     )
     private val roles = listOf(role)
+    private val tokenData = RefreshTokenData(
+            tokenId = "TokenId",
+            grantType = "GrantType",
+            clientId = client.id,
+            userId = user.id
+    )
 
     private fun setupSecurityContext() {
         `when`(securityContext.authentication)
@@ -164,17 +174,51 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_refresh() {
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+
+        val result = oAuth2Service.refresh(refreshToken)
+
+        verify(refreshTokenRepo, times(1))
+                .delete(refreshTokenEntity)
+
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_refresh_noUser() {
         TODO("Finish this")
     }
 
     @Test
     fun test_refresh_noTokenInDb() {
-        TODO("Finish this")
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
+        assertEquals("Refresh Token Revoked", ex.message)
     }
 
     @Test
     fun test_refresh_invalidUserId() {
-        TODO("Finish this")
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+
+        val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
+        assertEquals("Invalid Refresh UserID", ex.message)
     }
 
 }

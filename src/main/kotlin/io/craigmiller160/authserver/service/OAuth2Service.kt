@@ -38,6 +38,7 @@ class OAuth2Service (
     }
 
     @Secured(ClientAuthorities.CLIENT_CREDENTIALS)
+    @Transactional
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val accessToken = jwtHandler.createAccessToken(clientUserDetails)
@@ -47,6 +48,7 @@ class OAuth2Service (
     }
 
     @Secured(ClientAuthorities.PASSWORD)
+    @Transactional
     fun password(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val user = userRepo.findByEmailAndClientId(tokenRequest.username ?: "", clientUserDetails.client.id)

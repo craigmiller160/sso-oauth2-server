@@ -52,12 +52,24 @@ class RefreshTokenRepositoryTest {
 
     @Test
     fun test_removeClientOnlyRefresh() {
-        TODO("Finish this")
+        val result = refreshTokenRepo.removeClientOnlyRefresh(1)
+        assertEquals(1, result)
+        val count = refreshTokenRepo.count()
+        assertEquals(3, count)
+
+        val remaining = refreshTokenRepo.findById("4").get()
+        assertEquals(token4, remaining)
     }
 
     @Test
     fun test_removeClientUserRefresh() {
-        TODO("Finish this")
+        val result = refreshTokenRepo.removeClientUserRefresh(2, 1)
+        assertEquals(1, result)
+        val count = refreshTokenRepo.count()
+        assertEquals(3, count)
+
+        val remaining = refreshTokenRepo.findById("3").get()
+        assertEquals(token3, remaining)
     }
 
 }

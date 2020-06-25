@@ -20,11 +20,11 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
     @Transactional
     @Modifying
     @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId IS NULL")
-    fun removeClientOnlyRefresh(@Param("clientId") clientId: Long)
+    fun removeClientOnlyRefresh(@Param("clientId") clientId: Long): Int
 
     @Transactional
     @Modifying
     @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId = :userId")
-    fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long)
+    fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long): Int
 
 }

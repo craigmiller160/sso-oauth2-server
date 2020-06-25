@@ -57,8 +57,12 @@ CREATE TABLE client_user_roles (
 CREATE TABLE refresh_tokens (
     id VARCHAR(255) NOT NULL,
     refresh_token TEXT NOT NULL,
+    client_id BIGINT NOT NULL,
+    user_id BIGINT,
     timestamp TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (client_id) REFERENCES clients (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE OR REPLACE FUNCTION validate_client_user_role()

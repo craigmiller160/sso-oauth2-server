@@ -50,8 +50,8 @@ class JwtHandlerTest {
             allowClientCredentials = true,
             allowAuthCode = true,
             allowPassword = true,
-            accessTokenTimeoutSecs = 0,
-            refreshTokenTimeoutSecs = 0
+            accessTokenTimeoutSecs = 200,
+            refreshTokenTimeoutSecs = 200
     )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = User(

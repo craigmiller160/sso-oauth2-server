@@ -74,8 +74,8 @@ class OAuth2ServiceTest {
             allowClientCredentials = true,
             allowAuthCode = true,
             allowPassword = true,
-            accessTokenTimeoutSecs = 0,
-            refreshTokenTimeoutSecs = 0
+            accessTokenTimeoutSecs = 300,
+            refreshTokenTimeoutSecs = 300
     )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = User(

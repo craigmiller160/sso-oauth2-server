@@ -83,9 +83,6 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientOnly() {
-        `when`(tokenConfig.accessExpSecs)
-                .thenReturn(accessExpSecs)
-
         val token = jwtHandler.createAccessToken(clientUserDetails)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
@@ -106,9 +103,6 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientAndUser() {
-        `when`(tokenConfig.accessExpSecs)
-                .thenReturn(accessExpSecs)
-
         val token = jwtHandler.createAccessToken(clientUserDetails, user)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
@@ -130,9 +124,6 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientUserAndRoles() {
-        `when`(tokenConfig.accessExpSecs)
-                .thenReturn(accessExpSecs)
-
         val role = Role(1L, "Role1", 1L)
         val roles = listOf(role)
 
@@ -160,9 +151,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken() {
-        `when`(tokenConfig.refreshExpSecs)
-                .thenReturn(refreshExpSecs)
-        val (token, tokenId) = jwtHandler.createRefreshToken("password", 1L, 1L)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L)
         assertNotNull(tokenId)
 
         val parts = token.split(".")
@@ -182,9 +171,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken_noUser() {
-        `when`(tokenConfig.refreshExpSecs)
-                .thenReturn(refreshExpSecs)
-        val (token, tokenId) = jwtHandler.createRefreshToken("password", 1L)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password")
         assertNotNull(tokenId)
 
         val parts = token.split(".")

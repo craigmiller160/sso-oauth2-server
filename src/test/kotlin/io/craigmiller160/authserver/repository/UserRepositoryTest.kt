@@ -45,7 +45,9 @@ class UserRepositoryTest {
                 enabled = true,
                 allowClientCredentials = false,
                 allowPassword = false,
-                allowAuthCode = false
+                allowAuthCode = false,
+                accessTokenTimeoutSecs = 0,
+                refreshTokenTimeoutSecs = 0
         )
         client = clientRepo.save(client)
 

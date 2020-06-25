@@ -21,7 +21,7 @@ class ClientUserDetailsServiceTest {
 
     @Mock
     private lateinit var clientRepo: ClientRepository
-    private val client = Client(10, "GHI", "ABC", "DEF", true, false, false, false)
+    private val client = Client(10, "GHI", "ABC", "DEF", true, false, false, false, 0, 0)
 
     @InjectMocks
     private lateinit var clientUserDetailsService: ClientUserDetailsService

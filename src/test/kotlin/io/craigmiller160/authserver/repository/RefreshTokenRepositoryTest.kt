@@ -21,9 +21,9 @@ class RefreshTokenRepositoryTest {
 
     @BeforeEach
     fun setup() {
-        token1 = RefreshToken("1", "ABC", LocalDateTime.of(2020, 1, 1, 1, 1))
-        token2 = RefreshToken("2", "DEF", LocalDateTime.of(2020, 2, 2, 2, 2))
-        token3 = RefreshToken("3", "GHI", LocalDateTime.now())
+        token1 = RefreshToken("1", "ABC", 1, 1, LocalDateTime.of(2020, 1, 1, 1, 1))
+        token2 = RefreshToken("2", "DEF", 1, 1, LocalDateTime.of(2020, 2, 2, 2, 2))
+        token3 = RefreshToken("3", "GHI", 1, 1, LocalDateTime.now())
 
         token1 = refreshTokenRepo.save(token1)
         token2 = refreshTokenRepo.save(token2)

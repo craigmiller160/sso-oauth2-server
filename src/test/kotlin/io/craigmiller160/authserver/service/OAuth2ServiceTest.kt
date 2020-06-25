@@ -167,4 +167,14 @@ class OAuth2ServiceTest {
         TODO("Finish this")
     }
 
+    @Test
+    fun test_refresh_noTokenInDb() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_refresh_invalidUserId() {
+        TODO("Finish this")
+    }
+
 }

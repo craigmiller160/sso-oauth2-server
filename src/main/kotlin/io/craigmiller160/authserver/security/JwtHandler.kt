@@ -3,19 +3,24 @@ package io.craigmiller160.authserver.security
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
+import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
+import io.craigmiller160.authserver.dto.RefreshTokenData
+import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.springframework.stereotype.Component
+import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
 import java.util.Date
 import java.util.UUID
 
 @Component
-class JwtCreator(
+class JwtHandler(
         private val tokenConfig: TokenConfig,
         private val legacyDateConverter: LegacyDateConverter
 ) {
@@ -60,12 +65,45 @@ class JwtCreator(
         return jwt.serialize()
     }
 
-    fun createRefreshToken(): String {
-        // TODO probably need a subject for this one too
-        val claims = createDefaultClaims(tokenConfig.refreshExpSecs)
-                .build()
+    fun createRefreshToken(grantType: String, clientId: Long, userId: Long = 0): Pair<String,String> {
+        var claimBuilder = createDefaultClaims(tokenConfig.refreshExpSecs)
+                .claim("grantType", grantType)
+                .claim("clientId", clientId)
 
-        return createToken(claims)
+        if (userId > 0) {
+            claimBuilder = claimBuilder.claim("userId", userId)
+        }
+
+        val claims = claimBuilder.build()
+
+        val token = createToken(claims)
+        return Pair(token, claims.jwtid)
+    }
+
+    fun parseRefreshToken(refreshToken: String, clientId: Long): RefreshTokenData {
+        val jwt = SignedJWT.parse(refreshToken)
+        val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey)
+        if (!jwt.verify(verifier)) {
+            throw InvalidRefreshTokenException("Bad Signature")
+        }
+
+        val claims = jwt.jwtClaimsSet
+        val now = LocalDateTime.now()
+        val exp = legacyDateConverter.convertDateToLocalDateTime(claims.expirationTime)
+        if(exp < now) {
+            throw InvalidRefreshTokenException("Expired")
+        }
+
+        val refreshClientId = claims.getLongClaim("clientId")
+        if (refreshClientId != clientId) {
+            throw InvalidRefreshTokenException("Invalid Client ID")
+        }
+
+        val userId = claims.getLongClaim("userId")
+        val grantType = claims.getStringClaim("grantType")
+        val tokenId = claims.jwtid
+
+        return RefreshTokenData(tokenId, grantType, refreshClientId, userId)
     }
 
 }

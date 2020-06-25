@@ -11,8 +11,7 @@ import javax.persistence.Table
 @Table(name = "refresh_tokens")
 data class RefreshToken (
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Long,
+        val id: String,
         val refreshToken: String,
         val timestamp: LocalDateTime
 )

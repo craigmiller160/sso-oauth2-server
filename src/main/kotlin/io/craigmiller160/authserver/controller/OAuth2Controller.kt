@@ -25,12 +25,17 @@ class OAuth2Controller(
             GrantType.CLIENT_CREDENTIALS -> oAuth2Service.clientCredentials()
             GrantType.PASSWORD -> oAuth2Service.password(tokenRequest)
             GrantType.AUTH_CODE -> oAuth2Service.authCode()
+            GrantType.REFRESH_TOKEN -> oAuth2Service.refresh(tokenRequest.refresh_token!!)
             else -> throw UnsupportedGrantTypeException(tokenRequest.grant_type)
         }
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {
         if (GrantType.PASSWORD == tokenRequest.grant_type && (StringUtils.isBlank(tokenRequest.username) || StringUtils.isBlank(tokenRequest.password))) {
+            throw BadRequestException("Invalid token request")
+        }
+
+        if (GrantType.REFRESH_TOKEN == tokenRequest.grant_type && StringUtils.isBlank(tokenRequest.refresh_token)) {
             throw BadRequestException("Invalid token request")
         }
     }

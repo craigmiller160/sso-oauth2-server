@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Repository
-interface RefreshTokenRepository : JpaRepository<RefreshToken,Long> {
+interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
 
     @Transactional
     @Modifying

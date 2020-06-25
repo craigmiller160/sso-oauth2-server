@@ -76,4 +76,23 @@ class OAuth2ControllerTest {
         assertEquals("foo", ex.message)
     }
 
+    @Test
+    fun test_token_refresh_noToken() {
+        val request = TokenRequest(GrantType.REFRESH_TOKEN, null, null, null)
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_refresh() {
+        val tokenResponse = TokenResponse("refresh", "")
+        val token = "ABCDEFG"
+        val request = TokenRequest(GrantType.REFRESH_TOKEN, null, null, token)
+        `when`(oAuth2Service.refresh(token))
+                .thenReturn(tokenResponse)
+
+        val result = oAuth2Controller.token(request)
+        assertEquals(tokenResponse, result)
+    }
+
 }

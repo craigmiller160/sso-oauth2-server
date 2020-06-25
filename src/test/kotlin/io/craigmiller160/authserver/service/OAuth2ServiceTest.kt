@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.service
 
 import com.nhaarman.mockito_kotlin.isA
+import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
@@ -8,11 +9,17 @@ import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
-import io.craigmiller160.authserver.security.JwtCreator
+import io.craigmiller160.authserver.security.GrantType
+import io.craigmiller160.authserver.security.JwtHandler
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasProperty
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -30,12 +37,14 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
+import java.time.LocalDateTime
+import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ServiceTest {
 
     @Mock
-    private lateinit var jwtCreator: JwtCreator
+    private lateinit var jwtHandler: JwtHandler
     @Mock
     private lateinit var refreshTokenRepo: RefreshTokenRepository
     @Mock
@@ -80,6 +89,12 @@ class OAuth2ServiceTest {
             clientId = 1L
     )
     private val roles = listOf(role)
+    private val tokenData = RefreshTokenData(
+            tokenId = "TokenId",
+            grantType = "GrantType",
+            clientId = client.id,
+            userId = user.id
+    )
 
     private fun setupSecurityContext() {
         `when`(securityContext.authentication)
@@ -101,10 +116,10 @@ class OAuth2ServiceTest {
     @Test
     fun test_clientCredentials() {
         setupSecurityContext()
-        `when`(jwtCreator.createAccessToken(clientUserDetails))
+        `when`(jwtHandler.createAccessToken(clientUserDetails))
                 .thenReturn(accessToken)
-        `when`(jwtCreator.createRefreshToken())
-                .thenReturn(refreshToken)
+        `when`(jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, client.id))
+                .thenReturn(Pair(refreshToken, "ABC"))
 
         val result = oAuth2Service.clientCredentials()
         assertEquals(TokenResponse(accessToken, refreshToken), result)
@@ -116,10 +131,10 @@ class OAuth2ServiceTest {
     @Test
     fun test_password() {
         setupSecurityContext()
-        `when`(jwtCreator.createAccessToken(clientUserDetails, user, roles))
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
                 .thenReturn(accessToken)
-        `when`(jwtCreator.createRefreshToken())
-                .thenReturn(refreshToken)
+        `when`(jwtHandler.createRefreshToken(GrantType.PASSWORD, client.id, user.id))
+                .thenReturn(Pair(refreshToken, "ABC"))
 
         `when`(userRepo.findByEmailAndClientId(user.email, client.id))
                 .thenReturn(user)
@@ -152,12 +167,93 @@ class OAuth2ServiceTest {
 
         val tokenRequest = TokenRequest("password", user.email, "password2", null)
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
+        assertEquals("Invalid credentials", ex.message)
     }
 
     @Test
     fun test_authCode() {
         val result = oAuth2Service.authCode()
         assertEquals(TokenResponse("authCode", ""), result)
+    }
+
+    @Test
+    fun test_refresh() {
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+        `when`(userRepo.findById(tokenData.userId!!))
+                .thenReturn(Optional.of(user))
+        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+                .thenReturn(roles)
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(tokenData.grantType, client.id, user.id))
+                .thenReturn(Pair(refreshToken, tokenData.tokenId))
+
+        val result = oAuth2Service.refresh(refreshToken)
+        assertThat(result, allOf(
+                hasProperty("accessToken", equalTo(accessToken)),
+                hasProperty("refreshToken", equalTo(refreshToken))
+        ))
+
+        verify(refreshTokenRepo, times(1))
+                .delete(refreshTokenEntity)
+    }
+
+    @Test
+    fun test_refresh_noUser() {
+        setupSecurityContext()
+        val tokenData = this.tokenData.copy(userId = null)
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+        `when`(jwtHandler.createAccessToken(clientUserDetails))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(tokenData.grantType, client.id))
+                .thenReturn(Pair(refreshToken, tokenData.tokenId))
+
+        val result = oAuth2Service.refresh(refreshToken)
+        assertThat(result, allOf(
+                hasProperty("accessToken", equalTo(accessToken)),
+                hasProperty("refreshToken", equalTo(refreshToken))
+        ))
+
+        verify(refreshTokenRepo, times(1))
+                .delete(refreshTokenEntity)
+    }
+
+    @Test
+    fun test_refresh_noTokenInDb() {
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
+        assertEquals("Refresh Token Revoked", ex.message)
+    }
+
+    @Test
+    fun test_refresh_invalidUserId() {
+        setupSecurityContext()
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+
+        val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
+        assertEquals("Invalid Refresh UserID", ex.message)
     }
 
 }

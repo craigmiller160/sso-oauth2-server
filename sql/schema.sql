@@ -22,6 +22,8 @@ CREATE TABLE clients (
     allow_client_credentials BOOLEAN DEFAULT false,
     allow_password BOOLEAN DEFAULT false,
     allow_auth_code BOOLEAN DEFAULT false,
+    access_token_timeout_secs INT NOT NULL,
+    refresh_token_timeout_secs INT NOT NULL,
     PRIMARY KEY (id)
 );
 

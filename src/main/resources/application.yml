@@ -27,8 +27,6 @@ spring:
 
 security:
   token:
-    access-exp-secs: 300
-    refresh-exp-secs: 3600
     key-store-path: classpath:keys/jwt.jks
     key-store-type: JKS
     key-store-password: password

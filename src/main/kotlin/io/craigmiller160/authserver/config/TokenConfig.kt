@@ -19,8 +19,6 @@ import javax.annotation.PostConstruct
 @Configuration
 @ConfigurationProperties(prefix = "security.token")
 class TokenConfig (
-        var accessExpSecs: Int = 0,
-        var refreshExpSecs: Int = 0,
         var keyStorePath: String = "",
         var keyStoreType: String = "",
         var keyStorePassword: String = "",

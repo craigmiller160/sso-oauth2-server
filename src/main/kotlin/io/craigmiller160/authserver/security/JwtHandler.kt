@@ -34,7 +34,7 @@ class JwtHandler(
     fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): String {
         val roleNames = roles.map { it.name }
 
-        var claimBuilder = createDefaultClaims(tokenConfig.accessExpSecs)
+        var claimBuilder = createDefaultClaims(clientUserDetails.client.accessTokenTimeoutSecs)
                 .claim("clientKey", clientUserDetails.username)
                 .claim("clientName", clientUserDetails.client.name)
                 .claim("roles", roleNames)
@@ -65,10 +65,10 @@ class JwtHandler(
         return jwt.serialize()
     }
 
-    fun createRefreshToken(grantType: String, clientId: Long, userId: Long = 0): Pair<String,String> {
-        var claimBuilder = createDefaultClaims(tokenConfig.refreshExpSecs)
+    fun createRefreshToken(clientUserDetails: ClientUserDetails, grantType: String, userId: Long = 0): Pair<String,String> {
+        var claimBuilder = createDefaultClaims(clientUserDetails.client.refreshTokenTimeoutSecs)
                 .claim("grantType", grantType)
-                .claim("clientId", clientId)
+                .claim("clientId", clientUserDetails.client.id)
 
         if (userId > 0) {
             claimBuilder = claimBuilder.claim("userId", userId)

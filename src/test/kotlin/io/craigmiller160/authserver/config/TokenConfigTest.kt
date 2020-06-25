@@ -21,8 +21,6 @@ class TokenConfigTest {
     @BeforeEach
     fun setup() {
         tokenConfig = TokenConfig(
-                accessExpSecs,
-                refreshExpSecs,
                 "",
                 keyStoreType,
                 keyStorePassword,

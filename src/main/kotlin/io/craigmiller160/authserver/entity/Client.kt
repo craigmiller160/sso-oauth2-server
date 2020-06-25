@@ -18,5 +18,7 @@ data class Client (
         val enabled: Boolean,
         val allowClientCredentials: Boolean,
         val allowPassword: Boolean,
-        val allowAuthCode: Boolean
+        val allowAuthCode: Boolean,
+        val accessTokenTimeoutSecs: Int,
+        val refreshTokenTimeoutSecs: Int
 )

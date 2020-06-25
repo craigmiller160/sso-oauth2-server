@@ -73,7 +73,7 @@ class OAuth2Service (
         val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 
         val existingTokenEntity = refreshTokenRepo.findById(tokenData.tokenId)
-                .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") } // TODO make sure this works
+                .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") }
 
         refreshTokenRepo.delete(existingTokenEntity)
 

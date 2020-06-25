@@ -16,6 +16,10 @@ import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasProperty
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -182,18 +186,49 @@ class OAuth2ServiceTest {
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
+        `when`(userRepo.findById(tokenData.userId!!))
+                .thenReturn(Optional.of(user))
+        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+                .thenReturn(roles)
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(tokenData.grantType, client.id, user.id))
+                .thenReturn(Pair(refreshToken, tokenData.tokenId))
 
         val result = oAuth2Service.refresh(refreshToken)
+        assertThat(result, allOf(
+                hasProperty("accessToken", equalTo(accessToken)),
+                hasProperty("refreshToken", equalTo(refreshToken))
+        ))
 
         verify(refreshTokenRepo, times(1))
                 .delete(refreshTokenEntity)
-
-        TODO("Finish this")
     }
 
     @Test
     fun test_refresh_noUser() {
-        TODO("Finish this")
+        setupSecurityContext()
+        val tokenData = this.tokenData.copy(userId = null)
+        `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
+                .thenReturn(tokenData)
+
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+
+        `when`(refreshTokenRepo.findById(tokenData.tokenId))
+                .thenReturn(Optional.of(refreshTokenEntity))
+        `when`(jwtHandler.createAccessToken(clientUserDetails))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(tokenData.grantType, client.id))
+                .thenReturn(Pair(refreshToken, tokenData.tokenId))
+
+        val result = oAuth2Service.refresh(refreshToken)
+        assertThat(result, allOf(
+                hasProperty("accessToken", equalTo(accessToken)),
+                hasProperty("refreshToken", equalTo(refreshToken))
+        ))
+
+        verify(refreshTokenRepo, times(1))
+                .delete(refreshTokenEntity)
     }
 
     @Test

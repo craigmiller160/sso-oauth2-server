@@ -45,8 +45,9 @@ class RefreshTokenRepositoryTest {
         assertEquals(2, result)
 
         val remaining = refreshTokenRepo.findAll()
-        assertEquals(1, remaining.size)
+        assertEquals(2, remaining.size)
         assertEquals(token3, remaining[0])
+        assertEquals(token4, remaining[1])
     }
 
     @Test

@@ -38,4 +38,16 @@ The client key/secret are provided via Basic Auth. Otherwise, just the grant typ
 
 The `password` grant type is a simple user authentication flow. It is useful for multi-user applications where different users have different permissions.
 
-The client key/secret are provided via Basic Auth. Otherwise, the grant type is set to "password", and the username/password must be included in the urlencoded body. 
+The client key/secret are provided via Basic Auth. Otherwise, the grant type is set to "password", and the username/password must be included in the urlencoded body.
+
+### refresh_token
+
+```
+    POST /oauth/token
+    Authorization: Basic #####
+    grant_type=refresh_token&refresh_token=######
+``` 
+
+The `refresh_token` grant type is used to refresh a token. All authentication flows provide refresh tokens, which will be used after the access token expires.
+
+The client key/secret are provided via Basic Auth. Otherwise, the grant type is set to "refresh_token", and the refresh token itself must be included in the urlencoded body.

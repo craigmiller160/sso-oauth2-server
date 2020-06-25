@@ -3,7 +3,10 @@ package io.craigmiller160.authserver.service
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
+import io.craigmiller160.authserver.entity.Role
+import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
+import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -16,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import javax.transaction.Transactional
 
 @Service
 class OAuth2Service (
@@ -63,11 +67,29 @@ class OAuth2Service (
         return TokenResponse("authCode", "")
     }
 
+    @Transactional
     fun refresh(origRefreshToken: String): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
-        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
+        val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 
-        TODO("Finish this")
+        val existingTokenEntity = refreshTokenRepo.findById(tokenData.tokenId)
+                .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") } // TODO make sure this works
+
+        refreshTokenRepo.delete(existingTokenEntity)
+
+        val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
+            val user = userRepo.findById(userId)
+                    .orElseThrow { InvalidRefreshTokenException("Invalid Refresh UserID") }
+
+            val roles = roleRepo.findAllByUserIdAndClientId(userId, clientUserDetails.client.id)
+            Pair(user, roles)
+        }
+
+        val accessToken = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
+        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(tokenData.grantType, clientUserDetails.client.id, tokenData.userId ?: 0)
+        saveRefreshToken(refreshToken, tokenId)
+
+        return TokenResponse(accessToken, refreshToken)
     }
 
 }

@@ -16,6 +16,6 @@ data class RefreshToken (
         val clientId: Long,
         val userId: Long?,
         val timestamp: LocalDateTime,
-        val accessTokenTimeoutSecs: Long,
-        val refreshTokenTimeoutSecs: Long
+        val accessTokenTimeoutSecs: Int,
+        val refreshTokenTimeoutSecs: Int
 )

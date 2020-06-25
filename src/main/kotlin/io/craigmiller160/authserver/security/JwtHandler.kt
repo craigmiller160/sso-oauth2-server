@@ -7,6 +7,7 @@ import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
+import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
@@ -79,7 +80,7 @@ class JwtHandler(
         return Pair(token, claims.jwtid)
     }
 
-    fun parseRefreshToken(refreshToken: String, clientId: Long): Triple<String,Long,Long?> {
+    fun parseRefreshToken(refreshToken: String, clientId: Long): RefreshTokenData {
         val jwt = SignedJWT.parse(refreshToken)
         val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey)
         if (!jwt.verify(verifier)) {
@@ -100,8 +101,9 @@ class JwtHandler(
 
         val userId = claims.getLongClaim("userId")
         val grantType = claims.getStringClaim("grantType")
+        val tokenId = claims.jwtid
 
-        return Triple(grantType, refreshClientId, userId)
+        return RefreshTokenData(tokenId, grantType, refreshClientId, userId)
     }
 
 }

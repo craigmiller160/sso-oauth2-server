@@ -66,6 +66,7 @@ class JwtHandlerTest {
     private val accessExpSecs = 10
     private val refreshExpSecs = 20
     private val expectedHeader = """{"alg":"RS256"}"""
+    private val tokenId = "ABCDEFG"
     private lateinit var keyPair: KeyPair
 
     @BeforeEach
@@ -207,6 +208,7 @@ class JwtHandlerTest {
                 .claim("clientId", client.id)
                 .claim("grantType", grantType)
                 .expirationTime(generateExp(exp))
+                .jwtID(tokenId)
 
         if (withUser) {
             claimBuilder = claimBuilder.claim("userId", user.id)
@@ -232,22 +234,24 @@ class JwtHandlerTest {
     fun test_parseRefreshToken() {
         val token = createJwt(false, 1000)
 
-        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(token, client.id)
+        val data = jwtHandler.parseRefreshToken(token, client.id)
 
-        assertEquals("client_credentials", grantType)
-        assertEquals(client.id, clientId)
-        assertNull(userId)
+        assertEquals("client_credentials", data.grantType)
+        assertEquals(client.id, data.clientId)
+        assertEquals(tokenId, data.tokenId)
+        assertNull(data.userId)
     }
 
     @Test
     fun test_parseRefreshToken_withUser() {
         val token = createJwt(true, 1000)
 
-        val (grantType, clientId, userId) = jwtHandler.parseRefreshToken(token, client.id)
+        val data = jwtHandler.parseRefreshToken(token, client.id)
 
-        assertEquals("password", grantType)
-        assertEquals(client.id, clientId)
-        assertEquals(user.id, userId)
+        assertEquals("password", data.grantType)
+        assertEquals(client.id, data.clientId)
+        assertEquals(user.id, data.userId)
+        assertEquals(tokenId, data.tokenId)
     }
 
     @Test

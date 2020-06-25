@@ -126,6 +126,8 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
+        verify(refreshTokenRepo, times(1))
+                .removeClientOnlyRefresh(client.id)
     }
 
     @Test
@@ -147,6 +149,8 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
+        verify(refreshTokenRepo, times(1))
+                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
@@ -182,7 +186,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, user.id, LocalDateTime.now())
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
@@ -203,6 +207,8 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .delete(refreshTokenEntity)
+        verify(refreshTokenRepo, times(1))
+                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
@@ -212,7 +218,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, null, LocalDateTime.now())
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
@@ -229,6 +235,8 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .delete(refreshTokenEntity)
+        verify(refreshTokenRepo, times(1))
+                .removeClientOnlyRefresh(client.id)
     }
 
     @Test
@@ -247,7 +255,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, 2L, LocalDateTime.now())
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))

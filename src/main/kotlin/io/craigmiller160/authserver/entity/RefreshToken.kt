@@ -13,5 +13,7 @@ data class RefreshToken (
         @Id
         val id: String,
         val refreshToken: String,
+        val clientId: Long,
+        val userId: Long?,
         val timestamp: LocalDateTime
 )

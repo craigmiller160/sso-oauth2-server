@@ -17,4 +17,14 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
     @Query("DELETE FROM RefreshToken WHERE timestamp < :maxTimestamp")
     fun removeOldTokens(@Param("maxTimestamp") maxTimestamp: LocalDateTime): Int
 
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId IS NULL")
+    fun removeClientOnlyRefresh(@Param("clientId") clientId: Long): Int
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId = :userId")
+    fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long): Int
+
 }

@@ -30,21 +30,25 @@ class OAuth2Service (
         private val passwordEncoder: PasswordEncoder
 ) {
 
-    private fun saveRefreshToken(refreshToken: String, tokenId: String) {
-        val refreshTokenEntity = RefreshToken(tokenId, refreshToken, LocalDateTime.now())
+    private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
+        val refreshTokenEntity = RefreshToken(tokenId, refreshToken, clientId, userId, LocalDateTime.now())
+        userId?.let { refreshTokenRepo.removeClientUserRefresh(clientId, userId) }
+                ?: refreshTokenRepo.removeClientOnlyRefresh(clientId)
         refreshTokenRepo.save(refreshTokenEntity)
     }
 
     @Secured(ClientAuthorities.CLIENT_CREDENTIALS)
+    @Transactional
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val accessToken = jwtHandler.createAccessToken(clientUserDetails)
         val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.CLIENT_CREDENTIALS, clientUserDetails.client.id)
-        saveRefreshToken(refreshToken, tokenId)
+        saveRefreshToken(refreshToken, tokenId, clientUserDetails.client.id)
         return TokenResponse(accessToken, refreshToken)
     }
 
     @Secured(ClientAuthorities.PASSWORD)
+    @Transactional
     fun password(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val user = userRepo.findByEmailAndClientId(tokenRequest.username ?: "", clientUserDetails.client.id)
@@ -58,7 +62,7 @@ class OAuth2Service (
 
         val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val (refreshToken, tokenId) = jwtHandler.createRefreshToken(GrantType.PASSWORD, clientUserDetails.client.id, user.id)
-        saveRefreshToken(refreshToken, tokenId)
+        saveRefreshToken(refreshToken, tokenId, clientUserDetails.client.id, user.id)
         return TokenResponse(accessToken, refreshToken)
     }
 
@@ -87,7 +91,7 @@ class OAuth2Service (
 
         val accessToken = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
         val (refreshToken, tokenId) = jwtHandler.createRefreshToken(tokenData.grantType, clientUserDetails.client.id, tokenData.userId ?: 0)
-        saveRefreshToken(refreshToken, tokenId)
+        saveRefreshToken(refreshToken, tokenId, tokenData.clientId, tokenData.userId)
 
         return TokenResponse(accessToken, refreshToken)
     }

@@ -16,6 +16,7 @@ import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
+import io.craigmiller160.authserver.testutils.TestData
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.equalTo
@@ -65,18 +66,7 @@ class OAuth2ServiceTest {
     private val refreshToken = "RefreshToken"
     private val password = "{bcrypt}\$2a\$10\$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe"
 
-    private val client = Client(
-            id = 1L,
-            name = "Name",
-            clientKey = "Key",
-            clientSecret = "Secret",
-            enabled = true,
-            allowClientCredentials = true,
-            allowAuthCode = true,
-            allowPassword = true,
-            accessTokenTimeoutSecs = 300,
-            refreshTokenTimeoutSecs = 300
-    )
+    private val client = TestData.createClient()
     private val clientUserDetails = ClientUserDetails(client)
     private val user = User(
             id = 1L,

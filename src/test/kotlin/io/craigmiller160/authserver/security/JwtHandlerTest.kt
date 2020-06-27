@@ -10,6 +10,7 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
@@ -41,26 +42,9 @@ class JwtHandlerTest {
     @Spy
     private val legacyDateConverter = LegacyDateConverter()
 
-    private val client = Client(
-            id = 1L,
-            name = "Name",
-            clientKey = "Key",
-            clientSecret = "Secret",
-            enabled = true,
-            allowClientCredentials = true,
-            allowAuthCode = true,
-            allowPassword = true,
-            accessTokenTimeoutSecs = 200,
-            refreshTokenTimeoutSecs = 200
-    )
+    private val client = TestData.createClient()
     private val clientUserDetails = ClientUserDetails(client)
-    private val user = User(
-            id = 1L,
-            email = "craig@gmail.com",
-            password = "password",
-            firstName = "Craig",
-            lastName = "Miller"
-    )
+    private val user = TestData.createUser()
 
     @InjectMocks
     private lateinit var jwtHandler: JwtHandler

@@ -11,7 +11,12 @@ class UIService (
 ) {
 
     fun validateRequest(pageRequest: PageRequest) {
+        if (pageRequest.response_type != "code") {
+            throw BadRequestException("Invalid response type")
+        }
+
         val client = clientRepo.findByClientKey(pageRequest.client_id) ?: throw BadRequestException("Client not supported")
+
         if (client.redirectUri == null || client.redirectUri != pageRequest.redirect_uri) {
             throw BadRequestException("Invalid redirect URI")
         }

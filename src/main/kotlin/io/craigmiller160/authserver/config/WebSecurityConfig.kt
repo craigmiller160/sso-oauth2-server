@@ -34,7 +34,7 @@ class WebSecurityConfig(
                     .and()
                     .authorizeRequests()
                     .antMatchers("/jwk", "/ui/**/*").permitAll()
-                    .anyRequest().permitAll() // TODO revert to fully authenticated
+                    .anyRequest().fullyAuthenticated()
                     .and()
                     .requiresChannel().anyRequest().requiresSecure()
                     .and()

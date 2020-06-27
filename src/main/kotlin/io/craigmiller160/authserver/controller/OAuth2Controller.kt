@@ -34,6 +34,7 @@ class OAuth2Controller(
     @PostMapping("/auth")
     fun authCode(login: AuthCodeLogin) {
         println(login) // TODO delete this
+        // TODO do something here
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {

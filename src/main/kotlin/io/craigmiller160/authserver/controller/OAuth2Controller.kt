@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.controller
 
+import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.exception.BadRequestException
@@ -28,6 +29,11 @@ class OAuth2Controller(
             GrantType.REFRESH_TOKEN -> oAuth2Service.refresh(tokenRequest.refresh_token!!)
             else -> throw UnsupportedGrantTypeException(tokenRequest.grant_type)
         }
+    }
+
+    @PostMapping("/auth")
+    fun authCode(login: AuthCodeLogin) {
+        println(login) // TODO delete this
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {

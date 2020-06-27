@@ -42,7 +42,10 @@ class JwtHandlerTest {
     @Spy
     private val legacyDateConverter = LegacyDateConverter()
 
-    private val client = TestData.createClient()
+    private val client = TestData.createClient(
+            accessTokenTimeoutSecs = 300,
+            refreshTokenTimeoutSecs = 300
+    )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = TestData.createUser()
 
@@ -149,7 +152,7 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(1L))
+        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
         assertThat(jsonObject.getLong("userId"), equalTo(1L))
     }
 
@@ -169,7 +172,7 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(1L))
+        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
     }
 
     private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {

@@ -8,7 +8,7 @@ import io.craigmiller160.authserver.entity.User
 
 object TestData {
 
-    fun createClient() = Client(
+    fun createClient(accessTokenTimeoutSecs: Int = 0, refreshTokenTimeoutSecs: Int = 0) = Client(
             id = 0,
             name = "Name",
             clientKey = "Key",
@@ -17,8 +17,8 @@ object TestData {
             allowClientCredentials = true,
             allowAuthCode = true,
             allowPassword = true,
-            accessTokenTimeoutSecs = 0,
-            refreshTokenTimeoutSecs = 0,
+            accessTokenTimeoutSecs = accessTokenTimeoutSecs,
+            refreshTokenTimeoutSecs = refreshTokenTimeoutSecs,
             redirectUri = null
     )
 

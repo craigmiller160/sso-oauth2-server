@@ -39,10 +39,25 @@
                         <label for="password">Password</label>
                         <input id="password" name="password" class="form-control" type="password" />
                     </div>
+                    <input id="clientId" type="hidden" name="clientId" />
+                    <input id="redirectUri" type="hidden" name="redirectUri" />
+                    <!-- TODO need to handle a state parameter too -->
                     <button type="submit" class="btn btn-success">Login</button>
                 </form>
             </div>
         </div>
     </div>
+    <script>
+        var queryString = window.location.search.replace('?', '');
+        var queryParams = queryString.split('&')
+            .reduce((acc, param) => {
+                var parts = param.split('=');
+                acc[parts[0]] = parts[1];
+                return acc;
+            }, {});
+
+        document.querySelector('#clientId').value = queryParams.clientId;
+        document.querySelector('#redirectUri').value = queryParams.redirectUri;
+    </script>
 </body>
 </html>

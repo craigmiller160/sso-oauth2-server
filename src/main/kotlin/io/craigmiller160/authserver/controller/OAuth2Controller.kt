@@ -21,8 +21,8 @@ class OAuth2Controller(
         private val oAuth2Service: OAuth2Service
 ) {
 
-    @GetMapping("/auth/{resourceName}") // TODO need special security restrictions here... how to do this?
-    fun getMapping(@PathVariable resourceName: String): InputStream {
+    @GetMapping("/auth/{resourceName}", produces = [MediaType.TEXT_HTML_VALUE]) // TODO need special security restrictions here... how to do this?
+    fun getMapping(@PathVariable resourceName: String): InputStream? {
         return javaClass.classLoader.getResourceAsStream("ui/$resourceName")
     }
 

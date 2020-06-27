@@ -33,7 +33,7 @@ class WebSecurityConfig(
                     .antMatchers("/oauth/**/*", "/jwk")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/jwk", "/oauth/auth/**").permitAll() // TODO this is too permissive for the /auth stuff
+                    .antMatchers("/jwk", "ui/**").permitAll()
                     .anyRequest().fullyAuthenticated()
                     .and()
                     .requiresChannel().anyRequest().requiresSecure()

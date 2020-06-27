@@ -52,4 +52,4 @@ THEN THERE IS A REDIRECT TO THE ORIGINAL REDIRECT URI
 GET https://original-redirect-url.com?code=#######
 
 
-https://localhost:7003/ui/login.html?clientId=abc&redirectUri=def
+https://localhost:7003/ui/login.html?response_type=code&client_id=abc&redirect_uri=def

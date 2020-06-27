@@ -20,5 +20,6 @@ data class Client (
         val allowPassword: Boolean,
         val allowAuthCode: Boolean,
         val accessTokenTimeoutSecs: Int,
-        val refreshTokenTimeoutSecs: Int
+        val refreshTokenTimeoutSecs: Int,
+        val redirectUri: String?
 )

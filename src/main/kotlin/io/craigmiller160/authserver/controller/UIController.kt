@@ -14,12 +14,26 @@ class UIController {
 
     @GetMapping("/resources/css/{resourceName}")
     fun getCss(@PathVariable resourceName: String, res: HttpServletResponse) {
-        javaClass.classLoader.getResourceAsStream("ui/css/$resourceName")?.let { resourceStream ->
-            res.contentType = "text/css"
-            IOUtils.copy(resourceStream, res.writer, StandardCharsets.UTF_8)
-        } ?: res.apply {
-            status = 404
-        }
+        javaClass.classLoader.getResourceAsStream("ui/css/$resourceName")
+                ?.let { resourceStream ->
+                    res.contentType = "text/css"
+                    IOUtils.copy(resourceStream, res.writer, StandardCharsets.UTF_8)
+                }
+                ?: res.apply {
+                    status = 404
+                }
+    }
+
+    @GetMapping("/{pageName}")
+    fun getPage(@PathVariable pageName: String, res: HttpServletResponse) {
+        javaClass.classLoader.getResourceAsStream("ui/$pageName")
+                ?.let { pageStream ->
+                    res.contentType = "text/html"
+                    IOUtils.copy(pageStream, res.writer, StandardCharsets.UTF_8)
+                }
+                ?: res.apply {
+                    status = 404
+                }
     }
 
 }

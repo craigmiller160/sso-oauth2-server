@@ -41,6 +41,7 @@
                     </div>
                     <input id="clientId" type="hidden" name="clientId" />
                     <input id="redirectUri" type="hidden" name="redirectUri" />
+                    <input id="responseType" type="hidden" name="responseType" />
                     <!-- TODO need to handle a state parameter too -->
                     <button type="submit" class="btn btn-success">Login</button>
                 </form>
@@ -58,6 +59,7 @@
 
         document.querySelector('#clientId').value = queryParams.client_id;
         document.querySelector('#redirectUri').value = queryParams.redirect_uri;
+        document.querySelector('#responseType').value = queryParams.response_type;
     </script>
 </body>
 </html>

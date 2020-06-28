@@ -1,11 +1,26 @@
 package io.craigmiller160.authserver.security
 
 import io.craigmiller160.authserver.config.TokenConfig
+import io.craigmiller160.authserver.exception.AuthCodeException
+import io.craigmiller160.authserver.testutils.JwtUtils
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
+import java.security.KeyPair
 
+@ExtendWith(MockitoExtension::class)
 class AuthCodeHandlerTest {
+
+    private val clientId = 1L
+    private val userId = 2L
+    private val expSecs = 60
 
     @Mock
     private lateinit var tokenConfig: TokenConfig
@@ -13,23 +28,44 @@ class AuthCodeHandlerTest {
     @InjectMocks
     private lateinit var authCodeHandler: AuthCodeHandler
 
-    @Test
+    private lateinit var keyPair: KeyPair
+
+    @BeforeEach
     fun setup() {
-
+        keyPair = JwtUtils.createKeyPair()
     }
 
     @Test
-    fun test_createAuthCode() {
-        TODO("Finish this")
-    }
+    fun test_createAuthCode_and_validateAuthCode() {
+        `when`(tokenConfig.privateKey)
+                .thenReturn(keyPair.private)
+        `when`(tokenConfig.publicKey)
+                .thenReturn(keyPair.public)
 
-    @Test
-    fun test_validateAuthCode() {
-        TODO("Finish this")
+        val authCode = authCodeHandler.createAuthCode(clientId, userId, expSecs)
+        assertNotNull(authCode)
+
+        val (resultClientId, resultUserId) = authCodeHandler.validateAuthCode(authCode)
+        assertEquals(clientId, resultClientId)
+        assertEquals(userId, resultUserId)
     }
 
     @Test
     fun test_validateAuthCode_expired() {
+        `when`(tokenConfig.privateKey)
+                .thenReturn(keyPair.private)
+        `when`(tokenConfig.publicKey)
+                .thenReturn(keyPair.public)
+
+        val authCode = authCodeHandler.createAuthCode(clientId, userId, -100)
+        assertNotNull(authCode)
+
+        val ex = assertThrows<AuthCodeException> { authCodeHandler.validateAuthCode(authCode) }
+        assertEquals("Auth Code is expired", ex.message)
+    }
+
+    @Test
+    fun test_validateAuthCode_invalidEncryption() {
         TODO("Finish this")
     }
 

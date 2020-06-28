@@ -26,7 +26,7 @@ class AuthCodeHandler (
     fun validateAuthCode(authCode: String): Pair<Long,Long> {
         val encryptedBytes = Base64.getDecoder().decode(authCode)
         val cipher = Cipher.getInstance("RSA")
-        cipher.init(Cipher.DECRYPT_MODE, tokenConfig.privateKey)
+        cipher.init(Cipher.DECRYPT_MODE, tokenConfig.publicKey)
 
         val decryptedBytes = cipher.doFinal(encryptedBytes)
         val rawToken = String(decryptedBytes)

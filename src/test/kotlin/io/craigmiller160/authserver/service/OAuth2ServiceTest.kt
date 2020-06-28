@@ -256,4 +256,14 @@ class OAuth2ServiceTest {
         assertEquals("Invalid Refresh UserID", ex.message)
     }
 
+    @Test
+    fun test_authCodeLogin() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_validateAuthCodeLogin() {
+        TODO("Finish this")
+    }
+
 }

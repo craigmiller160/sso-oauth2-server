@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.service
 
+import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
@@ -69,6 +70,14 @@ class OAuth2Service (
     @Secured(ClientAuthorities.AUTH_CODE)
     fun authCode(): TokenResponse {
         return TokenResponse("authCode", "")
+    }
+
+    fun authCodeLogin(login: AuthCodeLogin) {
+        TODO("Finish this")
+    }
+
+    fun validateAuthCodeLogin(login: AuthCodeLogin) {
+        TODO("Finish this")
     }
 
     @Transactional

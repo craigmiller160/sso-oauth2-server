@@ -10,6 +10,7 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.testutils.JwtUtils
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
@@ -60,10 +61,7 @@ class JwtHandlerTest {
 
     @BeforeEach
     fun setup() {
-        val keyPairGen = KeyPairGenerator.getInstance("RSA")
-        keyPairGen.initialize(2048)
-
-        keyPair = keyPairGen.genKeyPair()
+        keyPair = JwtUtils.createKeyPair()
         `when`(tokenConfig.privateKey)
                 .thenReturn(keyPair.private)
     }
@@ -232,8 +230,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_parseRefreshToken_badSignature() {
-        val keyPairGen = KeyPairGenerator.getInstance("RSA")
-        val keyPair = keyPairGen.genKeyPair()
+        val keyPair = JwtUtils.createKeyPair()
 
         val token = createJwt(true, 1000, keyPair)
 

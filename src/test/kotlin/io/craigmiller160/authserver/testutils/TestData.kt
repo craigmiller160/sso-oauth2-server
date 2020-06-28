@@ -19,6 +19,7 @@ object TestData {
             allowPassword = true,
             accessTokenTimeoutSecs = accessTokenTimeoutSecs,
             refreshTokenTimeoutSecs = refreshTokenTimeoutSecs,
+            authCodeTimeoutSecs = 0,
             redirectUri = null
     )
 

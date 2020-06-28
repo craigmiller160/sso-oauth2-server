@@ -85,6 +85,8 @@ class OAuth2Service (
         val user = userRepo.findByEmailAndClientId(login.username, client.id)
                 ?: throw AuthCodeException("User not found")
 
+        // TODO validate password
+
         return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!)
     }
 

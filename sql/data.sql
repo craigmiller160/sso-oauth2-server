@@ -13,7 +13,7 @@ VALUES (1, 'ROLE_READ', 2),
        (2, 'ROLE_WRITE', 2);
 
 INSERT INTO dev.client_users (id, user_id, client_id)
-VALUES (1, 1, 2);
+VALUES (1, 1, 2), (2, 3, 3);
 
 INSERT INTO dev.client_user_roles (user_id, client_id, role_id)
 VALUES (1, 2, 1), (1, 2, 2);

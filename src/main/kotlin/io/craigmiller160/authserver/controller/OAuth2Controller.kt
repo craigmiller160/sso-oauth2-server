@@ -36,8 +36,9 @@ class OAuth2Controller(
     fun authCode(login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
-        // TODO return 302 and redirect to redirectUri with code as query param
-        TODO("Finish this")
+        val redirectUrl = "${login.redirectUri}?code=$authCode"
+        res.status = 302
+        res.addHeader("Location", redirectUrl)
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {

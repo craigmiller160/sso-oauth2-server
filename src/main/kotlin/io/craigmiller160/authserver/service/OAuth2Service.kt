@@ -75,7 +75,7 @@ class OAuth2Service (
 
     @Secured(ClientAuthorities.AUTH_CODE)
     fun authCode(): TokenResponse {
-        return TokenResponse("authCode", "")
+        TODO("Finish this")
     }
 
     fun authCodeLogin(login: AuthCodeLogin): String {

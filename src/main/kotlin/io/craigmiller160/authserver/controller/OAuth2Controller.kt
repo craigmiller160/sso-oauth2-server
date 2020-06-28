@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/oauth")
@@ -32,9 +33,10 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCode(login: AuthCodeLogin) {
+    fun authCode(login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
-        oAuth2Service.authCodeLogin(login)
+        val authCode = oAuth2Service.authCodeLogin(login)
+        // TODO return 302 and redirect to redirectUri with code as query param
         TODO("Finish this")
     }
 

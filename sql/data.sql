@@ -1,6 +1,7 @@
 INSERT INTO dev.users (id, email, first_name, last_name, password)
 VALUES (1, 'craig@gmail.com', 'Craig', 'Miller', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe'),
-       (2, 'bob@gmail.com', 'Bob', 'Saget', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe');
+       (2, 'bob@gmail.com', 'Bob', 'Saget', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe'),
+       (3, 'auth@gmail.com', 'Auth', 'Code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe');
 
 INSERT INTO dev.clients (id, name, client_key, client_secret, enabled, allow_client_credentials, allow_password, allow_auth_code, access_token_timeout_secs, refresh_token_timeout_secs, auth_code_timeout_secs, redirect_uri)
 VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, true, false, false, 300, 3600, null, null),

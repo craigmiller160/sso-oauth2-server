@@ -5,4 +5,4 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import java.lang.RuntimeException
 
 @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Bad Auth Code Request")
-class AuthCodeException(msg: String) : RuntimeException(msg)
+class AuthCodeException(msg: String, ex: Throwable? = null) : RuntimeException(msg, ex)

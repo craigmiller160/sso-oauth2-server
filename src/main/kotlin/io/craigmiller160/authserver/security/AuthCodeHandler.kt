@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.security
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.exception.AuthCodeException
 import org.springframework.stereotype.Component
+import java.security.GeneralSecurityException
 import java.util.Base64
 import javax.crypto.Cipher
 
@@ -28,7 +29,12 @@ class AuthCodeHandler (
         val cipher = Cipher.getInstance("RSA")
         cipher.init(Cipher.DECRYPT_MODE, tokenConfig.publicKey)
 
-        val decryptedBytes = cipher.doFinal(encryptedBytes)
+        val decryptedBytes = try {
+            cipher.doFinal(encryptedBytes)
+        } catch (ex: GeneralSecurityException) {
+            throw AuthCodeException("Invalid Auth Code encryption", ex)
+        }
+
         val rawToken = String(decryptedBytes)
         val (clientId, userId, exp) = rawToken.split(delimiter)
 

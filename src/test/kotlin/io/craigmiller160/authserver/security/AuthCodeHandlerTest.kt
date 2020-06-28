@@ -14,6 +14,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.security.KeyPair
+import java.util.Base64
+import javax.crypto.Cipher
 
 @ExtendWith(MockitoExtension::class)
 class AuthCodeHandlerTest {
@@ -66,7 +68,17 @@ class AuthCodeHandlerTest {
 
     @Test
     fun test_validateAuthCode_invalidEncryption() {
-        TODO("Finish this")
+        `when`(tokenConfig.publicKey)
+                .thenReturn(keyPair.public)
+
+        val cipher = Cipher.getInstance("RSA")
+        cipher.init(Cipher.ENCRYPT_MODE, keyPair.public)
+        val rawToken = "$clientId|$userId|${System.currentTimeMillis() + 60000}"
+        val encryptedBytes = cipher.doFinal(rawToken.toByteArray())
+        val encrypted = Base64.getEncoder().encodeToString(encryptedBytes)
+
+        val ex = assertThrows<AuthCodeException> { authCodeHandler.validateAuthCode(encrypted) }
+        assertEquals("Invalid Auth Code encryption", ex.message)
     }
 
 }

@@ -6,8 +6,11 @@ import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.AuthCodeException
+import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -28,7 +31,8 @@ class OAuth2Service (
         private val refreshTokenRepo: RefreshTokenRepository,
         private val userRepo: UserRepository,
         private val roleRepo: RoleRepository,
-        private val passwordEncoder: PasswordEncoder
+        private val passwordEncoder: PasswordEncoder,
+        private val clientRepo: ClientRepository
 ) {
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
@@ -77,7 +81,15 @@ class OAuth2Service (
     }
 
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
-        TODO("Finish this")
+        if (login.responseType != "code") {
+            throw AuthCodeException("Invalid response type")
+        }
+
+        val client = clientRepo.findByClientKey(login.clientId) ?: throw AuthCodeException("Client not supported")
+
+        if (client.redirectUri == null || client.redirectUri != login.redirectUri) {
+            throw AuthCodeException("Invalid redirect URI")
+        }
     }
 
     @Transactional

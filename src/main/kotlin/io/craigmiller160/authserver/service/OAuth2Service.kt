@@ -14,6 +14,7 @@ import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
@@ -32,7 +33,8 @@ class OAuth2Service (
         private val userRepo: UserRepository,
         private val roleRepo: RoleRepository,
         private val passwordEncoder: PasswordEncoder,
-        private val clientRepo: ClientRepository
+        private val clientRepo: ClientRepository,
+        private val authCodeHandler: AuthCodeHandler
 ) {
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
@@ -76,8 +78,14 @@ class OAuth2Service (
         return TokenResponse("authCode", "")
     }
 
-    fun authCodeLogin(login: AuthCodeLogin) {
-        TODO("Finish this")
+    fun authCodeLogin(login: AuthCodeLogin): String {
+        val client = clientRepo.findByClientKey(login.clientId)
+                ?: throw AuthCodeException("Client not supported")
+
+        val user = userRepo.findByEmailAndClientId(login.username, client.id)
+                ?: throw AuthCodeException("User not found")
+
+        return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!)
     }
 
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
@@ -85,10 +93,11 @@ class OAuth2Service (
             throw AuthCodeException("Invalid response type")
         }
 
-        val client = clientRepo.findByClientKey(login.clientId) ?: throw AuthCodeException("Client not supported")
+        val client = clientRepo.findByClientKey(login.clientId)
+                ?: throw AuthCodeException("Client not supported")
 
-        if (client.redirectUri == null || client.redirectUri != login.redirectUri) {
-            throw AuthCodeException("Invalid redirect URI")
+        if (!client.supportsAuthCode(login.redirectUri)) {
+            throw AuthCodeException("Client does not support Auth Code")
         }
     }
 

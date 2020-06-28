@@ -17,8 +17,8 @@ class UIService (
 
         val client = clientRepo.findByClientKey(pageRequest.client_id) ?: throw AuthCodeException("Client not supported")
 
-        if (client.redirectUri == null || client.redirectUri != pageRequest.redirect_uri) {
-            throw AuthCodeException("Invalid redirect URI")
+        if (!client.supportsAuthCode(pageRequest.redirect_uri)) {
+            throw AuthCodeException("Client does not support Auth Code")
         }
     }
 

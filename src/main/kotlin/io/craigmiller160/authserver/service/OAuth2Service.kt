@@ -74,8 +74,30 @@ class OAuth2Service (
     }
 
     @Secured(ClientAuthorities.AUTH_CODE)
-    fun authCode(): TokenResponse {
-        TODO("Finish this")
+    fun authCode(tokenRequest: TokenRequest): TokenResponse {
+        val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
+        if (clientUserDetails.client.clientKey != tokenRequest.client_id) {
+            throw InvalidLoginException("Invalid client id")
+        }
+
+        if (clientUserDetails.client.redirectUri != tokenRequest.redirect_uri) {
+            throw InvalidLoginException("Invalid redirect uri")
+        }
+
+        val (clientId, userId) = authCodeHandler.validateAuthCode(tokenRequest.code!!)
+        if (clientUserDetails.client.id != clientId) {
+            throw InvalidLoginException("Invalid auth code client")
+        }
+
+        val user = userRepo.findById(userId)
+                .orElseThrow { InvalidLoginException("Invalid user id") }
+
+        val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
+
+        val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.AUTH_CODE, user.id)
+        saveRefreshToken(refreshToken, tokenId, clientUserDetails.client.id, user.id)
+        return TokenResponse(accessToken, refreshToken)
     }
 
     fun authCodeLogin(login: AuthCodeLogin): String {

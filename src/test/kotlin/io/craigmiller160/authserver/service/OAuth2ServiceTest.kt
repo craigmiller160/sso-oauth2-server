@@ -193,22 +193,52 @@ class OAuth2ServiceTest {
         val result = oAuth2Service.authCode(request)
         assertEquals(TokenResponse(accessToken, refreshToken), result)
 
-        // TODO need to validate the saving of the refreshToken
+        verify(refreshTokenRepo, times(1))
+                .save(isA<RefreshToken>())
+        verify(refreshTokenRepo, times(1))
+                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
     fun test_authCode_invalidClientKey() {
-        TODO("Finish this")
+        setupSecurityContext()
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "abc", redirectUri = client.redirectUri, code = authCode)
+
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
+        assertEquals("Invalid client id", ex.message)
     }
 
     @Test
     fun test_authCode_invalidRedirectUri() {
-        TODO("Finish this")
+        setupSecurityContext()
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = "abc", code = authCode)
+
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
+        assertEquals("Invalid redirect ui", ex.message)
+    }
+
+    @Test
+    fun test_authCode_invalidAuthCodeClientId() {
+        setupSecurityContext()
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+
+        `when`(authCodeHandler.validateAuthCode(authCode))
+                .thenReturn(Pair(2, user.id))
+
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
+        assertEquals("Invalid auth code client", ex.message)
     }
 
     @Test
     fun test_authCode_invalidUser() {
-        TODO("Finish this")
+        setupSecurityContext()
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+
+        `when`(authCodeHandler.validateAuthCode(authCode))
+                .thenReturn(Pair(client.id, user.id))
+
+        val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
+        assertEquals("Invalid user id", ex.message)
     }
 
     @Test

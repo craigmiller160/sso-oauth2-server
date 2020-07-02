@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.testutils
 
 import io.craigmiller160.authserver.dto.AuthCodeLogin
+import io.craigmiller160.authserver.dto.PageRequest
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientUser
@@ -19,6 +20,10 @@ object TestData {
                 redirectUri = "http://somewhere.com",
                 responseType = "code"
         )
+    }
+
+    fun createPageRequest(): PageRequest {
+        return PageRequest("Key", "http://somewhere.com", "code")
     }
 
     fun createTokenRequest(grantType: String, username: String? = null,

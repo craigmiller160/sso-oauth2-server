@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.testutils
 
+import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientUser
@@ -9,6 +10,16 @@ import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.security.GrantType
 
 object TestData {
+
+    fun createAuthCodeLogin(): AuthCodeLogin {
+        return AuthCodeLogin(
+                username = "craig@gmail.com",
+                password = "password",
+                clientId = "Key",
+                redirectUri = "http://somewhere.com",
+                responseType = "code"
+        )
+    }
 
     fun createTokenRequest(grantType: String, username: String? = null,
                            password: String? = null, refreshToken: String? = null,
@@ -28,7 +39,7 @@ object TestData {
             accessTokenTimeoutSecs = accessTokenTimeoutSecs,
             refreshTokenTimeoutSecs = refreshTokenTimeoutSecs,
             authCodeTimeoutSecs = 0,
-            redirectUri = null
+            redirectUri = "http://somewhere.com"
     )
 
     fun createUser() = User(

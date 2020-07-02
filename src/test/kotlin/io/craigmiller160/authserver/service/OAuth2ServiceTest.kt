@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.service
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.isA
 import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.dto.TokenRequest
@@ -8,6 +9,7 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.AuthCodeException
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.repository.ClientRepository
@@ -327,22 +329,51 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_authCodeLogin() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(clientRepo.findByClientKey(client.clientKey))
+                .thenReturn(client)
+        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+                .thenReturn(user)
+        `when`(passwordEncoder.matches("password", "{bcrypt}\$2a\$10\$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe"))
+                .thenReturn(true)
+
+        `when`(authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!))
+                .thenReturn(authCode)
+
+        val result = oAuth2Service.authCodeLogin(login)
+        assertEquals(authCode, result)
     }
 
     @Test
     fun test_authCodeLogin_badClient() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.authCodeLogin(login) }
+        assertEquals("Client not supported", ex.message)
     }
 
     @Test
     fun test_authCodeLogin_badUser() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(clientRepo.findByClientKey(client.clientKey))
+                .thenReturn(client)
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.authCodeLogin(login) }
+        assertEquals("User not found", ex.message)
     }
 
     @Test
     fun test_authCodeLogin_badPassword() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(clientRepo.findByClientKey(client.clientKey))
+                .thenReturn(client)
+        `when`(userRepo.findByEmailAndClientId(user.email, client.id))
+                .thenReturn(user)
+        `when`(passwordEncoder.matches(any(), any()))
+                .thenReturn(false)
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.authCodeLogin(login) }
+        assertEquals("Invalid credentials", ex.message)
     }
 
     @Test

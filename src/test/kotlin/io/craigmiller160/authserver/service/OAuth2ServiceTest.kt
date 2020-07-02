@@ -378,22 +378,38 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_validateAuthCodeLogin_success() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(clientRepo.findByClientKey(client.clientKey))
+                .thenReturn(client)
+
+        oAuth2Service.validateAuthCodeLogin(login)
+        // No tests needed, if an exception is not thrown, then this is a success
     }
 
     @Test
     fun test_validateAuthCodeLogin_invalidResponseType() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin().copy(responseType = "abc")
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
+        assertEquals("Invalid response type", ex.message)
     }
 
     @Test
     fun test_validateAuthCodeLogin_badClient() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
+        assertEquals("Client not supported", ex.message)
     }
 
     @Test
     fun test_validateAuthCodeLogin_authCodeNotSupported() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(clientRepo.findByClientKey(client.clientKey))
+                .thenReturn(client.copy(allowAuthCode = false))
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
+        assertEquals("Client does not support Auth Code", ex.message)
     }
 
 }

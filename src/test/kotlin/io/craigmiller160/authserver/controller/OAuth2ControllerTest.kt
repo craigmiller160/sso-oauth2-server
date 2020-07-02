@@ -1,6 +1,6 @@
 package io.craigmiller160.authserver.controller
 
-import io.craigmiller160.authserver.dto.TokenRequest
+import com.nhaarman.mockito_kotlin.verify
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import javax.servlet.http.HttpServletResponse
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ControllerTest {
@@ -24,6 +27,11 @@ class OAuth2ControllerTest {
 
     @InjectMocks
     private lateinit var oAuth2Controller: OAuth2Controller
+
+    @Mock
+    private lateinit var res: HttpServletResponse
+
+    private val authCode = "authCode"
 
     @Test
     fun test_token_clientCredentials() {
@@ -35,8 +43,25 @@ class OAuth2ControllerTest {
     }
 
     @Test
-    fun test_authCode() {
-        TODO("Finish this")
+    fun test_authCodeLogin() {
+        val login = TestData.createAuthCodeLogin()
+        `when`(oAuth2Service.authCodeLogin(login))
+                .thenReturn(authCode)
+
+        val headerNameCaptor = ArgumentCaptor.forClass(String::class.java)
+        val headerValueCaptor = ArgumentCaptor.forClass(String::class.java)
+        val statusCaptor = ArgumentCaptor.forClass(Int::class.java)
+
+        oAuth2Controller.authCodeLogin(login, res)
+
+        verify(res, times(1))
+                .status = statusCaptor.capture()
+        verify(res, times(1))
+                .addHeader(headerNameCaptor.capture(), headerValueCaptor.capture())
+
+        assertEquals(302, statusCaptor.value)
+        assertEquals("Location", headerNameCaptor.value)
+        assertEquals("${login.redirectUri}?code=$authCode", headerValueCaptor.value)
     }
 
     @Test
@@ -68,11 +93,36 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_authCode() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", code = "code", redirectUri = "uri")
         val tokenResponse = TokenResponse("authCode", "")
-        `when`(oAuth2Service.authCode(TestData.createTokenRequest(GrantType.AUTH_CODE))).thenReturn(tokenResponse)
-        val request = TestData.createTokenRequest(GrantType.AUTH_CODE)
+        `when`(oAuth2Service.authCode(request))
+                .thenReturn(tokenResponse)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
+    }
+
+    @Test
+    fun test_token_authCode_noClientId() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, code = "code", redirectUri = "uri")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_authCode_noCode() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", redirectUri = "uri")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_authCode_noRedirectUri() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", code = "code")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
     }
 
     @Test

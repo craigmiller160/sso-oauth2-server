@@ -33,7 +33,7 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCode(login: AuthCodeLogin, res: HttpServletResponse) {
+    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
         val redirectUrl = "${login.redirectUri}?code=$authCode"
@@ -41,7 +41,6 @@ class OAuth2Controller(
         res.addHeader("Location", redirectUrl)
     }
 
-    // TODO improve validations for auth code
     private fun validateTokenRequest(tokenRequest: TokenRequest) {
         if (GrantType.PASSWORD == tokenRequest.grant_type && (StringUtils.isBlank(tokenRequest.username) || StringUtils.isBlank(tokenRequest.password))) {
             throw BadRequestException("Invalid token request")

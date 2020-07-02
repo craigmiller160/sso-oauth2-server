@@ -31,7 +31,7 @@ class JwtHandler(
         return legacyDateConverter.convertLocalDateTimeToDate(exp)
     }
 
-    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): String {
+    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): Pair<String,String> {
         val roleNames = roles.map { it.name }
 
         var claimBuilder = createDefaultClaims(clientUserDetails.client.accessTokenTimeoutSecs)
@@ -44,7 +44,9 @@ class JwtHandler(
                     .claim("userEmail", user.email)
         } ?: claimBuilder.subject(clientUserDetails.client.name)
 
-        return createToken(claimBuilder.build())
+        val claims = claimBuilder.build()
+        val token = createToken(claims)
+        return Pair(token, claims.jwtid)
     }
 
     private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
@@ -65,10 +67,11 @@ class JwtHandler(
         return jwt.serialize()
     }
 
-    fun createRefreshToken(clientUserDetails: ClientUserDetails, grantType: String, userId: Long = 0): Pair<String,String> {
+    fun createRefreshToken(clientUserDetails: ClientUserDetails, grantType: String, userId: Long = 0, tokenId: String): Pair<String,String> {
         var claimBuilder = createDefaultClaims(clientUserDetails.client.refreshTokenTimeoutSecs)
                 .claim("grantType", grantType)
                 .claim("clientId", clientUserDetails.client.id)
+                .jwtID(tokenId)
 
         if (userId > 0) {
             claimBuilder = claimBuilder.claim("userId", userId)

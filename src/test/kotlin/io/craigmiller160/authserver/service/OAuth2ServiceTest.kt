@@ -135,7 +135,7 @@ class OAuth2ServiceTest {
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
                 .thenReturn(roles)
 
-        val tokenRequest = TokenRequest("password", user.email, "password", null)
+        val tokenRequest = TestData.createTokenRequest(GrantType.PASSWORD, username = user.email, password = "password")
         val result = oAuth2Service.password(tokenRequest)
         assertEquals(TokenResponse(accessToken, refreshToken), result)
 
@@ -148,7 +148,7 @@ class OAuth2ServiceTest {
     @Test
     fun test_password_noUserFound() {
         setupSecurityContext()
-        val tokenRequest = TokenRequest("password", user.email, "password", null)
+        val tokenRequest = TestData.createTokenRequest(GrantType.PASSWORD, username = user.email, password = "password")
 
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
         assertEquals("User does not exist for client", ex.message)
@@ -161,14 +161,14 @@ class OAuth2ServiceTest {
         `when`(userRepo.findByEmailAndClientId(user.email, client.id))
                 .thenReturn(user)
 
-        val tokenRequest = TokenRequest("password", user.email, "password2", null)
+        val tokenRequest = TestData.createTokenRequest(GrantType.PASSWORD, username = user.email, password = "password2")
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.password(tokenRequest) }
         assertEquals("Invalid credentials", ex.message)
     }
 
     @Test
     fun test_authCode() {
-        val result = oAuth2Service.authCode()
+        val result = oAuth2Service.authCode(TestData.createTokenRequest(GrantType.AUTH_CODE))
         assertEquals(TokenResponse("authCode", ""), result)
     }
 

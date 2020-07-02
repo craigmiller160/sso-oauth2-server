@@ -1,12 +1,19 @@
 package io.craigmiller160.authserver.testutils
 
+import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.ClientUserRole
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.security.GrantType
 
 object TestData {
+
+    fun createTokenRequest(grantType: String, username: String? = null,
+                           password: String? = null, refreshToken: String? = null): TokenRequest {
+        return TokenRequest(grantType, username, password, refreshToken, null, null, null)
+    }
 
     fun createClient(accessTokenTimeoutSecs: Int = 0, refreshTokenTimeoutSecs: Int = 0) = Client(
             id = 0,

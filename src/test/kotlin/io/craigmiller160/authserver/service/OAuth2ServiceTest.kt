@@ -214,7 +214,7 @@ class OAuth2ServiceTest {
         val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = "abc", code = authCode)
 
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
-        assertEquals("Invalid redirect ui", ex.message)
+        assertEquals("Invalid redirect uri", ex.message)
     }
 
     @Test
@@ -331,7 +331,37 @@ class OAuth2ServiceTest {
     }
 
     @Test
-    fun test_validateAuthCodeLogin() {
+    fun test_authCodeLogin_badClient() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_authCodeLogin_badUser() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_authCodeLogin_badPassword() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_validateAuthCodeLogin_success() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_validateAuthCodeLogin_invalidResponseType() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_validateAuthCodeLogin_badClient() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_validateAuthCodeLogin_authCodeNotSupported() {
         TODO("Finish this")
     }
 

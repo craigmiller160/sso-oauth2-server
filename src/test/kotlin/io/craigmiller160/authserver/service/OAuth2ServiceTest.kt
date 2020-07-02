@@ -10,9 +10,11 @@ import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
@@ -59,12 +61,18 @@ class OAuth2ServiceTest {
     @Spy
     private val passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
+    @Mock
+    private lateinit var authCodeHandler: AuthCodeHandler
+    @Mock
+    private lateinit var clientRepo: ClientRepository
+
     @InjectMocks
     private lateinit var oAuth2Service: OAuth2Service
 
     private val accessToken = "AccessToken"
     private val refreshToken = "RefreshToken"
     private val password = "{bcrypt}\$2a\$10\$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe"
+    private val authCode = "ABCDEFG"
 
     private val client = TestData.createClient()
     private val clientUserDetails = ClientUserDetails(client)
@@ -168,8 +176,39 @@ class OAuth2ServiceTest {
 
     @Test
     fun test_authCode() {
-        val result = oAuth2Service.authCode(TestData.createTokenRequest(GrantType.AUTH_CODE))
-        assertEquals(TokenResponse("authCode", ""), result)
+        setupSecurityContext()
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+
+        `when`(userRepo.findById(user.id))
+                .thenReturn(Optional.of(user))
+        `when`(authCodeHandler.validateAuthCode(authCode))
+                .thenReturn(Pair(client.id, user.id))
+        `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
+                .thenReturn(roles)
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+                .thenReturn(accessToken)
+        `when`(jwtHandler.createRefreshToken(clientUserDetails, GrantType.AUTH_CODE, user.id))
+                .thenReturn(Pair(refreshToken, "1"))
+
+        val result = oAuth2Service.authCode(request)
+        assertEquals(TokenResponse(accessToken, refreshToken), result)
+
+        // TODO need to validate the saving of the refreshToken
+    }
+
+    @Test
+    fun test_authCode_invalidClientKey() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_authCode_invalidRedirectUri() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_authCode_invalidUser() {
+        TODO("Finish this")
     }
 
     @Test

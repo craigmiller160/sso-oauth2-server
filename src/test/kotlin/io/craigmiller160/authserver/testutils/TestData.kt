@@ -11,8 +11,9 @@ import io.craigmiller160.authserver.security.GrantType
 object TestData {
 
     fun createTokenRequest(grantType: String, username: String? = null,
-                           password: String? = null, refreshToken: String? = null): TokenRequest {
-        return TokenRequest(grantType, username, password, refreshToken, null, null, null)
+                           password: String? = null, refreshToken: String? = null,
+                           clientId: String? = null, redirectUri: String? = null, code: String? = null): TokenRequest {
+        return TokenRequest(grantType, username, password, refreshToken, clientId, code, redirectUri)
     }
 
     fun createClient(accessTokenTimeoutSecs: Int = 0, refreshTokenTimeoutSecs: Int = 0) = Client(

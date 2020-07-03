@@ -51,7 +51,7 @@ class OAuth2Service (
         val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails)
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.CLIENT_CREDENTIALS, tokenId = accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id)
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
     @Secured(ClientAuthorities.PASSWORD)
@@ -70,7 +70,7 @@ class OAuth2Service (
         val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.PASSWORD, user.id, tokenId = accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id, user.id)
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
     @Secured(ClientAuthorities.AUTH_CODE)
@@ -97,7 +97,7 @@ class OAuth2Service (
         val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.AUTH_CODE, user.id, accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id, user.id)
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
     fun authCodeLogin(login: AuthCodeLogin): String {
@@ -149,7 +149,7 @@ class OAuth2Service (
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenData.userId ?: 0, accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, tokenData.clientId, tokenData.userId)
 
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
 }

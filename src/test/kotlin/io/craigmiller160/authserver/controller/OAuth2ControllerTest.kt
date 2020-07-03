@@ -35,7 +35,7 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_clientCredentials() {
-        val tokenResponse = TokenResponse("clientCredentials", "")
+        val tokenResponse = TokenResponse("clientCredentials", "", "")
         `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)
         val request = TestData.createTokenRequest(GrantType.CLIENT_CREDENTIALS)
         val result = oAuth2Controller.token(request)
@@ -66,7 +66,7 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_password() {
-        val tokenResponse = TokenResponse("password", "")
+        val tokenResponse = TokenResponse("password", "", "")
         val request = TestData.createTokenRequest(GrantType.PASSWORD, username = "user", password = "pass")
         `when`(oAuth2Service.password(request))
                 .thenReturn(tokenResponse)
@@ -94,7 +94,7 @@ class OAuth2ControllerTest {
     @Test
     fun test_token_authCode() {
         val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", code = "code", redirectUri = "uri")
-        val tokenResponse = TokenResponse("authCode", "")
+        val tokenResponse = TokenResponse("authCode", "", "")
         `when`(oAuth2Service.authCode(request))
                 .thenReturn(tokenResponse)
         val result = oAuth2Controller.token(request)
@@ -141,7 +141,7 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_refresh() {
-        val tokenResponse = TokenResponse("refresh", "")
+        val tokenResponse = TokenResponse("refresh", "", "")
         val token = "ABCDEFG"
         val request = TestData.createTokenRequest(GrantType.REFRESH_TOKEN, refreshToken = token)
         `when`(oAuth2Service.refresh(token))

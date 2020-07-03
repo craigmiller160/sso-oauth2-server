@@ -125,7 +125,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Pair(refreshToken, tokenId))
 
         val result = oAuth2Service.clientCredentials()
-        assertEquals(TokenResponse(accessToken, refreshToken), result)
+        assertEquals(TokenResponse(accessToken, refreshToken, tokenId), result)
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
@@ -148,7 +148,7 @@ class OAuth2ServiceTest {
 
         val tokenRequest = TestData.createTokenRequest(GrantType.PASSWORD, username = user.email, password = "password")
         val result = oAuth2Service.password(tokenRequest)
-        assertEquals(TokenResponse(accessToken, refreshToken), result)
+        assertEquals(TokenResponse(accessToken, refreshToken, tokenId), result)
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
@@ -194,7 +194,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Pair(refreshToken, tokenId))
 
         val result = oAuth2Service.authCode(request)
-        assertEquals(TokenResponse(accessToken, refreshToken), result)
+        assertEquals(TokenResponse(accessToken, refreshToken, tokenId), result)
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())

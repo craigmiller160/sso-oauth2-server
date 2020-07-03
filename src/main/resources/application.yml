@@ -32,3 +32,7 @@ security:
     key-store-password: password
     key-store-alias: jwt
     delete-older-than-secs: 86400
+
+logging:
+  level:
+    io.craigmiller160.authserver: DEBUG

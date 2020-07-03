@@ -49,6 +49,7 @@ class JwtHandlerTest {
     )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = TestData.createUser()
+    private val origTokenId = "origTokenId"
 
     @InjectMocks
     private lateinit var jwtHandler: JwtHandler
@@ -68,7 +69,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientOnly() {
-        val token = jwtHandler.createAccessToken(clientUserDetails)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -78,7 +79,7 @@ class JwtHandlerTest {
         assertEquals(8, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(client.name))
@@ -88,7 +89,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientAndUser() {
-        val token = jwtHandler.createAccessToken(clientUserDetails, user)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -98,7 +99,7 @@ class JwtHandlerTest {
         assertEquals(9, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
@@ -112,7 +113,7 @@ class JwtHandlerTest {
         val role = Role(1L, "Role1", 1L)
         val roles = listOf(role)
 
-        val token = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -122,7 +123,7 @@ class JwtHandlerTest {
         assertEquals(9, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
@@ -136,8 +137,8 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L)
-        assertNotNull(tokenId)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
+        assertEquals(origTokenId, tokenId)
 
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
@@ -156,8 +157,8 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken_noUser() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password")
-        assertNotNull(tokenId)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
+        assertEquals(origTokenId, tokenId)
 
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))

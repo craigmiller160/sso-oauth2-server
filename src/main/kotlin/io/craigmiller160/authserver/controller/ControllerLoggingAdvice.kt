@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
+import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @Component
 @Aspect
@@ -31,6 +33,16 @@ class ControllerLoggingAdvice {
     @Pointcut("execution(public * io.craigmiller160.authserver.controller.*Controller.*(..))")
     fun controllerPublicMethods() { }
 
+    private fun getResponseStatus(result: Any?, joinPoint: JoinPoint): Int {
+        if (result is ResponseEntity<*>) {
+            return result.statusCode.value()
+        }
+
+        val responseArg = joinPoint.args
+                .find { arg -> arg is HttpServletResponse } as HttpServletResponse?
+        return responseArg?.status ?: 0
+    }
+
     @Before("controllerPublicMethods()")
     fun logRequest(joinPoint: JoinPoint) {
         val request = getRequest()
@@ -42,15 +54,15 @@ class ControllerLoggingAdvice {
     @AfterReturning("controllerPublicMethods()", returning = "result")
     fun logResponseAfterReturning(joinPoint: JoinPoint, result: Any?) {
         val request = getRequest()
-        val responseEntity = if(result is ResponseEntity<*>) result else null
+        val status = getResponseStatus(result, joinPoint)
         val path = buildPath(request)
         val method = request.method
-        val status = responseEntity?.statusCode?.value() ?: 0
         logger.debug("Response $status: $method $path = ${joinPoint.signature.name}()")
     }
 
     @AfterThrowing("controllerPublicMethods()", throwing = "throwing")
     fun logResponseAfterThrowing(joinPoint: JoinPoint, throwing: Throwable) {
+        // TODO improve this to include error status code
         val request = getRequest()
         val path = buildPath(request)
         val method = request.method

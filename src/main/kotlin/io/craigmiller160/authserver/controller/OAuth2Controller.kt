@@ -10,6 +10,7 @@ import io.craigmiller160.authserver.service.OAuth2Service
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletResponse
@@ -33,7 +34,7 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
+    fun authCodeLogin(@RequestBody login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
         val redirectUrl = "${login.redirectUri}?code=$authCode"

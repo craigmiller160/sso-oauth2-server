@@ -31,37 +31,75 @@
     </nav>
     <div class="container">
         <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <form class="login-form" method="POST" action="/oauth/auth">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" class="form-control" type="email" required autofocus />
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" class="form-control" type="password" required />
-                    </div>
-                    <input id="clientId" type="hidden" name="clientId" />
-                    <input id="redirectUri" type="hidden" name="redirectUri" />
-                    <input id="responseType" type="hidden" name="responseType" />
-                    <!-- TODO need to handle a state parameter too -->
-                    <button type="submit" class="btn btn-success">Login</button>
-                </form>
+            <div class="col-md-6 offset-md-3 login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input id="username" name="username" class="form-control" type="email" required autofocus />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" class="form-control" type="password" required />
+                </div>
+                <input id="clientId" type="hidden" name="clientId" />
+                <input id="redirectUri" type="hidden" name="redirectUri" />
+                <input id="responseType" type="hidden" name="responseType" />
+                <!-- TODO need to handle a state parameter too -->
+                <button id="submitBtn" type="button" class="btn btn-success">Login</button>
             </div>
         </div>
     </div>
     <script>
-        var queryString = window.location.search.replace('?', '');
-        var queryParams = queryString.split('&')
-            .reduce((acc, param) => {
-                var parts = param.split('=');
-                acc[parts[0]] = parts[1];
-                return acc;
-            }, {});
+        const usernameField = document.querySelector('#username');
+        const passwordField = document.querySelector('#password');
+        const clientIdField = document.querySelector('#clientId');
+        const redirectUriField = document.querySelector('#redirectUri');
+        const responseTypeField = document.querySelector('#responseType');
+        const submitBtn = document.querySelector('#submitBtn');
 
-        document.querySelector('#clientId').value = queryParams.client_id;
-        document.querySelector('#redirectUri').value = queryParams.redirect_uri;
-        document.querySelector('#responseType').value = queryParams.response_type;
+        const populateQueryParamValues = () => {
+            const queryString = window.location.search.replace('?', '');
+            const queryParams = queryString.split('&')
+                .reduce((acc, param) => {
+                    var parts = param.split('=');
+                    acc[parts[0]] = parts[1];
+                    return acc;
+                }, {});
+
+            clientIdField.value = queryParams.client_id;
+            redirectUriField.value = queryParams.redirect_uri;
+            responseTypeField.value = queryParams.response_type;
+        };
+
+        const doLogin = () => {
+            const body = {
+                username: usernameField.value,
+                password: passwordField.value,
+                clientId: clientIdField.value,
+                redirectUri: redirectUriField.value,
+                responseType: responseTypeField.value
+            };
+            const bodyString = Object.entries(body)
+                .map(([key, value]) => `${key}=${value}`)
+                .join('&'); // TODO delete this
+
+            fetch('/oauth/auth', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+                .then((res) => {
+                    console.log(res.headers);
+                })
+                .catch((ex) => console.log(ex)); // TODO better error handling
+        };
+
+        submitBtn.onclick = doLogin;
+
+        populateQueryParamValues();
+
     </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.dto.Error
+import org.apache.coyote.Response
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import javax.servlet.http.HttpServletRequest
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.HttpMediaTypeNotSupportedException
 import org.springframework.web.HttpRequestMethodNotSupportedException
 
 @RestControllerAdvice
@@ -23,6 +25,21 @@ class ErrorControllerAdvice {
         val error = Error(
                 status = status,
                 error = "Access Denied",
+                message = ex.message ?: "",
+                path = req.requestURI
+        )
+        return ResponseEntity
+                .status(status)
+                .body(error)
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
+    fun mediaTypeNotSupportedException(req: HttpServletRequest, ex: HttpMediaTypeNotSupportedException): ResponseEntity<Error> {
+        log.error("", ex)
+        val status = 415
+        val error = Error(
+                status = status,
+                error = "Unsupported Media Type",
                 message = ex.message ?: "",
                 path = req.requestURI
         )

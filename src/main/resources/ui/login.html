@@ -44,7 +44,7 @@
                     <input id="clientId" type="hidden" name="clientId" />
                     <input id="redirectUri" type="hidden" name="redirectUri" />
                     <input id="responseType" type="hidden" name="responseType" />
-                    <!-- TODO need to handle a state parameter too -->
+                    <input id="state" type="hidden" name="state" />
                     <button id="submitBtn" type="submit" class="btn btn-success">Login</button>
                 </form>
             </div>
@@ -54,6 +54,7 @@
         const clientIdField = document.querySelector('#clientId');
         const redirectUriField = document.querySelector('#redirectUri');
         const responseTypeField = document.querySelector('#responseType');
+        const stateField = document.querySelector('#state');
 
         const populateQueryParamValues = () => {
             const queryString = window.location.search.replace('?', '');
@@ -67,6 +68,7 @@
             clientIdField.value = decodeURIComponent(queryParams.client_id);
             redirectUriField.value = decodeURIComponent(queryParams.redirect_uri);
             responseTypeField.value = decodeURIComponent(queryParams.response_type);
+            stateField.valued = decodeURIComponent(queryParams.state);
         };
 
         populateQueryParamValues();

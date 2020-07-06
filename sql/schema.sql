@@ -24,6 +24,8 @@ CREATE TABLE clients (
     allow_auth_code BOOLEAN DEFAULT false,
     access_token_timeout_secs INT NOT NULL,
     refresh_token_timeout_secs INT NOT NULL,
+    auth_code_timeout_secs INT,
+    redirect_uri VARCHAR(255),
     PRIMARY KEY (id)
 );
 

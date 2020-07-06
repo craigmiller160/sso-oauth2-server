@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.repository
 
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -15,18 +16,7 @@ class ClientRepositoryTest {
 
     @Autowired
     private lateinit var clientRepo: ClientRepository
-    private val client = Client(
-            id = 1L,
-            name = "Name",
-            clientKey = "Key",
-            clientSecret = "Secret",
-            enabled = true,
-            allowClientCredentials = true,
-            allowAuthCode = true,
-            allowPassword = true,
-            accessTokenTimeoutSecs = 0,
-            refreshTokenTimeoutSecs = 0
-    )
+    private val client = TestData.createClient()
 
     @BeforeEach
     fun setup() {

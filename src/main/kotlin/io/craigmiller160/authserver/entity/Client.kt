@@ -20,5 +20,12 @@ data class Client (
         val allowPassword: Boolean,
         val allowAuthCode: Boolean,
         val accessTokenTimeoutSecs: Int,
-        val refreshTokenTimeoutSecs: Int
-)
+        val refreshTokenTimeoutSecs: Int,
+        val authCodeTimeoutSecs: Int?,
+        val redirectUri: String?
+) {
+        fun supportsAuthCode(otherRedirectUri: String): Boolean {
+                return allowAuthCode && authCodeTimeoutSecs != null &&
+                        redirectUri != null && redirectUri == otherRedirectUri
+        }
+}

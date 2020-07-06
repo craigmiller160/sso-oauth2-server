@@ -1,19 +1,25 @@
 package io.craigmiller160.authserver.service
 
+import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.AuthCodeException
+import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
+import org.apache.commons.lang3.StringUtils
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -27,7 +33,9 @@ class OAuth2Service (
         private val refreshTokenRepo: RefreshTokenRepository,
         private val userRepo: UserRepository,
         private val roleRepo: RoleRepository,
-        private val passwordEncoder: PasswordEncoder
+        private val passwordEncoder: PasswordEncoder,
+        private val clientRepo: ClientRepository,
+        private val authCodeHandler: AuthCodeHandler
 ) {
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
@@ -41,10 +49,10 @@ class OAuth2Service (
     @Transactional
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
-        val accessToken = jwtHandler.createAccessToken(clientUserDetails)
-        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.CLIENT_CREDENTIALS)
-        saveRefreshToken(refreshToken, tokenId, clientUserDetails.client.id)
-        return TokenResponse(accessToken, refreshToken)
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails)
+        val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.CLIENT_CREDENTIALS, tokenId = accessTokenId)
+        saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
     @Secured(ClientAuthorities.PASSWORD)
@@ -60,15 +68,68 @@ class OAuth2Service (
 
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 
-        val accessToken = jwtHandler.createAccessToken(clientUserDetails, user, roles)
-        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.PASSWORD, user.id)
-        saveRefreshToken(refreshToken, tokenId, clientUserDetails.client.id, user.id)
-        return TokenResponse(accessToken, refreshToken)
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.PASSWORD, user.id, tokenId = accessTokenId)
+        saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id, user.id)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
     @Secured(ClientAuthorities.AUTH_CODE)
-    fun authCode(): TokenResponse {
-        return TokenResponse("authCode", "")
+    fun authCode(tokenRequest: TokenRequest): TokenResponse {
+        val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
+        if (clientUserDetails.client.clientKey != tokenRequest.client_id) {
+            throw InvalidLoginException("Invalid client id")
+        }
+
+        if (clientUserDetails.client.redirectUri != tokenRequest.redirect_uri) {
+            throw InvalidLoginException("Invalid redirect uri")
+        }
+
+        val (clientId, userId) = authCodeHandler.validateAuthCode(tokenRequest.code!!)
+        if (clientUserDetails.client.id != clientId) {
+            throw InvalidLoginException("Invalid auth code client")
+        }
+
+        val user = userRepo.findById(userId)
+                .orElseThrow { InvalidLoginException("Invalid user id") }
+
+        val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
+
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, GrantType.AUTH_CODE, user.id, accessTokenId)
+        saveRefreshToken(refreshToken, refreshTokenId, clientUserDetails.client.id, user.id)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
+    }
+
+    fun authCodeLogin(login: AuthCodeLogin): String {
+        val client = clientRepo.findByClientKey(login.clientId)
+                ?: throw AuthCodeException("Client not supported")
+
+        val user = userRepo.findByEmailAndClientId(login.username, client.id)
+                ?: throw AuthCodeException("User not found")
+
+        if (!passwordEncoder.matches(login.password, user.password)) {
+            throw AuthCodeException("Invalid credentials")
+        }
+
+        return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!)
+    }
+
+    fun validateAuthCodeLogin(login: AuthCodeLogin) {
+        if (StringUtils.isBlank(login.state)) {
+            throw AuthCodeException("No state property")
+        }
+
+        if (login.responseType != "code") {
+            throw AuthCodeException("Invalid response type")
+        }
+
+        val client = clientRepo.findByClientKey(login.clientId)
+                ?: throw AuthCodeException("Client not supported")
+
+        if (!client.supportsAuthCode(login.redirectUri)) {
+            throw AuthCodeException("Client does not support Auth Code")
+        }
     }
 
     @Transactional
@@ -89,11 +150,11 @@ class OAuth2Service (
             Pair(user, roles)
         }
 
-        val accessToken = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
-        val (refreshToken, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenData.userId ?: 0)
-        saveRefreshToken(refreshToken, tokenId, tokenData.clientId, tokenData.userId)
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
+        val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenData.userId ?: 0, accessTokenId)
+        saveRefreshToken(refreshToken, refreshTokenId, tokenData.clientId, tokenData.userId)
 
-        return TokenResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
 }

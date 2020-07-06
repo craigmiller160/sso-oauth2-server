@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth2 Login</title>
+    <link rel="stylesheet" href="/ui/resources/css/bootstrap.min.css">
+    <style>
+        .header {
+            background-color: yellow;
+            text-align: center;
+        }
+
+        .header > a {
+            cursor: default;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-form {
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-light header">
+        <a class="navbar-brand">
+            <strong>OAuth2 Login</strong>
+        </a>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <form action="/oauth/auth" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" class="form-control" type="email" required autofocus />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" class="form-control" type="password" required />
+                    </div>
+                    <input id="clientId" type="hidden" name="clientId" />
+                    <input id="redirectUri" type="hidden" name="redirectUri" />
+                    <input id="responseType" type="hidden" name="responseType" />
+                    <input id="state" type="hidden" name="state" />
+                    <button id="submitBtn" type="submit" class="btn btn-success">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const clientIdField = document.querySelector('#clientId');
+        const redirectUriField = document.querySelector('#redirectUri');
+        const responseTypeField = document.querySelector('#responseType');
+        const stateField = document.querySelector('#state');
+
+        const populateQueryParamValues = () => {
+            const queryString = window.location.search.replace('?', '');
+            const queryParams = queryString.split('&')
+                .reduce((acc, param) => {
+                    var parts = param.split('=');
+                    acc[parts[0]] = parts[1];
+                    return acc;
+                }, {});
+
+            clientIdField.value = decodeURIComponent(queryParams.client_id);
+            redirectUriField.value = decodeURIComponent(queryParams.redirect_uri);
+            responseTypeField.value = decodeURIComponent(queryParams.response_type);
+            stateField.value = decodeURIComponent(queryParams.state);
+        };
+
+        populateQueryParamValues();
+
+    </script>
+</body>
+</html>

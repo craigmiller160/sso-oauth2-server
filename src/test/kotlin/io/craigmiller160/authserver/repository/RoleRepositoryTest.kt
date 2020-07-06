@@ -5,6 +5,7 @@ import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.ClientUserRole
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -37,65 +38,19 @@ class RoleRepositoryTest {
 
     @BeforeEach
     fun setup() {
-        user = User(
-                id = 0,
-                email = "craig@gmail.com",
-                firstName = "Craig",
-                lastName = "Miller",
-                password = "password"
-        )
-        user = userRepo.save(user)
+        user = userRepo.save(TestData.createUser())
 
-        client = Client(
-                id = 0,
-                name = "Client",
-                clientKey = "Key",
-                clientSecret = "Secret",
-                enabled = true,
-                allowClientCredentials = false,
-                allowPassword = false,
-                allowAuthCode = false,
-                accessTokenTimeoutSecs = 0,
-                refreshTokenTimeoutSecs = 0
-        )
-        client = clientRepo.save(client)
+        client = clientRepo.save(TestData.createClient())
 
-        clientUser = ClientUser(
-                id = 0,
-                userId = user.id,
-                clientId = client.id
-        )
-        clientUser = clientUserRepo.save(clientUser)
+        clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
 
-        role1 = Role(
-                id = 0,
-                name = "Role1",
-                clientId = client.id
-        )
-        role1 = roleRepo.save(role1)
+        role1 = roleRepo.save(TestData.createRole1(client.id))
 
-        role2 = Role(
-                id = 0,
-                name = "Role2",
-                clientId = client.id
-        )
-        role2 = roleRepo.save(role2)
+        role2 = roleRepo.save(TestData.createRole2(client.id))
 
-        clientUserRole1 = ClientUserRole(
-                id = 0,
-                clientId = client.id,
-                userId = user.id,
-                roleId = role1.id
-        )
-        clientUserRole1 = clientUserRoleRepo.save(clientUserRole1)
+        clientUserRole1 = clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
 
-        clientUserRole2 = ClientUserRole(
-                id = 0,
-                clientId = client.id,
-                userId = user.id,
-                roleId = role2.id
-        )
-        clientUserRole2 = clientUserRoleRepo.save(clientUserRole2)
+        clientUserRole2 = clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
     }
 
     @AfterEach

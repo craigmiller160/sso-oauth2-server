@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.service
 
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.repository.ClientRepository
+import io.craigmiller160.authserver.testutils.TestData
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.equalTo
@@ -21,7 +22,7 @@ class ClientUserDetailsServiceTest {
 
     @Mock
     private lateinit var clientRepo: ClientRepository
-    private val client = Client(10, "GHI", "ABC", "DEF", true, false, false, false, 0, 0)
+    private val client = TestData.createClient()
 
     @InjectMocks
     private lateinit var clientUserDetailsService: ClientUserDetailsService

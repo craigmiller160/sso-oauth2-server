@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.repository
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -28,35 +29,9 @@ class UserRepositoryTest {
 
     @BeforeEach
     fun setup() {
-        user = User(
-                id = 0,
-                email = "craig@gmail.com",
-                firstName = "Craig",
-                lastName = "Miller",
-                password = "password"
-        )
-        user = userRepo.save(user)
-
-        client = Client(
-                id = 0,
-                name = "Client",
-                clientKey = "Key",
-                clientSecret = "Secret",
-                enabled = true,
-                allowClientCredentials = false,
-                allowPassword = false,
-                allowAuthCode = false,
-                accessTokenTimeoutSecs = 0,
-                refreshTokenTimeoutSecs = 0
-        )
-        client = clientRepo.save(client)
-
-        clientUser = ClientUser(
-                id = 0,
-                userId = user.id,
-                clientId = client.id
-        )
-        clientUser = clientUserRepo.save(clientUser)
+        user = userRepo.save(TestData.createUser())
+        client = clientRepo.save(TestData.createClient())
+        clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
     }
 
     @AfterEach

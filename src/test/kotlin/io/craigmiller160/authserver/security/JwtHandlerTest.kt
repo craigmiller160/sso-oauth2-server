@@ -10,6 +10,8 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.testutils.JwtUtils
+import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.authserver.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
@@ -41,26 +43,13 @@ class JwtHandlerTest {
     @Spy
     private val legacyDateConverter = LegacyDateConverter()
 
-    private val client = Client(
-            id = 1L,
-            name = "Name",
-            clientKey = "Key",
-            clientSecret = "Secret",
-            enabled = true,
-            allowClientCredentials = true,
-            allowAuthCode = true,
-            allowPassword = true,
-            accessTokenTimeoutSecs = 200,
-            refreshTokenTimeoutSecs = 200
+    private val client = TestData.createClient(
+            accessTokenTimeoutSecs = 300,
+            refreshTokenTimeoutSecs = 300
     )
     private val clientUserDetails = ClientUserDetails(client)
-    private val user = User(
-            id = 1L,
-            email = "craig@gmail.com",
-            password = "password",
-            firstName = "Craig",
-            lastName = "Miller"
-    )
+    private val user = TestData.createUser()
+    private val origTokenId = "origTokenId"
 
     @InjectMocks
     private lateinit var jwtHandler: JwtHandler
@@ -73,17 +62,14 @@ class JwtHandlerTest {
 
     @BeforeEach
     fun setup() {
-        val keyPairGen = KeyPairGenerator.getInstance("RSA")
-        keyPairGen.initialize(2048)
-
-        keyPair = keyPairGen.genKeyPair()
+        keyPair = JwtUtils.createKeyPair()
         `when`(tokenConfig.privateKey)
                 .thenReturn(keyPair.private)
     }
 
     @Test
     fun test_createAccessToken_clientOnly() {
-        val token = jwtHandler.createAccessToken(clientUserDetails)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
@@ -93,7 +79,7 @@ class JwtHandlerTest {
         assertEquals(8, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(client.name))
@@ -103,22 +89,24 @@ class JwtHandlerTest {
 
     @Test
     fun test_createAccessToken_clientAndUser() {
-        val token = jwtHandler.createAccessToken(clientUserDetails, user)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(9, jsonObject.length())
+        assertEquals(11, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
         assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
         assertEquals(0, jsonObject.getJSONArray("roles").length())
     }
 
@@ -127,22 +115,24 @@ class JwtHandlerTest {
         val role = Role(1L, "Role1", 1L)
         val roles = listOf(role)
 
-        val token = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(9, jsonObject.length())
+        assertEquals(11, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
         assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
 
         val rolesArray = jsonObject.getJSONArray("roles")
         assertEquals(1, rolesArray.length())
@@ -151,8 +141,8 @@ class JwtHandlerTest {
 
     @Test
     fun test_createRefreshToken() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L)
-        assertNotNull(tokenId)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
+        assertEquals(origTokenId, tokenId)
 
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
@@ -165,14 +155,14 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(1L))
+        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
         assertThat(jsonObject.getLong("userId"), equalTo(1L))
     }
 
     @Test
     fun test_createRefreshToken_noUser() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password")
-        assertNotNull(tokenId)
+        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
+        assertEquals(origTokenId, tokenId)
 
         val parts = token.split(".")
         val header = String(Base64.getDecoder().decode(parts[0]))
@@ -185,7 +175,7 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(1L))
+        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
     }
 
     private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {
@@ -245,8 +235,7 @@ class JwtHandlerTest {
 
     @Test
     fun test_parseRefreshToken_badSignature() {
-        val keyPairGen = KeyPairGenerator.getInstance("RSA")
-        val keyPair = keyPairGen.genKeyPair()
+        val keyPair = JwtUtils.createKeyPair()
 
         val token = createJwt(true, 1000, keyPair)
 

@@ -1,19 +1,23 @@
 package io.craigmiller160.authserver.controller
 
-import io.craigmiller160.authserver.dto.TokenRequest
+import com.nhaarman.mockito_kotlin.verify
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
+import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentCaptor
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import javax.servlet.http.HttpServletResponse
 
 @ExtendWith(MockitoExtension::class)
 class OAuth2ControllerTest {
@@ -24,19 +28,46 @@ class OAuth2ControllerTest {
     @InjectMocks
     private lateinit var oAuth2Controller: OAuth2Controller
 
+    @Mock
+    private lateinit var res: HttpServletResponse
+
+    private val authCode = "authCode"
+
     @Test
     fun test_token_clientCredentials() {
-        val tokenResponse = TokenResponse("clientCredentials", "")
+        val tokenResponse = TokenResponse("clientCredentials", "", "")
         `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)
-        val request = TokenRequest(GrantType.CLIENT_CREDENTIALS, null, null, null)
+        val request = TestData.createTokenRequest(GrantType.CLIENT_CREDENTIALS)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }
 
     @Test
+    fun test_authCodeLogin() {
+        val login = TestData.createAuthCodeLogin()
+        `when`(oAuth2Service.authCodeLogin(login))
+                .thenReturn(authCode)
+
+        val headerNameCaptor = ArgumentCaptor.forClass(String::class.java)
+        val headerValueCaptor = ArgumentCaptor.forClass(String::class.java)
+        val statusCaptor = ArgumentCaptor.forClass(Int::class.java)
+
+        oAuth2Controller.authCodeLogin(login, res)
+
+        verify(res, times(1))
+                .status = statusCaptor.capture()
+        verify(res, times(1))
+                .addHeader(headerNameCaptor.capture(), headerValueCaptor.capture())
+
+        assertEquals(302, statusCaptor.value)
+        assertEquals("Location", headerNameCaptor.value)
+        assertEquals("${login.redirectUri}?code=$authCode&state=${login.state}", headerValueCaptor.value)
+    }
+
+    @Test
     fun test_token_password() {
-        val tokenResponse = TokenResponse("password", "")
-        val request = TokenRequest(GrantType.PASSWORD, "user", "pass", null)
+        val tokenResponse = TokenResponse("password", "", "")
+        val request = TestData.createTokenRequest(GrantType.PASSWORD, username = "user", password = "pass")
         `when`(oAuth2Service.password(request))
                 .thenReturn(tokenResponse)
 
@@ -46,7 +77,7 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_password_noUsername() {
-        val request = TokenRequest(GrantType.PASSWORD, null, "pass", null)
+        val request = TestData.createTokenRequest(GrantType.PASSWORD, username = null, password = "pass")
 
         val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
         assertEquals("Invalid token request", ex.message)
@@ -54,7 +85,7 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_password_noPassword() {
-        val request = TokenRequest(GrantType.PASSWORD, "user", null, null)
+        val request = TestData.createTokenRequest(GrantType.PASSWORD, username = "user")
 
         val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
         assertEquals("Invalid token request", ex.message)
@@ -62,32 +93,57 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_token_authCode() {
-        val tokenResponse = TokenResponse("authCode", "")
-        `when`(oAuth2Service.authCode()).thenReturn(tokenResponse)
-        val request = TokenRequest(GrantType.AUTH_CODE, null, null, null)
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", code = "code", redirectUri = "uri")
+        val tokenResponse = TokenResponse("authCode", "", "")
+        `when`(oAuth2Service.authCode(request))
+                .thenReturn(tokenResponse)
         val result = oAuth2Controller.token(request)
         assertEquals(tokenResponse, result)
     }
 
     @Test
+    fun test_token_authCode_noClientId() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, code = "code", redirectUri = "uri")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_authCode_noCode() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", redirectUri = "uri")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
+    fun test_token_authCode_noRedirectUri() {
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "key", code = "code")
+
+        val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
+        assertEquals("Invalid token request", ex.message)
+    }
+
+    @Test
     fun test_token_unsupported() {
-        val request = TokenRequest("foo", null, null, null)
+        val request = TestData.createTokenRequest("foo")
         val ex = assertThrows<UnsupportedGrantTypeException> { oAuth2Controller.token(request) }
         assertEquals("foo", ex.message)
     }
 
     @Test
     fun test_token_refresh_noToken() {
-        val request = TokenRequest(GrantType.REFRESH_TOKEN, null, null, null)
+        val request = TestData.createTokenRequest(GrantType.REFRESH_TOKEN)
         val ex = assertThrows<BadRequestException> { oAuth2Controller.token(request) }
         assertEquals("Invalid token request", ex.message)
     }
 
     @Test
     fun test_token_refresh() {
-        val tokenResponse = TokenResponse("refresh", "")
+        val tokenResponse = TokenResponse("refresh", "", "")
         val token = "ABCDEFG"
-        val request = TokenRequest(GrantType.REFRESH_TOKEN, null, null, token)
+        val request = TestData.createTokenRequest(GrantType.REFRESH_TOKEN, refreshToken = token)
         `when`(oAuth2Service.refresh(token))
                 .thenReturn(tokenResponse)
 

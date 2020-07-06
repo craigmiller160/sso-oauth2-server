@@ -40,7 +40,11 @@ class ControllerLoggingAdvice {
 
         val responseArg = joinPoint.args
                 .find { arg -> arg is HttpServletResponse } as HttpServletResponse?
-        return responseArg?.status ?: 0
+        if (responseArg != null) {
+            return responseArg.status
+        }
+
+        return 200
     }
 
     @Before("controllerPublicMethods()")

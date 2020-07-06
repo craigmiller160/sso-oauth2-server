@@ -33,7 +33,7 @@ class WebSecurityConfig(
                     .antMatchers("/oauth/**/*", "/jwk", "/ui/**/*")
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/jwk", "/ui/**/*", "/oauth/auth").permitAll() // TODO find better security for /oauth/auth
+                    .antMatchers("/jwk", "/ui/**/*", "/oauth/auth").permitAll()
                     .anyRequest().fullyAuthenticated()
                     .and()
                     .requiresChannel().anyRequest().requiresSecure()

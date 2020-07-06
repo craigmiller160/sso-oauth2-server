@@ -34,7 +34,7 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCodeLogin(@RequestBody login: AuthCodeLogin, res: HttpServletResponse) {
+    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
         val redirectUrl = "${login.redirectUri}?code=$authCode"

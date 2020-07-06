@@ -19,6 +19,7 @@ import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
+import org.apache.commons.lang3.StringUtils
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -115,6 +116,10 @@ class OAuth2Service (
     }
 
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
+        if (StringUtils.isBlank(login.state)) {
+            throw AuthCodeException("No state property") // TODO add to unit tests
+        }
+
         if (login.responseType != "code") {
             throw AuthCodeException("Invalid response type")
         }

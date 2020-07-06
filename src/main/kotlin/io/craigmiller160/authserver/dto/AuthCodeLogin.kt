@@ -5,5 +5,6 @@ data class AuthCodeLogin (
         val password: String,
         val clientId: String,
         val redirectUri: String,
-        val responseType: String
+        val responseType: String,
+        val state: String
 )

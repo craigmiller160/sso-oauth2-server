@@ -36,10 +36,10 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
+    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) { // TODO add state to redirect uri tests
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
-        val redirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}"
+        val redirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}&state=${URLEncoder.encode(login.state, StandardCharsets.UTF_8)}"
         res.status = 302
         res.addHeader("Location", redirectUrl)
     }

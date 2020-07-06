@@ -117,7 +117,7 @@ class OAuth2Service (
 
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
         if (StringUtils.isBlank(login.state)) {
-            throw AuthCodeException("No state property") // TODO add to unit tests
+            throw AuthCodeException("No state property")
         }
 
         if (login.responseType != "code") {

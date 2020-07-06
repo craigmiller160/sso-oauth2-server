@@ -413,4 +413,12 @@ class OAuth2ServiceTest {
         assertEquals("Client does not support Auth Code", ex.message)
     }
 
+    @Test
+    fun test_validateAuthCodeLogin_noState() {
+        val login = TestData.createAuthCodeLogin().copy(state = "")
+
+        val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
+        assertEquals("No state property", ex.message)
+    }
+
 }

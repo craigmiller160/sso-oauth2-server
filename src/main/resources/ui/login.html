@@ -67,9 +67,9 @@
                     return acc;
                 }, {});
 
-            clientIdField.value = queryParams.client_id;
-            redirectUriField.value = queryParams.redirect_uri;
-            responseTypeField.value = queryParams.response_type;
+            clientIdField.value = decodeURIComponent(queryParams.client_id);
+            redirectUriField.value = decodeURIComponent(queryParams.redirect_uri);
+            responseTypeField.value = decodeURIComponent(queryParams.response_type);
         };
 
         const doLogin = () => {

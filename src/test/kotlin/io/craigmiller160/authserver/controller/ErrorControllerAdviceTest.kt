@@ -29,7 +29,7 @@ class ErrorControllerAdviceTest {
         val ex = UnsupportedGrantTypeException("message")
 
         val error = errorControllerAdvice.exception(req, ex)
-        assertThat(error, allOf(
+        assertThat(error.body, allOf(
                 hasProperty("status", equalTo(400)),
                 hasProperty("error", equalTo("Bad Request")),
                 hasProperty("message", equalTo("Unsupported OAuth2 Grant Type - message")),
@@ -44,7 +44,7 @@ class ErrorControllerAdviceTest {
         val ex = Exception("message")
 
         val error = errorControllerAdvice.exception(req, ex)
-        assertThat(error, allOf(
+        assertThat(error.body, allOf(
                 hasProperty("status", equalTo(500)),
                 hasProperty("error", equalTo("Internal Server Error")),
                 hasProperty("message", equalTo("Error - message")),
@@ -60,13 +60,23 @@ class ErrorControllerAdviceTest {
         `when`(ex.message).thenReturn("message")
 
         val error = errorControllerAdvice.accessDeniedException(req, ex)
-        assertThat(error, allOf(
+        assertThat(error.body, allOf(
                 hasProperty("status", equalTo(403)),
                 hasProperty("error", equalTo("Access Denied")),
                 hasProperty("message", equalTo("message")),
                 hasProperty("timestamp", notNullValue()),
                 hasProperty("path", equalTo("uri"))
         ))
+    }
+
+    @Test
+    fun test_mediaTypeNotSupportedException() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_methodNotSupportedException() {
+        TODO("Finish this")
     }
 
 }

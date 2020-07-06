@@ -42,6 +42,8 @@ class JwtHandler(
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)
                     .claim("userEmail", user.email)
+                    .claim("firstName", user.firstName) // TODO add to tests
+                    .claim("lastName", user.lastName) // TODO add to tests
         } ?: claimBuilder.subject(clientUserDetails.client.name)
 
         val claims = claimBuilder.build()

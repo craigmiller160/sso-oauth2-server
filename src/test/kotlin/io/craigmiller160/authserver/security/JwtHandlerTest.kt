@@ -96,7 +96,7 @@ class JwtHandlerTest {
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(9, jsonObject.length())
+        assertEquals(11, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
@@ -105,6 +105,8 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
         assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
         assertEquals(0, jsonObject.getJSONArray("roles").length())
     }
 
@@ -120,7 +122,7 @@ class JwtHandlerTest {
         assertEquals(expectedHeader, header)
 
         val jsonObject = JSONObject(body)
-        assertEquals(9, jsonObject.length())
+        assertEquals(11, jsonObject.length())
         assertThat(jsonObject.getLong("nbf"), notNullValue())
         assertThat(jsonObject.getLong("iat"), notNullValue())
         assertThat(jsonObject.getString("jti"), equalTo(tokenId))
@@ -129,6 +131,8 @@ class JwtHandlerTest {
         assertThat(jsonObject.getString("sub"), equalTo(user.email))
         assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
         assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
 
         val rolesArray = jsonObject.getJSONArray("roles")
         assertEquals(1, rolesArray.length())

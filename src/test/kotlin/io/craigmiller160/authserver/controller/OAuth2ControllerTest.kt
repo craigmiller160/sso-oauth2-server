@@ -61,7 +61,7 @@ class OAuth2ControllerTest {
 
         assertEquals(302, statusCaptor.value)
         assertEquals("Location", headerNameCaptor.value)
-        assertEquals("${login.redirectUri}?code=$authCode", headerValueCaptor.value)
+        assertEquals("${login.redirectUri}?code=$authCode&state=${login.state}", headerValueCaptor.value)
     }
 
     @Test

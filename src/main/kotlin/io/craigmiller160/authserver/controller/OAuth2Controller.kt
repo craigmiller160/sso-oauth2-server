@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -37,7 +39,7 @@ class OAuth2Controller(
     fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
         oAuth2Service.validateAuthCodeLogin(login)
         val authCode = oAuth2Service.authCodeLogin(login)
-        val redirectUrl = "${login.redirectUri}?code=$authCode"
+        val redirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}"
         res.status = 302
         res.addHeader("Location", redirectUrl)
     }

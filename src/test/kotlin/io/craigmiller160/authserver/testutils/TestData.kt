@@ -29,7 +29,7 @@ object TestData {
     fun createTokenRequest(grantType: String, username: String? = null,
                            password: String? = null, refreshToken: String? = null,
                            clientId: String? = null, redirectUri: String? = null, code: String? = null): TokenRequest {
-        return TokenRequest(grantType, username, password, refreshToken, clientId, code, redirectUri)
+        return TokenRequest(grantType, username, password, refreshToken, clientId, code, redirectUri, null)
     }
 
     fun createClient(accessTokenTimeoutSecs: Int = 0, refreshTokenTimeoutSecs: Int = 0) = Client(

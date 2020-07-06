@@ -7,5 +7,6 @@ data class TokenRequest(
         val refresh_token: String?,
         val client_id: String?,
         val code: String?,
-        val redirect_uri: String?
+        val redirect_uri: String?,
+        val state: String?
 )

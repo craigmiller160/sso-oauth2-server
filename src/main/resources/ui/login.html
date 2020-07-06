@@ -51,12 +51,9 @@
         </div>
     </div>
     <script>
-        const usernameField = document.querySelector('#username');
-        const passwordField = document.querySelector('#password');
         const clientIdField = document.querySelector('#clientId');
         const redirectUriField = document.querySelector('#redirectUri');
         const responseTypeField = document.querySelector('#responseType');
-        const submitBtn = document.querySelector('#submitBtn');
 
         const populateQueryParamValues = () => {
             const queryString = window.location.search.replace('?', '');
@@ -71,37 +68,6 @@
             redirectUriField.value = decodeURIComponent(queryParams.redirect_uri);
             responseTypeField.value = decodeURIComponent(queryParams.response_type);
         };
-
-        const doLogin = () => {
-            const body = {
-                username: usernameField.value,
-                password: passwordField.value,
-                clientId: clientIdField.value,
-                redirectUri: redirectUriField.value,
-                responseType: responseTypeField.value
-            };
-            const bodyString = Object.entries(body)
-                .map(([key, value]) => `${key}=${value}`)
-                .join('&'); // TODO delete this
-
-            fetch('/oauth/auth', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            })
-                .then((res) => {
-                    console.log(res.headers);
-                })
-                .catch((ex) => console.log(ex)); // TODO better error handling
-        };
-
-        // TODO add enter key support
-        // TODO disable submitBtn until values in input fields
-
-        // submitBtn.onclick = doLogin;
 
         populateQueryParamValues();
 

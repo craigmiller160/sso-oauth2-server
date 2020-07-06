@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.config.TokenConfig
 import net.minidev.json.JSONObject
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -13,8 +14,9 @@ class JwkController (
 ) {
 
     @GetMapping
-    fun getKey(): JSONObject {
-        return tokenConfig.jwkSet().toJSONObject()
+    fun getKey(): ResponseEntity<JSONObject> {
+        val jsonObject = tokenConfig.jwkSet().toJSONObject()
+        return ResponseEntity.ok(jsonObject)
     }
 
 }

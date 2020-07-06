@@ -62,7 +62,6 @@ class ControllerLoggingAdvice {
 
     @AfterThrowing("controllerPublicMethods()", throwing = "throwing")
     fun logResponseAfterThrowing(joinPoint: JoinPoint, throwing: Throwable) {
-        // TODO improve this to include error status code
         val request = getRequest()
         val path = buildPath(request)
         val method = request.method

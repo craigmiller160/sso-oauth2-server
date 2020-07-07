@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-@Component
-@Aspect
-class ControllerLoggingAdvice {
+//@Component
+//@Aspect
+class ControllerLoggingAdvice { // TODO delete this
 
     private val logger = LoggerFactory.getLogger(ControllerLoggingAdvice::class.java)
 

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ComponentScan(basePackages = [
-    "io.craigmiller160.oauth.utils.controller"
+    "io.craigmiller160.oauth.utils.controller",
+    "io.craigmiller160.oauth.utils.util"
 ])
 class OauthUtilsConfig

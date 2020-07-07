@@ -1,6 +1,6 @@
 package io.craigmiller160.authserver.config
 
-import io.craigmiller160.oauth.utils.controller.RequestLogger
+import io.craigmiller160.webutils.controller.RequestLogger
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer

@@ -10,7 +10,7 @@ import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.testutils.JwtUtils
 import io.craigmiller160.authserver.testutils.TestData
-import io.craigmiller160.oauth.utils.util.LegacyDateConverter
+import io.craigmiller160.webutils.util.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat

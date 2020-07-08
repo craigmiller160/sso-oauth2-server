@@ -22,6 +22,8 @@ class WebSecurityConfig(
         private val clientUserDetailsService: ClientUserDetailsService
 ) : WebSecurityConfigurerAdapter() {
 
+    // TODO add AuthEntryPoint
+
     override fun configure(http: HttpSecurity?) {
         http?.let {
             http.csrf()

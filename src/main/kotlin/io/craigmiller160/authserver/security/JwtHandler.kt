@@ -11,7 +11,7 @@ import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
-import io.craigmiller160.webutils.util.LegacyDateConverter
+import io.craigmiller160.date.converter.LegacyDateConverter
 import org.springframework.stereotype.Component
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime

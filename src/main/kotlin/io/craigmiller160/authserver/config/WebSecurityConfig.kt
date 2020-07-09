@@ -24,8 +24,6 @@ class WebSecurityConfig(
         private val authEntryPoint: AuthEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
-    // TODO add AuthEntryPoint
-
     override fun configure(http: HttpSecurity?) {
         http?.let {
             http.csrf()

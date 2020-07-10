@@ -6,19 +6,16 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
-import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.Role
-import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.testutils.JwtUtils
 import io.craigmiller160.authserver.testutils.TestData
-import io.craigmiller160.authserver.util.LegacyDateConverter
+import io.craigmiller160.date.converter.LegacyDateConverter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,10 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Spy
 import org.mockito.junit.jupiter.MockitoExtension
 import java.security.KeyPair
-import java.security.KeyPairGenerator
 import java.time.LocalDateTime
 import java.util.Base64
 import java.util.Date
@@ -38,10 +33,10 @@ import java.util.Date
 @ExtendWith(MockitoExtension::class)
 class JwtHandlerTest {
 
+    private val legacyDateConverter = LegacyDateConverter()
+
     @Mock
     private lateinit var tokenConfig: TokenConfig
-    @Spy
-    private val legacyDateConverter = LegacyDateConverter()
 
     private val client = TestData.createClient(
             accessTokenTimeoutSecs = 300,

@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.config
 
 import io.craigmiller160.authserver.service.ClientUserDetailsService
+import io.craigmiller160.webutils.security.AuthEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -19,7 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
         securedEnabled = true
 )
 class WebSecurityConfig(
-        private val clientUserDetailsService: ClientUserDetailsService
+        private val clientUserDetailsService: ClientUserDetailsService,
+        private val authEntryPoint: AuthEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
@@ -39,6 +41,8 @@ class WebSecurityConfig(
                     .requiresChannel().anyRequest().requiresSecure()
                     .and()
                     .httpBasic()
+                    .and()
+                    .exceptionHandling().authenticationEntryPoint(authEntryPoint)
         }
     }
 

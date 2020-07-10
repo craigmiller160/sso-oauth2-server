@@ -36,3 +36,4 @@ security:
 logging:
   level:
     io.craigmiller160.authserver: DEBUG
+    io.craigmiller160.webutils: DEBUG

@@ -8,11 +8,10 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.RefreshTokenData
-import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
-import io.craigmiller160.authserver.util.LegacyDateConverter
+import io.craigmiller160.date.converter.LegacyDateConverter
 import org.springframework.stereotype.Component
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
@@ -21,9 +20,10 @@ import java.util.UUID
 
 @Component
 class JwtHandler(
-        private val tokenConfig: TokenConfig,
-        private val legacyDateConverter: LegacyDateConverter
+        private val tokenConfig: TokenConfig
 ) {
+
+    private val legacyDateConverter = LegacyDateConverter()
 
     private fun generateExp(expSecs: Int): Date {
         val now = LocalDateTime.now()

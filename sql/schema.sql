@@ -15,7 +15,7 @@ CREATE TABLE users (
 
 CREATE TABLE clients (
     id BIGSERIAL NOT NULL,
-    name VARCHAR(255),
+    name VARCHAR(255) UNIQUE,
     client_key VARCHAR(255) UNIQUE NOT NULL,
     client_secret VARCHAR(255) NOT NULL,
     enabled BOOLEAN DEFAULT false,

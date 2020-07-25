@@ -69,6 +69,29 @@ CREATE TABLE refresh_tokens (
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
+CREATE OR REPLACE FUNCTION validate_password()
+    RETURNS trigger AS
+    $BODY$
+
+    BEGIN
+        IF NEW.password IS NULL THEN
+            RAISE EXCEPTION 'password cannot be null';
+        END IF;
+
+        IF TRIM(NEW.password) = '' THEN
+            RAISE EXCEPTION 'password cannot be blank';
+        END IF;
+
+        RETURN NEW;
+    END;
+    $BODY$ LANGUAGE plpgsql;
+
+CREATE TRIGGER password_validation
+    BEFORE INSERT OR UPDATE
+    ON users
+    FOR EACH ROW
+    EXECUTE PROCEDURE validate_client_user_role();
+
 CREATE OR REPLACE FUNCTION validate_client_user_role()
     RETURNS trigger AS
     $BODY$

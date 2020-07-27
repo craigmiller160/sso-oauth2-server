@@ -17,7 +17,7 @@ VALUES (1, 'ROLE_READ', 2),
 SELECT setval('dev.roles_id_seq', 2, true);
 
 INSERT INTO dev.client_users (id, user_id, client_id)
-VALUES (1, 1, 2), (2, 3, 3), (3, 1, 4);
+VALUES (1, 1, 2), (2, 3, 3), (3, 1, 4), (4, 2, 2);
 SELECT setval('dev.client_users_id_seq', 3, true);
 
 INSERT INTO dev.client_user_roles (user_id, client_id, role_id)

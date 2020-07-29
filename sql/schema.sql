@@ -90,7 +90,7 @@ CREATE TRIGGER password_validation
     BEFORE INSERT OR UPDATE
     ON users
     FOR EACH ROW
-    EXECUTE PROCEDURE validate_client_user_role();
+    EXECUTE PROCEDURE validate_password();
 
 CREATE OR REPLACE FUNCTION validate_client_user_role()
     RETURNS trigger AS

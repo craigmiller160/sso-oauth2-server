@@ -74,6 +74,8 @@ CREATE OR REPLACE FUNCTION validate_password()
     $BODY$
 
     BEGIN
+        PERFORM set_config('search_path', TG_TABLE_SCHEMA, true);
+
         IF NEW.password IS NULL THEN
             RAISE EXCEPTION 'password cannot be null';
         END IF;
@@ -100,6 +102,8 @@ CREATE OR REPLACE FUNCTION validate_client_user_role()
     DECLARE user_has_client INT;
 
     BEGIN
+        PERFORM set_config('search_path', TG_TABLE_SCHEMA, true);
+
         IF NEW.client_id IS NULL THEN
             RAISE EXCEPTION 'client_id cannot be null';
         END IF;

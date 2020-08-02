@@ -43,7 +43,8 @@ CREATE TABLE client_users (
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (client_id) REFERENCES clients (id)
+    FOREIGN KEY (client_id) REFERENCES clients (id),
+    UNIQUE (user_id, client_id)
 );
 
 CREATE TABLE client_user_roles (

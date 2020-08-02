@@ -62,11 +62,12 @@ CREATE TABLE refresh_tokens (
     id VARCHAR(255) NOT NULL,
     refresh_token TEXT NOT NULL,
     client_id BIGINT NOT NULL,
-    user_id BIGINT,
+    user_id BIGINT DEFAULT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
     PRIMARY KEY (id),
     FOREIGN KEY (client_id) REFERENCES clients (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    UNIQUE (client_id, user_id)
 );
 
 CREATE OR REPLACE FUNCTION validate_password()

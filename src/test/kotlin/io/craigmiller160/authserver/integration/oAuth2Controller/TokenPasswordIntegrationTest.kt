@@ -10,7 +10,32 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class TokenPasswordIntegrationTest {
 
     @Test
-    fun test() {
+    fun `token() - password grant invalid client header`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - password grant successful`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - password grant no username`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - password grant no password`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - password grant invalid user`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - password grant bad password`() {
         TODO("Finish this")
     }
 

@@ -10,7 +10,27 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
-    fun test() {
+    fun test_getCss_bootstrap() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_getCss_other() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_getPage_login() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun test_getPage_other() {
+       TODO("Finish this")
+    }
+
+    @Test
+    fun test_getPage_badParams() {
         TODO("Finish this")
     }
 

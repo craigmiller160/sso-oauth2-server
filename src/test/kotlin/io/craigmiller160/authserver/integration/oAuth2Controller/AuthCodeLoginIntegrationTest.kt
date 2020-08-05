@@ -1,4 +1,4 @@
-package io.craigmiller160.authserver.integration.OAuth2Controller
+package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import org.junit.jupiter.api.Test

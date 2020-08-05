@@ -1,4 +1,4 @@
-package io.craigmiller160.authserver.integration.OAuth2Controller
+package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
-class TokenAuthCodeIntegrationTest {
+class TokenPasswordIntegrationTest {
 
     @Test
     fun test() {

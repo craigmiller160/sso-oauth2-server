@@ -10,6 +10,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class TokenAuthCodeIntegrationTest {
 
     @Test
+    fun `token() - auth_code grant invalid client header`() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun `test() - auth_code grant without client_id`() {
         TODO("Finish this")
     }

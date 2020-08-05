@@ -10,7 +10,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class TokenClientCredentialsIntegrationTest {
 
     @Test
-    fun test() {
+    fun `token() - client_credentials grant invalid client header`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `token() - client_credentials grant success`() {
         TODO("Finish this")
     }
 

@@ -10,6 +10,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class TokenRefreshIntegrationTest {
 
     @Test
+    fun `token() - refresh_token grant invalid client header`() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun `token() - successful refresh_token grant`() {
         TODO("Finish this")
     }

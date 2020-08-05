@@ -11,6 +11,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
+    fun test_authCodeLogin_invalidClientHeader() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun test_authCodeLogin() {
         TODO("Finish this")
     }

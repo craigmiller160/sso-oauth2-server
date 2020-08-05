@@ -10,7 +10,42 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class TokenAuthCodeIntegrationTest {
 
     @Test
-    fun test() {
+    fun `test() - auth_code grant without client_id`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant without code`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant without redirect_uri`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant with wrong client key`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant with wrong redirect uri`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant with invalid auth code`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant with expired auth code`() {
+        TODO("Finish this")
+    }
+
+    @Test
+    fun `test() - auth_code grant success`() {
         TODO("Finish this")
     }
 

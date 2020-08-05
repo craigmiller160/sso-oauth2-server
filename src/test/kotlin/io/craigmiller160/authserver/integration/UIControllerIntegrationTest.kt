@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.integration
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,6 +32,11 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
         client1 = clientRepo.save(client1)
         client2 = clientRepo.save(client2)
+    }
+
+    @AfterEach
+    fun clean() {
+        clientRepo.deleteAll()
     }
 
     @Test
@@ -79,14 +85,21 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun test_getPage_noAuthCode() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/ui/login.html?client_id=${client2.clientKey}&redirect_uri=${client2.redirectUri}&response_type=code"
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test
     fun test_getPage_other() {
         apiProcessor.call {
             request {
-                path = "/ui/foo.html"
+                path = "/ui/foo.html?client_id=${client1.clientKey}&redirect_uri=${client1.redirectUri}&response_type=code"
             }
             response {
                 status = 404
@@ -98,7 +111,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_badParams() {
         apiProcessor.call {
             request {
-                path = "/ui/login.html"
+                path = "/ui/login.html?client_id=${client1.clientKey}&redirect_uri=${client1.redirectUri}&response_type=code2"
             }
             response {
                 status = 401

@@ -65,6 +65,11 @@ class OAuth2ControllerTest {
     }
 
     @Test
+    fun test_authCodeLogin_fail() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun test_token_password() {
         val tokenResponse = TokenResponse("password", "", "")
         val request = TestData.createTokenRequest(GrantType.PASSWORD, username = "user", password = "pass")

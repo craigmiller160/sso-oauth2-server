@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration
 
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -11,7 +12,18 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun test_getCss_bootstrap() {
-        TODO("Finish this")
+        val result = apiProcessor.call {
+            request {
+                path = "/ui/resources/css/bootstrap.min.css"
+            }
+            response {
+                headers = mapOf(
+                        "Content-Type" to "text/css"
+                )
+            }
+        }
+
+        assertTrue(result.response.contentAsString.isNotBlank())
     }
 
     @Test

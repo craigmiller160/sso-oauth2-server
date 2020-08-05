@@ -7,6 +7,7 @@ import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
+import io.craigmiller160.authserver.utils.encodeUriParams
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,8 +15,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -43,13 +42,23 @@ class OAuth2Controller(
         try {
             oAuth2Service.validateAuthCodeLogin(login)
             val authCode = oAuth2Service.authCodeLogin(login)
-            val successRedirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}&state=${URLEncoder.encode(login.state, StandardCharsets.UTF_8)}"
+            val successParams = encodeUriParams(mapOf(
+                    "code" to authCode,
+                    "state" to login.state
+            ))
+            val successRedirectUrl = "${login.redirectUri}?$successParams"
             res.status = 302
             res.addHeader("Location", successRedirectUrl)
         } catch (ex: Exception) {
             log.debug("Error during login", ex)
-
-            val failRedirectUri = "/ui/login.html"
+            val failParams = encodeUriParams(mapOf(
+                    "response_type" to login.responseType,
+                    "client_id" to login.clientId,
+                    "redirect_uri" to login.redirectUri,
+                    "state" to login.state,
+                    "fail" to "true"
+            ))
+            val failRedirectUri = "/ui/login.html?$failParams"
             res.status = 302
             res.addHeader("Location", failRedirectUri)
         }

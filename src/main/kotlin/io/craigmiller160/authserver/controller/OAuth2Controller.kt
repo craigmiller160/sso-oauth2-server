@@ -8,9 +8,10 @@ import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.net.URLEncoder
@@ -22,6 +23,8 @@ import javax.servlet.http.HttpServletResponse
 class OAuth2Controller(
         private val oAuth2Service: OAuth2Service
 ) {
+
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/token", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun token(tokenRequest: TokenRequest): TokenResponse {
@@ -37,11 +40,19 @@ class OAuth2Controller(
 
     @PostMapping("/auth")
     fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
-        oAuth2Service.validateAuthCodeLogin(login)
-        val authCode = oAuth2Service.authCodeLogin(login)
-        val redirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}&state=${URLEncoder.encode(login.state, StandardCharsets.UTF_8)}"
-        res.status = 302
-        res.addHeader("Location", redirectUrl)
+        try {
+            oAuth2Service.validateAuthCodeLogin(login)
+            val authCode = oAuth2Service.authCodeLogin(login)
+            val successRedirectUrl = "${login.redirectUri}?code=${URLEncoder.encode(authCode, StandardCharsets.UTF_8)}&state=${URLEncoder.encode(login.state, StandardCharsets.UTF_8)}"
+            res.status = 302
+            res.addHeader("Location", successRedirectUrl)
+        } catch (ex: Exception) {
+            log.debug("Error during login", ex)
+
+            val failRedirectUri = "/ui/login.html"
+            res.status = 302
+            res.addHeader("Location", failRedirectUri)
+        }
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {

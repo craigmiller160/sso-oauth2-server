@@ -17,6 +17,9 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.junit.jupiter.MockitoExtension
+import java.lang.RuntimeException
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.servlet.http.HttpServletResponse
 
 @ExtendWith(MockitoExtension::class)
@@ -66,7 +69,27 @@ class OAuth2ControllerTest {
 
     @Test
     fun test_authCodeLogin_fail() {
-        TODO("Finish this")
+        val login = TestData.createAuthCodeLogin()
+        `when`(oAuth2Service.authCodeLogin(login))
+                .thenThrow(RuntimeException("Failing"))
+
+        val headerNameCaptor = ArgumentCaptor.forClass(String::class.java)
+        val headerValueCaptor = ArgumentCaptor.forClass(String::class.java)
+        val statusCaptor = ArgumentCaptor.forClass(Int::class.java)
+
+        oAuth2Controller.authCodeLogin(login, res)
+
+        verify(res, times(1))
+                .status = statusCaptor.capture()
+        verify(res, times(1))
+                .addHeader(headerNameCaptor.capture(), headerValueCaptor.capture())
+
+        assertEquals(302, statusCaptor.value)
+        assertEquals("Location", headerNameCaptor.value)
+
+        val redirect = URLEncoder.encode(login.redirectUri, StandardCharsets.UTF_8)
+        val expectedUri = "/ui/login.html?response_type=${login.responseType}&client_id=${login.clientId}&redirect_uri=$redirect&state=${login.state}&fail=true"
+        assertEquals(expectedUri, headerValueCaptor.value)
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
+import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.ClientRepository
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
@@ -39,7 +41,14 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
     @Test
     fun `token() - client_credentials grant success`() {
-        TODO("Finish this")
+        val tokenResponse = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+            }
+        }.convert(TokenResponse::class.java)
+
+        println(tokenResponse) // TODO delete this
     }
 
 }

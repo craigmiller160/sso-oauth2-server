@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 
 @AutoConfigureMockMvc
@@ -27,6 +28,8 @@ abstract class AbstractControllerIntegrationTest {
     private lateinit var clientRepo: ClientRepository
     private lateinit var authClient: Client
 
+    private val bcryptEncoder = BCryptPasswordEncoder()
+
     protected val validClientKey = "ValidClientKey"
     protected val validClientSecret = "ValidClientSecret"
     protected val validClientName = "ValidClientName"
@@ -40,13 +43,16 @@ abstract class AbstractControllerIntegrationTest {
                 type = AuthType.BASIC
                 userName = validClientKey
                 password = validClientSecret
+                isSecure = true
             }
         }
+
+        val encodedSecret = bcryptEncoder.encode(validClientSecret)
 
         authClient = TestData.createClient().copy(
                 name = validClientName,
                 clientKey = validClientKey,
-                clientSecret = validClientSecret
+                clientSecret = "{bcrypt}$encodedSecret"
         )
         authClient = clientRepo.save(authClient)
     }

@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
+import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -45,6 +46,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
             request {
                 path = "/oauth/token"
                 method = HttpMethod.POST
+                body = formOf("grant_type" to "client_credentials")
             }
         }.convert(TokenResponse::class.java)
 

@@ -6,6 +6,11 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.greaterThan
+import org.hamcrest.Matchers.hasProperty
+import org.hamcrest.core.AllOf.allOf
+import org.hamcrest.text.CharSequenceLength.hasLength
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,7 +55,11 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
             }
         }.convert(TokenResponse::class.java)
 
-        println(tokenResponse) // TODO delete this
+        assertThat(tokenResponse, allOf(
+                hasProperty("accessToken", hasLength(greaterThan(0))),
+                hasProperty("refreshToken", hasLength(greaterThan(0))),
+                hasProperty("tokenId", hasLength(greaterThan(0)))
+        ))
     }
 
 }

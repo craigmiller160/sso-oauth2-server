@@ -1,12 +1,15 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
+import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
+import org.exparity.hamcrest.date.DateMatchers.after
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.hasProperty
 import org.hamcrest.core.AllOf.allOf
@@ -55,11 +58,20 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
             }
         }.convert(TokenResponse::class.java)
 
-        assertThat(tokenResponse, allOf(
-                hasProperty("accessToken", hasLength(greaterThan(0))),
-                hasProperty("refreshToken", hasLength(greaterThan(0))),
-                hasProperty("tokenId", hasLength(greaterThan(0)))
-        ))
+        testTokenResponse(tokenResponse)
+    }
+
+    private fun testTokenResponse(tokenResponse: TokenResponse) {
+        val (accessToken, refreshToken, tokenId) = tokenResponse
+        assertThat(tokenId, hasLength(greaterThan(0)))
+        assertThat(accessToken, hasLength(greaterThan(0)))
+        assertThat(refreshToken, hasLength(greaterThan(0)))
+
+        val accessJwt = SignedJWT.parse(accessToken)
+        val accessClaims = accessJwt.jwtClaimsSet
+
+        assertThat(accessClaims.expirationTime, after(accessClaims.issueTime))
+        assertThat(accessClaims.jwtid, equalTo(tokenId))
     }
 
 }

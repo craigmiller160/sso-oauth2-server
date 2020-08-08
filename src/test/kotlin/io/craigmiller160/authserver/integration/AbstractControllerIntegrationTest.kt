@@ -49,7 +49,7 @@ abstract class AbstractControllerIntegrationTest {
 
         val encodedSecret = bcryptEncoder.encode(validClientSecret)
 
-        authClient = TestData.createClient().copy(
+        authClient = TestData.createClient(100, 1000).copy(
                 name = validClientName,
                 clientKey = validClientKey,
                 clientSecret = "{bcrypt}$encodedSecret"

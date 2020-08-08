@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
+import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -55,27 +56,41 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         userRepo.deleteAll()
     }
 
+    private fun createLoginForm() = formOf(
+            "username" to user.email,
+            "password" to password,
+            "clientId" to validClientKey,
+            "redirectUri" to authClient.redirectUri!!,
+            "responseType" to responseType,
+            "state" to state
+    )
+
     @Test
     fun test_authCodeLogin_invalidClientHeader() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/auth"
+                method = HttpMethod.POST
+                body = createLoginForm()
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = "abc"
+                    password = "def"
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test
     fun test_authCodeLogin() {
-        val form = formOf(
-                "username" to user.email,
-                "password" to password,
-                "clientId" to validClientKey,
-                "redirectUri" to authClient.redirectUri!!,
-                "responseType" to responseType,
-                "state" to state
-        )
-
         val result = apiProcessor.call {
             request {
                 path = "/oauth/auth"
                 method = HttpMethod.POST
-                body = form
+                body = createLoginForm()
             }
             response {
                 status = 302

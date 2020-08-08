@@ -7,11 +7,13 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
+import io.craigmiller160.date.converter.LegacyDateConverter
 import org.exparity.hamcrest.date.DateMatchers.after
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.hasProperty
+import org.hamcrest.Matchers.nullValue
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.text.CharSequenceLength.hasLength
 import org.junit.jupiter.api.AfterEach
@@ -31,6 +33,8 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
     private lateinit var clientRepo: ClientRepository
 
     private lateinit var client1: Client
+
+    private val dateConverter = LegacyDateConverter()
 
     @BeforeEach
     fun setup() {
@@ -70,8 +74,21 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
         val accessJwt = SignedJWT.parse(accessToken)
         val accessClaims = accessJwt.jwtClaimsSet
 
-        assertThat(accessClaims.expirationTime, after(accessClaims.issueTime))
+        val expTime = dateConverter.convertDateToLocalDateTime(accessClaims.expirationTime)
+        val issueTime = dateConverter.convertDateToLocalDateTime(accessClaims.issueTime)
+        val notBeforeTime = dateConverter.convertDateToLocalDateTime(accessClaims.notBeforeTime)
+
+        assertThat(expTime, equalTo(issueTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
+        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
         assertThat(accessClaims.jwtid, equalTo(tokenId))
+        assertThat(accessClaims.getClaim("clientKey") as String, equalTo(validClientKey))
+        assertThat(accessClaims.getClaim("clientName") as String, equalTo(validClientName))
+        assertThat(accessClaims.getStringListClaim("roles"), equalTo(listOf()))
+        assertThat(accessClaims.subject, equalTo(validClientName))
+
+        assertThat(accessClaims.getClaim("userEmail"), nullValue())
+        assertThat(accessClaims.getClaim("firstName"), nullValue())
+        assertThat(accessClaims.getClaim("lastName"), nullValue())
     }
 
 }

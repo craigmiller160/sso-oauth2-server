@@ -33,6 +33,8 @@ abstract class AbstractControllerIntegrationTest {
     protected val validClientKey = "ValidClientKey"
     protected val validClientSecret = "ValidClientSecret"
     protected val validClientName = "ValidClientName"
+    protected val accessTokenTimeoutSecs = 100
+    protected val refreshTokenTimeoutSecs = 1000
 
     @BeforeEach
     fun apiProcessorSetup() {
@@ -49,7 +51,7 @@ abstract class AbstractControllerIntegrationTest {
 
         val encodedSecret = bcryptEncoder.encode(validClientSecret)
 
-        authClient = TestData.createClient(100, 1000).copy(
+        authClient = TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs).copy(
                 name = validClientName,
                 clientKey = validClientKey,
                 clientSecret = "{bcrypt}$encodedSecret"

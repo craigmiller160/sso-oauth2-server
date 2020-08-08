@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.formOf
+import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -49,7 +50,21 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
     @Test
     fun `token() - client_credentials grant invalid client header`() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = formOf("grant_type" to "client_credentials")
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = "abc"
+                    password = "def"
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test

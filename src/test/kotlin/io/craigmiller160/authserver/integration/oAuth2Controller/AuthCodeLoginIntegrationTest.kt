@@ -180,7 +180,23 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun test_authCodeLogin_badCreds() {
-        TODO("Finish this")
+        val form = createLoginForm()
+        form["password"] = "abc"
+
+        val result = apiProcessor.call {
+            request {
+                path = "/oauth/auth"
+                method = HttpMethod.POST
+                body = form
+            }
+            response {
+                status = 302
+            }
+        }
+
+        val location = result.response.getHeader("Location")
+        assertNotNull(location)
+        validateErrorLocation(location!!, form)
     }
 
 }

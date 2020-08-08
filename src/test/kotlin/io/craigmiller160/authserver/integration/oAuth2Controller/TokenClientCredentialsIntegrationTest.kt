@@ -71,6 +71,27 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
         assertThat(accessToken, hasLength(greaterThan(0)))
         assertThat(refreshToken, hasLength(greaterThan(0)))
 
+        testAccessToken(accessToken, tokenId)
+        testRefreshToken(refreshToken, tokenId)
+    }
+
+    private fun testRefreshToken(refreshToken: String, tokenId: String) {
+        val refreshJwt = SignedJWT.parse(refreshToken)
+        val refreshClaims = refreshJwt.jwtClaimsSet
+
+        val expTime = dateConverter.convertDateToLocalDateTime(refreshClaims.expirationTime)
+        val issueTime = dateConverter.convertDateToLocalDateTime(refreshClaims.issueTime)
+        val notBeforeTime = dateConverter.convertDateToLocalDateTime(refreshClaims.notBeforeTime)
+
+        assertThat(expTime, equalTo(issueTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
+        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
+        assertThat(refreshClaims.jwtid, equalTo(tokenId))
+        assertThat(refreshClaims.getClaim("grantType") as String, equalTo("client_credentials"))
+        assertThat(refreshClaims.getClaim("clientId") as Long, equalTo(authClient.id))
+        assertThat(refreshClaims.getClaim("userId"), nullValue())
+    }
+
+    private fun testAccessToken(accessToken: String, tokenId: String) {
         val accessJwt = SignedJWT.parse(accessToken)
         val accessClaims = accessJwt.jwtClaimsSet
 

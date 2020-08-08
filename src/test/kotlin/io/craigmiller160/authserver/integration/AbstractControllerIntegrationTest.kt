@@ -26,7 +26,7 @@ abstract class AbstractControllerIntegrationTest {
 
     @Autowired
     private lateinit var clientRepo: ClientRepository
-    private lateinit var authClient: Client
+    protected lateinit var authClient: Client
 
     private val bcryptEncoder = BCryptPasswordEncoder()
 

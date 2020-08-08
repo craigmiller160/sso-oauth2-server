@@ -1,16 +1,24 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
+import io.craigmiller160.authserver.entity.ClientUser
+import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
+import io.craigmiller160.authserver.repository.ClientUserRepository
+import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.testutils.TestData
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
@@ -18,6 +26,34 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     private val state = "STATE"
+    private val responseType = "code"
+    private val encoder = BCryptPasswordEncoder()
+
+    @Autowired
+    private lateinit var userRepo: UserRepository
+
+    @Autowired
+    private lateinit var clientUserRepo: ClientUserRepository
+
+    private lateinit var user: User
+    private lateinit var password: String
+
+    @BeforeEach
+    fun setup() {
+        user = TestData.createUser()
+        password = user.password
+        user = user.copy(password = "{bcrypt}${encoder.encode(user.password)}")
+        user = userRepo.save(user)
+
+        val clientUser = ClientUser(0, authClient.id, user.id)
+        clientUserRepo.save(clientUser)
+    }
+
+    @AfterEach
+    fun clean() {
+        clientUserRepo.deleteAll()
+        userRepo.deleteAll()
+    }
 
     @Test
     fun test_authCodeLogin_invalidClientHeader() {
@@ -27,11 +63,11 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     @Test
     fun test_authCodeLogin() {
         val form = formOf(
-                "username" to "todo",
-                "password" to "todo",
+                "username" to user.email,
+                "password" to password,
                 "clientId" to validClientKey,
                 "redirectUri" to authClient.redirectUri!!,
-                "responseType" to "code",
+                "responseType" to responseType,
                 "state" to state
         )
 

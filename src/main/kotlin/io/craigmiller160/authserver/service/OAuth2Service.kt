@@ -105,8 +105,6 @@ class OAuth2Service (
         val client = clientRepo.findByClientKey(login.clientId)
                 ?: throw AuthCodeException("Client not supported")
 
-        println("DoingLogin") // TODO delete this
-
         val user = userRepo.findByEmailAndClientId(login.username, client.id)
                 ?: throw AuthCodeException("User not found")
 

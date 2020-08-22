@@ -50,7 +50,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         user = user.copy(password = "{bcrypt}${encoder.encode(user.password)}")
         user = userRepo.save(user)
 
-        val clientUser = ClientUser(0, authClient.id, user.id)
+        val clientUser = ClientUser(0, user.id, authClient.id)
         clientUserRepo.save(clientUser)
     }
 

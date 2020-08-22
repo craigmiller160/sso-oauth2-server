@@ -21,8 +21,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest() {
 
-    private val dateConverter = LegacyDateConverter()
-
     @Test
     fun `token() - client_credentials grant invalid client header`() {
         apiProcessor.call {
@@ -53,53 +51,6 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
         }.convert(TokenResponse::class.java)
 
         testTokenResponse(tokenResponse)
-    }
-
-    private fun testTokenResponse(tokenResponse: TokenResponse) {
-        val (accessToken, refreshToken, tokenId) = tokenResponse
-        assertThat(tokenId, hasLength(greaterThan(0)))
-        assertThat(accessToken, hasLength(greaterThan(0)))
-        assertThat(refreshToken, hasLength(greaterThan(0)))
-
-        testAccessToken(accessToken, tokenId)
-        testRefreshToken(refreshToken, tokenId)
-    }
-
-    private fun testRefreshToken(refreshToken: String, tokenId: String) {
-        val refreshJwt = SignedJWT.parse(refreshToken)
-        val refreshClaims = refreshJwt.jwtClaimsSet
-
-        val expTime = dateConverter.convertDateToLocalDateTime(refreshClaims.expirationTime)
-        val issueTime = dateConverter.convertDateToLocalDateTime(refreshClaims.issueTime)
-        val notBeforeTime = dateConverter.convertDateToLocalDateTime(refreshClaims.notBeforeTime)
-
-        assertThat(expTime, equalTo(issueTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
-        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
-        assertThat(refreshClaims.jwtid, equalTo(tokenId))
-        assertThat(refreshClaims.getClaim("grantType") as String, equalTo("client_credentials"))
-        assertThat(refreshClaims.getClaim("clientId") as Long, equalTo(authClient.id))
-        assertThat(refreshClaims.getClaim("userId"), nullValue())
-    }
-
-    private fun testAccessToken(accessToken: String, tokenId: String) {
-        val accessJwt = SignedJWT.parse(accessToken)
-        val accessClaims = accessJwt.jwtClaimsSet
-
-        val expTime = dateConverter.convertDateToLocalDateTime(accessClaims.expirationTime)
-        val issueTime = dateConverter.convertDateToLocalDateTime(accessClaims.issueTime)
-        val notBeforeTime = dateConverter.convertDateToLocalDateTime(accessClaims.notBeforeTime)
-
-        assertThat(expTime, equalTo(issueTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
-        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
-        assertThat(accessClaims.jwtid, equalTo(tokenId))
-        assertThat(accessClaims.getClaim("clientKey") as String, equalTo(validClientKey))
-        assertThat(accessClaims.getClaim("clientName") as String, equalTo(validClientName))
-        assertThat(accessClaims.getStringListClaim("roles"), equalTo(listOf()))
-        assertThat(accessClaims.subject, equalTo(validClientName))
-
-        assertThat(accessClaims.getClaim("userEmail"), nullValue())
-        assertThat(accessClaims.getClaim("firstName"), nullValue())
-        assertThat(accessClaims.getClaim("lastName"), nullValue())
     }
 
 }

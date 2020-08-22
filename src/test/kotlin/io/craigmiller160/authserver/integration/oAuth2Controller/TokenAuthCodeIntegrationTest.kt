@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
+import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -80,13 +81,15 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `test() - auth_code grant success`() {
-        apiProcessor.call {
+        val result = apiProcessor.call {
             request {
                 path = "/oauth/token"
                 method = HttpMethod.POST
                 body = createTokenForm()
             }
-        }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result)
     }
 
     @Test

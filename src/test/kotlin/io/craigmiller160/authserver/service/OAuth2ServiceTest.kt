@@ -382,6 +382,8 @@ class OAuth2ServiceTest {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
                 .thenReturn(client)
+        `when`(userRepo.findByEmailAndClientId(login.username, client.id))
+                .thenReturn(user)
 
         oAuth2Service.validateAuthCodeLogin(login)
         // No tests needed, if an exception is not thrown, then this is a success
@@ -408,6 +410,8 @@ class OAuth2ServiceTest {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
                 .thenReturn(client.copy(allowAuthCode = false))
+        `when`(userRepo.findByEmailAndClientId(login.username, client.id))
+                .thenReturn(user)
 
         val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
         assertEquals("Client does not support Auth Code", ex.message)

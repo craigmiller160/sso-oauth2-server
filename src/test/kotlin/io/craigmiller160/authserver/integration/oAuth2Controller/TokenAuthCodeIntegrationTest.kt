@@ -64,7 +64,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `test() - auth_code grant success`() {
+    fun `token() - auth_code grant success`() {
         val result = apiProcessor.call {
             request {
                 path = "/oauth/token"
@@ -77,7 +77,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `test() - auth_code grant validation rules`() {
+    fun `token() - auth_code grant validation rules`() {
         val runTest = { body: Form ->
             apiProcessor.call {
                 request {
@@ -97,7 +97,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `test() - auth_code grant with invalid login`() {
+    fun `token() - auth_code grant with invalid login`() {
         val runTest = { body: Form ->
             apiProcessor.call {
                 request {

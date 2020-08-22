@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
+import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
@@ -26,12 +27,10 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
 
     private fun createTokenForm(
-            clientId: String = validClientKey,
             username: String = authUser.email,
             password: String = authUserPassword
     ) = formOf(
-            "grant_type" to GrantType.AUTH_CODE,
-            "client_id" to clientId,
+            "grant_type" to GrantType.PASSWORD,
             "username" to username,
             "password" to password
     )
@@ -68,23 +67,41 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - password grant no username`() {
-        TODO("Finish this")
+    fun `token() - password grant validation`() {
+        val runTest = { body: Form ->
+            apiProcessor.call {
+                request {
+                    path = "/oauth/token"
+                    method = HttpMethod.POST
+                    this.body = body
+                }
+                response {
+                    status = 400
+                }
+            }
+        }
+
+        runTest(createTokenForm(username = ""))
+        runTest(createTokenForm(password = ""))
     }
 
     @Test
-    fun `token() - password grant no password`() {
-        TODO("Finish this")
-    }
+    fun `token() - password grant invalid credentials`() {
+        val runTest = { body: Form ->
+            apiProcessor.call {
+                request {
+                    path = "/oauth/token"
+                    method = HttpMethod.POST
+                    this.body = body
+                }
+                response {
+                    status = 401
+                }
+            }
+        }
 
-    @Test
-    fun `token() - password grant invalid user`() {
-        TODO("Finish this")
-    }
-
-    @Test
-    fun `token() - password grant bad password`() {
-        TODO("Finish this")
+        runTest(createTokenForm(username = "abc"))
+        runTest(createTokenForm(password = "abc"))
     }
 
 }

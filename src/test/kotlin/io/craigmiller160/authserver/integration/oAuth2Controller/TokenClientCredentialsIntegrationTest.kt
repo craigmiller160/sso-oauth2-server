@@ -53,4 +53,10 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
         testTokenResponse(tokenResponse, "client_credentials")
     }
 
+    @Test
+    fun `token() - client_credentials validations`() {
+        // TODO should add some for this
+        TODO("Finish this")
+    }
+
 }

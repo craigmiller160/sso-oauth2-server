@@ -89,7 +89,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `test() - auth_code grant validation`() {
+    fun `test() - auth_code grant validation rules`() {
         val runTest = { body: Form ->
             apiProcessor.call {
                 request {
@@ -103,27 +103,40 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
 
-        runTest(createTokenForm())
-        TODO("Finish this")
+        val noClientId = createTokenForm()
+        noClientId -= "client_id"
+        runTest(noClientId)
+
+        val noCode = createTokenForm()
+        noCode -= "code"
+        runTest(noCode)
+
+        val noRedirectUri = createTokenForm()
+        noRedirectUri -= "redirect_uri"
+        runTest(noRedirectUri)
+
+
     }
 
     @Test
-    fun `test() - auth_code grant without client_id`() {
-        TODO("Finish this")
-    }
+    fun `test() - auth_code grant with invalid login`() {
+        val runTest = { body: Form ->
+            apiProcessor.call {
+                request {
+                    path = "/oauth/token"
+                    method = HttpMethod.POST
+                    this.body = body
+                }
+                response {
+                    status = 401
+                }
+            }
+        }
 
-    @Test
-    fun `test() - auth_code grant without code`() {
-        TODO("Finish this")
-    }
+        val wrongClientKey = createTokenForm()
+        wrongClientKey += "client_id" to "abc"
+        runTest(wrongClientKey)
 
-    @Test
-    fun `test() - auth_code grant without redirect_uri`() {
-        TODO("Finish this")
-    }
-
-    @Test
-    fun `test() - auth_code grant with wrong client key`() {
         TODO("Finish this")
     }
 

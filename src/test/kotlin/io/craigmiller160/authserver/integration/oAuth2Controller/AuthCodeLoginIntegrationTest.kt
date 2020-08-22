@@ -23,7 +23,6 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     private val state = "STATE"
     private val responseType = "code"
-    private val encoder = BCryptPasswordEncoder()
     private val errorUri = "/ui/login.html"
 
     private fun createLoginForm() = formOf(

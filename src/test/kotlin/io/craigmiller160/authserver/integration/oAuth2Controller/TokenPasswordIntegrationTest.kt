@@ -104,4 +104,9 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
         runTest(createTokenForm(password = "abc"))
     }
 
+    @Test
+    fun `token() - password user not in client`() {
+        TODO("Finish this")
+    }
+
 }

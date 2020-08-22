@@ -49,4 +49,9 @@ class TokenRefreshIntegrationTest {
         TODO("Finish this")
     }
 
+    @Test
+    fun `token() - refresh_token user not in client`() {
+        TODO("Finish this")
+    }
+
 }

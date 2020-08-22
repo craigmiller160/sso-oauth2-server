@@ -117,4 +117,9 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
         runTest(createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, authUser.id, -1000)))
     }
 
+    @Test
+    fun `token() - auth_code user not in client`() {
+        TODO("Finish this")
+    }
+
 }

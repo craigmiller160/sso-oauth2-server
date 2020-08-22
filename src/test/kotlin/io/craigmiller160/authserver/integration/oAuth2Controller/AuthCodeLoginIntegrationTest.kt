@@ -2,22 +2,14 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.entity.ClientUser
-import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.ClientUserRepository
-import io.craigmiller160.authserver.repository.UserRepository
-import io.craigmiller160.authserver.testutils.TestData
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -34,35 +26,9 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     private val encoder = BCryptPasswordEncoder()
     private val errorUri = "/ui/login.html"
 
-    @Autowired
-    private lateinit var userRepo: UserRepository
-
-    @Autowired
-    private lateinit var clientUserRepo: ClientUserRepository
-
-    private lateinit var user: User
-    private lateinit var password: String
-
-    @BeforeEach
-    fun setup() {
-        user = TestData.createUser()
-        password = user.password
-        user = user.copy(password = "{bcrypt}${encoder.encode(user.password)}")
-        user = userRepo.save(user)
-
-        val clientUser = ClientUser(0, user.id, authClient.id)
-        clientUserRepo.save(clientUser)
-    }
-
-    @AfterEach
-    fun clean() {
-        clientUserRepo.deleteAll()
-        userRepo.deleteAll()
-    }
-
     private fun createLoginForm() = formOf(
-            "username" to user.email,
-            "password" to password,
+            "username" to authUser.email,
+            "password" to authUserPassword,
             "clientId" to validClientKey,
             "redirectUri" to authClient.redirectUri!!,
             "responseType" to responseType,

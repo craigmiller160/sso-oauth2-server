@@ -43,9 +43,11 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         )
     }
 
-    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS): String {
+    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, userId: Long = 0): String {
         val clientUserDetails = ClientUserDetails(authClient)
-        return jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, 0, tokenId).first
+        val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
+        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, authClient.id, null, LocalDateTime.now()))
+        return refreshToken
     }
 
     @Test
@@ -70,7 +72,6 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     @Test
     fun `token() - successful refresh_token grant for client only`() {
         val refreshToken = createToken()
-        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, authClient.id, null, LocalDateTime.now()))
 
         val result = apiProcessor.call {
             request {
@@ -85,7 +86,17 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - successful refresh_token grant with user`() {
-        TODO("Finish this")
+        val refreshToken = createToken(GrantType.PASSWORD, authUser.id)
+
+        val result = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result, GrantType.PASSWORD, isUser = true)
     }
 
     @Test

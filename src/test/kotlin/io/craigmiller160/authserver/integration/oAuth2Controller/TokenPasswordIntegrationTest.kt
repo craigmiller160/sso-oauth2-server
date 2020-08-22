@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
+import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -23,36 +24,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
-    @Autowired
-    private lateinit var userRepo: UserRepository
-    @Autowired
-    private lateinit var clientUserRepo: ClientUserRepository
-    private lateinit var authUser: User
-    private lateinit var password: String
-
-    private val encoder = BCryptPasswordEncoder()
-
-    @BeforeEach
-    fun setup() {
-        authUser = TestData.createUser()
-        password = authUser.password
-        authUser = userRepo.save(authUser.copy(password = "{bcrypt}encoder.encode(password)"))
-
-        val clientUser = ClientUser(0, authUser.id, authClient.id)
-        clientUserRepo.save(clientUser)
-    }
-
-    @AfterEach
-    fun clean() {
-        userRepo.deleteAll()
-        clientUserRepo.deleteAll()
-    }
-
 
     private fun createTokenForm(
             clientId: String = validClientKey,
             username: String = authUser.email,
-            password: String = this.password
+            password: String = authUserPassword
     ) = formOf(
             "grant_type" to GrantType.AUTH_CODE,
             "client_id" to clientId,
@@ -80,14 +56,15 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - password grant successful`() {
-        apiProcessor.call {
+        val result = apiProcessor.call {
             request {
                 path = "/oauth/token"
                 method = HttpMethod.POST
                 body = createTokenForm()
             }
-        }
-        TODO("Finish this")
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result, "password", isUser = true)
     }
 
     @Test

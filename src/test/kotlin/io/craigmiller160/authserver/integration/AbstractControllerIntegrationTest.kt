@@ -7,10 +7,17 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientUser
+import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.repository.ClientRepository
+import io.craigmiller160.authserver.repository.ClientUserRepository
+import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.date.converter.LegacyDateConverter
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.text.CharSequenceLength
 import org.junit.jupiter.api.AfterEach
@@ -35,8 +42,15 @@ abstract class AbstractControllerIntegrationTest {
     private lateinit var provObjMapper: ObjectMapper
 
     @Autowired
+    private lateinit var userRepo: UserRepository
+    @Autowired
+    private lateinit var clientUserRepo: ClientUserRepository
+    @Autowired
     private lateinit var clientRepo: ClientRepository
     protected lateinit var authClient: Client
+    protected lateinit var authUser: User
+    protected lateinit var authClientUser: ClientUser
+    protected lateinit var authUserPassword: String
 
     @Autowired
     private lateinit var tokenConfig: TokenConfig
@@ -72,11 +86,21 @@ abstract class AbstractControllerIntegrationTest {
                 clientSecret = "{bcrypt}$encodedSecret"
         )
         authClient = clientRepo.save(authClient)
+
+        authUser = TestData.createUser()
+        authUser = userRepo.save(authUser)
+
+        authClientUser = ClientUser(0, authUser.id, authClient.id)
+        authUserPassword = authUser.password
+        authUser = userRepo.save(authUser.copy(password = "{bcrypt}encoder.encode(password)"))
+        authClientUser = clientUserRepo.save(authClientUser)
     }
 
     @AfterEach
     fun apiProcessorCleanup() {
+        clientUserRepo.delete(authClientUser)
         clientRepo.delete(authClient)
+        userRepo.delete(authUser)
     }
 
     protected fun doEncrypt(value: String): String {
@@ -86,17 +110,17 @@ abstract class AbstractControllerIntegrationTest {
         return Base64.getEncoder().encodeToString(bytes)
     }
 
-    protected fun testTokenResponse(tokenResponse: TokenResponse) {
+    protected fun testTokenResponse(tokenResponse: TokenResponse, grantType: String, isUser: Boolean = false) {
         val (accessToken, refreshToken, tokenId) = tokenResponse
         MatcherAssert.assertThat(tokenId, CharSequenceLength.hasLength(Matchers.greaterThan(0)))
         MatcherAssert.assertThat(accessToken, CharSequenceLength.hasLength(Matchers.greaterThan(0)))
         MatcherAssert.assertThat(refreshToken, CharSequenceLength.hasLength(Matchers.greaterThan(0)))
 
-        testAccessToken(accessToken, tokenId)
-        testRefreshToken(refreshToken, tokenId)
+        testAccessToken(accessToken, tokenId, isUser)
+        testRefreshToken(refreshToken, tokenId, grantType, isUser)
     }
 
-    private fun testRefreshToken(refreshToken: String, tokenId: String) {
+    private fun testRefreshToken(refreshToken: String, tokenId: String, grantType: String, isUser: Boolean) {
         val refreshJwt = SignedJWT.parse(refreshToken)
         val refreshClaims = refreshJwt.jwtClaimsSet
 
@@ -104,15 +128,19 @@ abstract class AbstractControllerIntegrationTest {
         val issueTime = dateConverter.convertDateToLocalDateTime(refreshClaims.issueTime)
         val notBeforeTime = dateConverter.convertDateToLocalDateTime(refreshClaims.notBeforeTime)
 
-        MatcherAssert.assertThat(expTime, Matchers.equalTo(issueTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
-        MatcherAssert.assertThat(expTime, Matchers.equalTo(notBeforeTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
-        MatcherAssert.assertThat(refreshClaims.jwtid, Matchers.equalTo(tokenId))
-        MatcherAssert.assertThat(refreshClaims.getClaim("grantType") as String, Matchers.equalTo("client_credentials"))
-        MatcherAssert.assertThat(refreshClaims.getClaim("clientId") as Long, Matchers.equalTo(authClient.id))
-        MatcherAssert.assertThat(refreshClaims.getClaim("userId"), Matchers.nullValue())
+        assertThat(expTime, equalTo(issueTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
+        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(refreshTokenTimeoutSecs.toLong())))
+        assertThat(refreshClaims.jwtid, equalTo(tokenId))
+        assertThat(refreshClaims.getClaim("grantType") as String, equalTo(grantType))
+        assertThat(refreshClaims.getClaim("clientId") as Long, equalTo(authClient.id))
+        if (isUser) {
+            assertThat(refreshClaims.getClaim("userId") as Long, equalTo(authUser.id))
+        } else {
+            assertThat(refreshClaims.getClaim("userId"), nullValue())
+        }
     }
 
-    private fun testAccessToken(accessToken: String, tokenId: String) {
+    private fun testAccessToken(accessToken: String, tokenId: String, isUser: Boolean) {
         val accessJwt = SignedJWT.parse(accessToken)
         val accessClaims = accessJwt.jwtClaimsSet
 
@@ -120,17 +148,23 @@ abstract class AbstractControllerIntegrationTest {
         val issueTime = dateConverter.convertDateToLocalDateTime(accessClaims.issueTime)
         val notBeforeTime = dateConverter.convertDateToLocalDateTime(accessClaims.notBeforeTime)
 
-        MatcherAssert.assertThat(expTime, Matchers.equalTo(issueTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
-        MatcherAssert.assertThat(expTime, Matchers.equalTo(notBeforeTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
-        MatcherAssert.assertThat(accessClaims.jwtid, Matchers.equalTo(tokenId))
-        MatcherAssert.assertThat(accessClaims.getClaim("clientKey") as String, Matchers.equalTo(validClientKey))
-        MatcherAssert.assertThat(accessClaims.getClaim("clientName") as String, Matchers.equalTo(validClientName))
-        MatcherAssert.assertThat(accessClaims.getStringListClaim("roles"), Matchers.equalTo(listOf()))
-        MatcherAssert.assertThat(accessClaims.subject, Matchers.equalTo(validClientName))
-
-        MatcherAssert.assertThat(accessClaims.getClaim("userEmail"), Matchers.nullValue())
-        MatcherAssert.assertThat(accessClaims.getClaim("firstName"), Matchers.nullValue())
-        MatcherAssert.assertThat(accessClaims.getClaim("lastName"), Matchers.nullValue())
+        assertThat(expTime, equalTo(issueTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
+        assertThat(expTime, equalTo(notBeforeTime.plusSeconds(accessTokenTimeoutSecs.toLong())))
+        assertThat(accessClaims.jwtid, equalTo(tokenId))
+        assertThat(accessClaims.getClaim("clientKey") as String, equalTo(validClientKey))
+        assertThat(accessClaims.getClaim("clientName") as String, equalTo(validClientName))
+        assertThat(accessClaims.getStringListClaim("roles"), equalTo(listOf()))
+        if (isUser) {
+            assertThat(accessClaims.subject, equalTo(authUser.email))
+            assertThat(accessClaims.getClaim("userEmail") as String, equalTo(authUser.email))
+            assertThat(accessClaims.getClaim("firstName") as String, equalTo(authUser.firstName))
+            assertThat(accessClaims.getClaim("lastName") as String, equalTo(authUser.lastName))
+        } else {
+            assertThat(accessClaims.subject, equalTo(validClientName))
+            assertThat(accessClaims.getClaim("userEmail"), nullValue())
+            assertThat(accessClaims.getClaim("firstName"), nullValue())
+            assertThat(accessClaims.getClaim("lastName"), nullValue())
+        }
     }
 
 }

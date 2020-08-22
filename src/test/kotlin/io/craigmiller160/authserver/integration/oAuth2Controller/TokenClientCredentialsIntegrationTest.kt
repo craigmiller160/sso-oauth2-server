@@ -50,7 +50,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
             }
         }.convert(TokenResponse::class.java)
 
-        testTokenResponse(tokenResponse)
+        testTokenResponse(tokenResponse, "client_credentials")
     }
 
 }

@@ -32,22 +32,6 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     private lateinit var userRepo: UserRepository
     @Autowired
     private lateinit var clientUserRepo: ClientUserRepository
-    private lateinit var authUser: User
-
-    @BeforeEach
-    fun setup() {
-        authUser = TestData.createUser()
-        authUser = userRepo.save(authUser)
-
-        val clientUser = ClientUser(0, authUser.id, authClient.id)
-        clientUserRepo.save(clientUser)
-    }
-
-    @AfterEach
-    fun clean() {
-        userRepo.deleteAll()
-        clientUserRepo.deleteAll()
-    }
 
     private fun createTokenForm(
             clientId: String = validClientKey,
@@ -89,7 +73,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }.convert(TokenResponse::class.java)
 
-        testTokenResponse(result)
+        testTokenResponse(result, "authorization_code", isUser = true)
     }
 
     @Test

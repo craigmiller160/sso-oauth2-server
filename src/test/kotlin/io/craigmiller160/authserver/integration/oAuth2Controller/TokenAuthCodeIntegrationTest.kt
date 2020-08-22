@@ -3,7 +3,6 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -20,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.util.Base64
-import javax.crypto.Cipher
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
@@ -51,11 +48,15 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
         clientUserRepo.deleteAll()
     }
 
-    private fun createTokenForm() = formOf(
+    private fun createTokenForm(
+            clientId: String = validClientKey,
+            redirectUri: String = authClient.redirectUri!!,
+            code: String = authCodeHandler.createAuthCode(authClient.id, authUser.id, 1000000)
+    ) = formOf(
             "grant_type" to GrantType.AUTH_CODE,
-            "client_id" to validClientKey,
-            "code" to authCodeHandler.createAuthCode(authClient.id, authUser.id, 1000000),
-            "redirect_uri" to authClient.redirectUri!!
+            "client_id" to clientId,
+            "code" to code,
+            "redirect_uri" to redirectUri
     )
 
     @Test
@@ -103,19 +104,9 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
 
-        val noClientId = createTokenForm()
-        noClientId -= "client_id"
-        runTest(noClientId)
-
-        val noCode = createTokenForm()
-        noCode -= "code"
-        runTest(noCode)
-
-        val noRedirectUri = createTokenForm()
-        noRedirectUri -= "redirect_uri"
-        runTest(noRedirectUri)
-
-
+        runTest(createTokenForm(clientId = ""))
+        runTest(createTokenForm(code = ""))
+        runTest(createTokenForm(redirectUri = ""))
     }
 
     @Test
@@ -133,26 +124,10 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
 
-        val wrongClientKey = createTokenForm()
-        wrongClientKey += "client_id" to "abc"
-        runTest(wrongClientKey)
-
-        TODO("Finish this")
-    }
-
-    @Test
-    fun `test() - auth_code grant with wrong redirect uri`() {
-        TODO("Finish this")
-    }
-
-    @Test
-    fun `test() - auth_code grant with invalid auth code`() {
-        TODO("Finish this")
-    }
-
-    @Test
-    fun `test() - auth_code grant with expired auth code`() {
-        TODO("Finish this")
+        runTest(createTokenForm(clientId = "abc"))
+        runTest(createTokenForm(redirectUri = "abc"))
+        runTest(createTokenForm(code = "abc"))
+        runTest(createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, authUser.id, -1000)))
     }
 
 }

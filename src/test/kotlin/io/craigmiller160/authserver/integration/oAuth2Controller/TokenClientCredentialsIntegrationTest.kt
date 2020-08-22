@@ -1,16 +1,9 @@
 package io.craigmiller160.authserver.integration.oAuth2Controller
 
-import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.date.converter.LegacyDateConverter
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.greaterThan
-import org.hamcrest.Matchers.nullValue
-import org.hamcrest.text.CharSequenceLength.hasLength
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest

@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.integration
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.craigmiller160.apitestprocessor.ApiTestProcessor
 import io.craigmiller160.apitestprocessor.config.AuthType
+import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
@@ -13,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
+import java.util.Base64
+import javax.crypto.Cipher
 
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 abstract class AbstractControllerIntegrationTest {
@@ -28,6 +31,9 @@ abstract class AbstractControllerIntegrationTest {
     @Autowired
     private lateinit var clientRepo: ClientRepository
     protected lateinit var authClient: Client
+
+    @Autowired
+    private lateinit var tokenConfig: TokenConfig
 
     private val bcryptEncoder = BCryptPasswordEncoder()
 
@@ -63,6 +69,13 @@ abstract class AbstractControllerIntegrationTest {
     @AfterEach
     fun apiProcessorCleanup() {
         clientRepo.delete(authClient)
+    }
+
+    protected fun doEncrypt(value: String): String {
+        val cipher = Cipher.getInstance("RSA")
+        cipher.init(Cipher.ENCRYPT_MODE, tokenConfig.privateKey)
+        val bytes = cipher.doFinal(value.toByteArray())
+        return Base64.getEncoder().encodeToString(bytes)
     }
 
 }

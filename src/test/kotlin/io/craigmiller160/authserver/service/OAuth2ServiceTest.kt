@@ -182,8 +182,8 @@ class OAuth2ServiceTest {
         setupSecurityContext()
         val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
 
-        `when`(userRepo.findById(user.id))
-                .thenReturn(Optional.of(user))
+        `when`(userRepo.findByUserIdAndClientId(user.id, client.id))
+                .thenReturn(user)
         `when`(authCodeHandler.validateAuthCode(authCode))
                 .thenReturn(Pair(client.id, user.id))
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
@@ -241,7 +241,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Pair(client.id, user.id))
 
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
-        assertEquals("Invalid user id", ex.message)
+        assertEquals("Invalid user", ex.message)
     }
 
     @Test

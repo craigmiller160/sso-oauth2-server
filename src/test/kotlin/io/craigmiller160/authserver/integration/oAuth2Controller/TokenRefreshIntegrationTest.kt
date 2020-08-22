@@ -100,13 +100,21 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - refresh_token grant without refresh_token property`() {
-        TODO("Finish this")
-    }
+    fun `token() - refresh_token grant validations`() {
+        val runTest = { body: Form ->
+            apiProcessor.call {
+                request {
+                    path = "/oauth/token"
+                    method = HttpMethod.POST
+                    this.body = body
+                }
+                response {
+                    status = 400
+                }
+            }
+        }
 
-    @Test
-    fun `token() - refresh_token grant without DB token`() {
-        TODO("Finish this")
+        runTest(createForm(""))
     }
 
     @Test
@@ -116,7 +124,19 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with revoked token`() {
-        TODO("Finish this")
+        val refreshToken = createToken()
+        refreshTokenRepo.deleteAll()
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test

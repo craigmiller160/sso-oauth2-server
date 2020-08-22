@@ -25,6 +25,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
+    private lateinit var otherUser: User
+    private val otherUserPassword: String = "password"
+
+    @Autowired
+    private lateinit var userRepo: UserRepository
 
     private fun createTokenForm(
             username: String = authUser.email,
@@ -34,6 +39,18 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
             "username" to username,
             "password" to password
     )
+
+    @BeforeEach
+    fun setup() {
+        otherUser = TestData.createUser().copy(email = "bob@gmail.com", password = otherUserPassword)
+        otherUser = userRepo.save(otherUser)
+    }
+
+    @AfterEach
+    fun clean() {
+        userRepo.deleteAll()
+    }
+
     @Test
     fun `token() - password grant invalid client header`() {
         apiProcessor.call {
@@ -106,7 +123,16 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - password user not in client`() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                this.body = createTokenForm(username = otherUser.email, password = otherUserPassword)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

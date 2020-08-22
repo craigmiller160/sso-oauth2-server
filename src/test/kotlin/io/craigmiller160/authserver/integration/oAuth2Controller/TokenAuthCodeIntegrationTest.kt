@@ -25,13 +25,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
-    @Autowired
-    private lateinit var authCodeHandler: AuthCodeHandler
+    private lateinit var otherUser: User
+    private val otherUserPassword: String = "password"
 
     @Autowired
     private lateinit var userRepo: UserRepository
+
     @Autowired
-    private lateinit var clientUserRepo: ClientUserRepository
+    private lateinit var authCodeHandler: AuthCodeHandler
 
     private fun createTokenForm(
             clientId: String = validClientKey,
@@ -43,6 +44,17 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
             "code" to code,
             "redirect_uri" to redirectUri
     )
+
+    @BeforeEach
+    fun setup() {
+        otherUser = TestData.createUser().copy(email = "bob@gmail.com", password = otherUserPassword)
+        otherUser = userRepo.save(otherUser)
+    }
+
+    @AfterEach
+    fun clean() {
+        userRepo.deleteAll()
+    }
 
     @Test
     fun `token() - auth_code grant invalid client header`() {
@@ -119,7 +131,18 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - auth_code user not in client`() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                this.body = createTokenForm(
+                        code = authCodeHandler.createAuthCode(authClient.id, otherUser.id, 10000)
+                )
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

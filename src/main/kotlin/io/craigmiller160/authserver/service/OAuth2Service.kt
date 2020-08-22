@@ -90,8 +90,8 @@ class OAuth2Service (
             throw InvalidLoginException("Invalid auth code client")
         }
 
-        val user = userRepo.findById(userId)
-                .orElseThrow { InvalidLoginException("Invalid user id") }
+        val user = userRepo.findByUserIdAndClientId(userId, clientId)
+                ?: throw InvalidLoginException("Invalid user")
 
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 

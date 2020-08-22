@@ -92,7 +92,7 @@ abstract class AbstractControllerIntegrationTest {
 
         authClientUser = ClientUser(0, authUser.id, authClient.id)
         authUserPassword = authUser.password
-        authUser = userRepo.save(authUser.copy(password = "{bcrypt}encoder.encode(password)"))
+        authUser = userRepo.save(authUser.copy(password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}"))
         authClientUser = clientUserRepo.save(authClientUser)
     }
 

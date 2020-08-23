@@ -16,6 +16,9 @@
 	<description>SSO Auth Server</description>
 
 	<properties>
+		<web.utils.version>1.0.0-SNAPSHOT</web.utils.version>
+		<api.test.processor.version>1.0.0-SNAPSHOT</api.test.processor.version>
+		<legacy.date.converter.version>1.0.1</legacy.date.converter.version>
 		<java.version>11</java.version>
 		<kotlin.version>1.3.72</kotlin.version>
 		<postgres.version>42.2.9</postgres.version>
@@ -23,11 +26,28 @@
 		<hamcrest.version>2.2</hamcrest.version>
 		<junit.version>4.13</junit.version>
 		<mockito.kotlin.version>1.6.0</mockito.kotlin.version>
-		<web.utils.version>1.0.0-SNAPSHOT</web.utils.version>
 		<commons.lang.version>3.10</commons.lang.version>
+		<hamcrest.date.version>2.0.7</hamcrest.date.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>io.craigmiller160</groupId>
+			<artifactId>legacy-date-converter</artifactId>
+			<version>${legacy.date.converter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.exparity</groupId>
+			<artifactId>hamcrest-date</artifactId>
+			<version>${hamcrest.date.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.craigmiller160</groupId>
+			<artifactId>api-test-processor</artifactId>
+			<version>${api.test.processor.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>io.craigmiller160</groupId>
 			<artifactId>web-utils</artifactId>

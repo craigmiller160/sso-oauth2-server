@@ -50,7 +50,7 @@ class OAuth2Controller(
             res.status = 302
             res.addHeader("Location", successRedirectUrl)
         } catch (ex: Exception) {
-            log.debug("Error during login", ex)
+            log.error("Error during login", ex)
             val failParams = encodeUriParams(mapOf(
                     "response_type" to login.responseType,
                     "client_id" to login.clientId,

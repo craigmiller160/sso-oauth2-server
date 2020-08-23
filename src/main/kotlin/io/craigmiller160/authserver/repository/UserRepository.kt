@@ -20,4 +20,17 @@ interface UserRepository : JpaRepository<User,Long> {
     """)
     fun findByEmailAndClientId(email: String, clientId: Long): User?
 
+    @Query("""
+        SELECT u
+        FROM User u
+        WHERE u.id = :userId
+        AND u.id = (
+            SELECT cu.userId
+            FROM ClientUser cu
+            WHERE cu.clientId = :clientId
+            AND cu.userId = :userId
+        )
+    """)
+    fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
+
 }

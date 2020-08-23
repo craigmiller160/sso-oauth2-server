@@ -182,8 +182,8 @@ class OAuth2ServiceTest {
         setupSecurityContext()
         val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
 
-        `when`(userRepo.findById(user.id))
-                .thenReturn(Optional.of(user))
+        `when`(userRepo.findByUserIdAndClientId(user.id, client.id))
+                .thenReturn(user)
         `when`(authCodeHandler.validateAuthCode(authCode))
                 .thenReturn(Pair(client.id, user.id))
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
@@ -241,7 +241,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Pair(client.id, user.id))
 
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
-        assertEquals("Invalid user id", ex.message)
+        assertEquals("Invalid user", ex.message)
     }
 
     @Test
@@ -254,8 +254,8 @@ class OAuth2ServiceTest {
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
-        `when`(userRepo.findById(tokenData.userId!!))
-                .thenReturn(Optional.of(user))
+        `when`(userRepo.findByUserIdAndClientId(tokenData.userId!!, client.id))
+                .thenReturn(user)
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
                 .thenReturn(roles)
         `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
@@ -325,7 +325,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Optional.of(refreshTokenEntity))
 
         val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
-        assertEquals("Invalid Refresh UserID", ex.message)
+        assertEquals("Invalid Refresh User", ex.message)
     }
 
     @Test
@@ -382,6 +382,8 @@ class OAuth2ServiceTest {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
                 .thenReturn(client)
+        `when`(userRepo.findByEmailAndClientId(login.username, client.id))
+                .thenReturn(user)
 
         oAuth2Service.validateAuthCodeLogin(login)
         // No tests needed, if an exception is not thrown, then this is a success
@@ -408,6 +410,8 @@ class OAuth2ServiceTest {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
                 .thenReturn(client.copy(allowAuthCode = false))
+        `when`(userRepo.findByEmailAndClientId(login.username, client.id))
+                .thenReturn(user)
 
         val ex = assertThrows<AuthCodeException> { oAuth2Service.validateAuthCodeLogin(login) }
         assertEquals("Client does not support Auth Code", ex.message)

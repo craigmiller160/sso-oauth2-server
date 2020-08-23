@@ -90,8 +90,8 @@ class OAuth2Service (
             throw InvalidLoginException("Invalid auth code client")
         }
 
-        val user = userRepo.findById(userId)
-                .orElseThrow { InvalidLoginException("Invalid user id") }
+        val user = userRepo.findByUserIdAndClientId(userId, clientId)
+                ?: throw InvalidLoginException("Invalid user")
 
         val roles = roleRepo.findAllByUserIdAndClientId(user.id, clientUserDetails.client.id)
 
@@ -127,6 +127,9 @@ class OAuth2Service (
         val client = clientRepo.findByClientKey(login.clientId)
                 ?: throw AuthCodeException("Client not supported")
 
+        userRepo.findByEmailAndClientId(login.username, client.id)
+                ?: throw AuthCodeException("User not found")
+
         if (!client.supportsAuthCode(login.redirectUri)) {
             throw AuthCodeException("Client does not support Auth Code")
         }
@@ -143,8 +146,8 @@ class OAuth2Service (
         refreshTokenRepo.delete(existingTokenEntity)
 
         val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
-            val user = userRepo.findById(userId)
-                    .orElseThrow { InvalidRefreshTokenException("Invalid Refresh UserID") }
+            val user = userRepo.findByUserIdAndClientId(userId, clientUserDetails.client.id)
+                    ?: throw InvalidRefreshTokenException("Invalid Refresh User")
 
             val roles = roleRepo.findAllByUserIdAndClientId(userId, clientUserDetails.client.id)
             Pair(user, roles)

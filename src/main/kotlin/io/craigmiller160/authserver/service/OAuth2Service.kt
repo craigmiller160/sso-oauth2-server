@@ -149,8 +149,6 @@ class OAuth2Service (
 
     @Transactional
     fun refresh(origRefreshToken: String): TokenResponse {
-        // TODO need to validate refresh_token grant_type... especially if the plan is to disable client_credentials
-
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 

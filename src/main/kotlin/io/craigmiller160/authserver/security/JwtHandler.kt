@@ -10,7 +10,9 @@ import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
+import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.date.converter.LegacyDateConverter
 import org.springframework.stereotype.Component
 import java.security.interfaces.RSAPublicKey
@@ -106,6 +108,9 @@ class JwtHandler(
 
         val userId = claims.getLongClaim("userId")
         val grantType = claims.getStringClaim("grantType")
+        if (GrantType.isGrantTypeSupported(grantType)) {
+            throw UnsupportedGrantTypeException(grantType)
+        }
         val tokenId = claims.jwtid
 
         return RefreshTokenData(tokenId, grantType, refreshClientId, userId)

@@ -135,8 +135,12 @@ class OAuth2Service (
         val client = clientRepo.findByClientKey(login.clientId)
                 ?: throw AuthCodeException("Client not supported")
 
-        userRepo.findByEmailAndClientId(login.username, client.id)
+        val user = userRepo.findByEmailAndClientId(login.username, client.id)
                 ?: throw AuthCodeException("User not found")
+
+        if (!user.enabled) {
+            throw AuthCodeException("User is disabled")
+        }
 
         if (!client.supportsAuthCode(login.redirectUri)) {
             throw AuthCodeException("Client does not support Auth Code")

@@ -190,16 +190,20 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     fun `authCodeLogin() - auth_code login with disabled user`() {
         val form = createLoginForm(user = disabledUser)
 
-        apiProcessor.call {
+        val result = apiProcessor.call {
             request {
                 path = "/oauth/auth"
                 method = HttpMethod.POST
                 body = form
             }
             response {
-                status = 401
+                status = 302
             }
         }
+
+        val location = result.response.getHeader("Location")
+        assertNotNull(location)
+        validateErrorLocation(location!!, form)
     }
 
 }

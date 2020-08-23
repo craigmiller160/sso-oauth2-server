@@ -130,7 +130,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - auth_code user not in client`() {
+    fun `token() - auth_code grant user not in client`() {
         apiProcessor.call {
             request {
                 path = "/oauth/token"
@@ -138,6 +138,30 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
                 this.body = createTokenForm(
                         code = authCodeHandler.createAuthCode(authClient.id, otherUser.id, 10000)
                 )
+            }
+            response {
+                status = 401
+            }
+        }
+    }
+
+    @Test
+    fun `token() - auth_code grant with disabled client`() {
+        val form = createTokenForm(
+                clientId = disabledClient.clientKey,
+                code = authCodeHandler.createAuthCode(disabledClient.id, authUser.id, 1000000)
+        )
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = form
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
             }
             response {
                 status = 401

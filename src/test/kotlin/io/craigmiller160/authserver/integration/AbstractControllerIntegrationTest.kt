@@ -49,8 +49,10 @@ abstract class AbstractControllerIntegrationTest {
     private lateinit var clientRepo: ClientRepository
     protected lateinit var authClient: Client
     protected lateinit var authUser: User
-    protected lateinit var authClientUser: ClientUser
+    private lateinit var authClientUser: ClientUser
+    private lateinit var disabledClientUser: ClientUser
     protected lateinit var authUserPassword: String
+    protected lateinit var disabledClient: Client
 
     @Autowired
     private lateinit var tokenConfig: TokenConfig
@@ -94,12 +96,25 @@ abstract class AbstractControllerIntegrationTest {
         authUserPassword = authUser.password
         authUser = userRepo.save(authUser.copy(password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}"))
         authClientUser = clientUserRepo.save(authClientUser)
+
+        disabledClient = TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs).copy(
+                name = "DisabledClient",
+                clientKey = "DisabledKey",
+                clientSecret = "{bcrypt}$encodedSecret",
+                enabled = false
+        )
+        disabledClient = clientRepo.save(disabledClient)
+
+        disabledClientUser = ClientUser(0, authUser.id, disabledClient.id)
+        disabledClientUser = clientUserRepo.save(disabledClientUser)
     }
 
     @AfterEach
     fun apiProcessorCleanup() {
         clientUserRepo.delete(authClientUser)
+        clientUserRepo.delete(disabledClientUser)
         clientRepo.delete(authClient)
+        clientRepo.delete(disabledClient)
         userRepo.delete(authUser)
     }
 

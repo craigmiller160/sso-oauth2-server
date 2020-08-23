@@ -204,7 +204,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - refresh_token user not in client`() {
+    fun `token() - refresh_token grant user not in client`() {
         val refreshToken = createToken(userId = otherUser.id)
 
         apiProcessor.call {
@@ -212,6 +212,27 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
                 path = "/oauth/token"
                 method = HttpMethod.POST
                 body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
+    }
+
+    @Test
+    fun `token() - refresh_token grant with disabled client`() {
+        val refreshToken = createToken(client = disabledClient)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
             }
             response {
                 status = 401

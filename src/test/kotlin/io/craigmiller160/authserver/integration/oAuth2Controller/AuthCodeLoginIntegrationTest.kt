@@ -25,10 +25,10 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     private val responseType = "code"
     private val errorUri = "/ui/login.html"
 
-    private fun createLoginForm() = formOf(
+    private fun createLoginForm(clientId: String = validClientKey) = formOf(
             "username" to authUser.email,
             "password" to authUserPassword,
-            "clientId" to validClientKey,
+            "clientId" to clientId,
             "redirectUri" to authClient.redirectUri!!,
             "responseType" to responseType,
             "state" to state
@@ -162,6 +162,27 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         val location = result.response.getHeader("Location")
         assertNotNull(location)
         validateErrorLocation(location!!, form)
+    }
+
+    @Test
+    fun `authCodeLogin() - auth_code login with disabled client`() {
+        val form = createLoginForm(disabledClient.clientKey)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/auth"
+                method = HttpMethod.POST
+                body = form
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

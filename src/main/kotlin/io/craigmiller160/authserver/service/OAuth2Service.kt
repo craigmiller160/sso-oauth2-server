@@ -7,7 +7,6 @@ import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.AuthCodeException
-import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.repository.ClientRepository
@@ -15,12 +14,10 @@ import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.AuthCodeHandler
-import io.craigmiller160.authserver.security.ClientAuthorities
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import org.apache.commons.lang3.StringUtils
-import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -45,7 +42,6 @@ class OAuth2Service (
         refreshTokenRepo.save(refreshTokenEntity)
     }
 
-    @Secured(ClientAuthorities.CLIENT_CREDENTIALS)
     @Transactional
     fun clientCredentials(): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
@@ -55,7 +51,6 @@ class OAuth2Service (
         return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
-    @Secured(ClientAuthorities.PASSWORD)
     @Transactional
     fun password(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
@@ -78,7 +73,7 @@ class OAuth2Service (
         return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
-    @Secured(ClientAuthorities.AUTH_CODE)
+    @Transactional
     fun authCode(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         if (clientUserDetails.client.clientKey != tokenRequest.client_id) {
@@ -109,6 +104,7 @@ class OAuth2Service (
         return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
 
+    @Transactional
     fun authCodeLogin(login: AuthCodeLogin): String {
         val client = clientRepo.findByClientKey(login.clientId)
                 ?: throw AuthCodeException("Client not supported")
@@ -123,6 +119,7 @@ class OAuth2Service (
         return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!)
     }
 
+    @Transactional
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
         if (StringUtils.isBlank(login.state)) {
             throw AuthCodeException("No state property")

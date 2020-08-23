@@ -97,7 +97,7 @@ abstract class AbstractControllerIntegrationTest {
         authUser = userRepo.save(authUser.copy(password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}"))
         authClientUser = clientUserRepo.save(authClientUser)
 
-        disabledClient = TestData.createClient().copy(
+        disabledClient = TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs).copy(
                 name = "DisabledClient",
                 clientKey = "DisabledKey",
                 clientSecret = "{bcrypt}$encodedSecret",

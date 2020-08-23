@@ -110,7 +110,7 @@ abstract class AbstractControllerIntegrationTest {
         disabledClientClientUser = ClientUser(0, authUser.id, disabledClient.id)
         disabledClientClientUser = clientUserRepo.save(disabledClientClientUser)
 
-        disabledUser = TestData.createUser().copy(email = "disabled@gmail.com", password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}")
+        disabledUser = TestData.createUser().copy(email = "disabled@gmail.com", password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}", enabled = false)
         disabledUser = userRepo.save(disabledUser)
 
         disabledUserClientUser = ClientUser(0, disabledUser.id, authClient.id)

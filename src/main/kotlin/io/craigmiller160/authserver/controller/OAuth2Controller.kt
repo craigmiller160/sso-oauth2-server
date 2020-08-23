@@ -29,7 +29,6 @@ class OAuth2Controller(
     fun token(tokenRequest: TokenRequest): TokenResponse {
         validateTokenRequest(tokenRequest)
         return when (tokenRequest.grant_type) {
-            GrantType.CLIENT_CREDENTIALS -> oAuth2Service.clientCredentials()
             GrantType.PASSWORD -> oAuth2Service.password(tokenRequest)
             GrantType.AUTH_CODE -> oAuth2Service.authCode(tokenRequest)
             GrantType.REFRESH_TOKEN -> oAuth2Service.refresh(tokenRequest.refresh_token!!)

@@ -4,6 +4,8 @@ import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
+import io.craigmiller160.authserver.security.GrantType
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -34,12 +36,27 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
     }
 
     @Test
+    fun `token() - client_credentials not allowed`() {
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
+            }
+            response {
+                status = 400
+            }
+        }
+    }
+
+    @Test
+    @Disabled
     fun `token() - client_credentials grant success`() {
         val tokenResponse = apiProcessor.call {
             request {
                 path = "/oauth/token"
                 method = HttpMethod.POST
-                body = formOf("grant_type" to "client_credentials")
+                body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
             }
         }.convert(TokenResponse::class.java)
 

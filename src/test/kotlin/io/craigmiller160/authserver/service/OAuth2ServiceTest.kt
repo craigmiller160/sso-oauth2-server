@@ -84,7 +84,8 @@ class OAuth2ServiceTest {
             email = "craig@gmail.com",
             firstName = "Craig",
             lastName = "Miller",
-            password = password
+            password = password,
+            enabled = true
     )
     private val role = Role(
             id = 1L,

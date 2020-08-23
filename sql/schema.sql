@@ -10,6 +10,7 @@ CREATE TABLE users (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     password VARCHAR(255) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id)
 );
 

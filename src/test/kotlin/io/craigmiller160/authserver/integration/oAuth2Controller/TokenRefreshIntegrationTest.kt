@@ -240,4 +240,20 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         }
     }
 
+    @Test
+    fun `token() - refresh_token grant with disabled user`() {
+        val refreshToken = createToken(userId = disabledUser.id)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
+    }
+
 }

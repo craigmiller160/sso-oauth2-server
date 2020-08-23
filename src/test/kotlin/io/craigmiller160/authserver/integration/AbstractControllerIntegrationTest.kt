@@ -50,9 +50,11 @@ abstract class AbstractControllerIntegrationTest {
     protected lateinit var authClient: Client
     protected lateinit var authUser: User
     private lateinit var authClientUser: ClientUser
-    private lateinit var disabledClientUser: ClientUser
+    private lateinit var disabledClientClientUser: ClientUser
+    private lateinit var disabledUserClientUser: ClientUser
     protected lateinit var authUserPassword: String
     protected lateinit var disabledClient: Client
+    protected lateinit var disabledUser: User
 
     @Autowired
     private lateinit var tokenConfig: TokenConfig
@@ -105,17 +107,25 @@ abstract class AbstractControllerIntegrationTest {
         )
         disabledClient = clientRepo.save(disabledClient)
 
-        disabledClientUser = ClientUser(0, authUser.id, disabledClient.id)
-        disabledClientUser = clientUserRepo.save(disabledClientUser)
+        disabledClientClientUser = ClientUser(0, authUser.id, disabledClient.id)
+        disabledClientClientUser = clientUserRepo.save(disabledClientClientUser)
+
+        disabledUser = TestData.createUser().copy(email = "disabled@gmail.com", password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}", enabled = false)
+        disabledUser = userRepo.save(disabledUser)
+
+        disabledUserClientUser = ClientUser(0, disabledUser.id, authClient.id)
+        disabledUserClientUser = clientUserRepo.save(disabledUserClientUser)
     }
 
     @AfterEach
     fun apiProcessorCleanup() {
         clientUserRepo.delete(authClientUser)
-        clientUserRepo.delete(disabledClientUser)
+        clientUserRepo.delete(disabledClientClientUser)
+        clientUserRepo.delete(disabledUserClientUser)
         clientRepo.delete(authClient)
         clientRepo.delete(disabledClient)
         userRepo.delete(authUser)
+        userRepo.delete(disabledUser)
     }
 
     protected fun doEncrypt(value: String): String {

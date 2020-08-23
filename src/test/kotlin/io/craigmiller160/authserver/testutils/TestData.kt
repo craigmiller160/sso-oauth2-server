@@ -53,7 +53,8 @@ object TestData {
             email = "craig@gmail.com",
             firstName = "Craig",
             lastName = "Miller",
-            password = "password"
+            password = "password",
+            enabled = true
     )
 
     fun createClientUser(userId: Long, clientId: Long) = ClientUser(

@@ -147,7 +147,26 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - auth_code grant with disabled client`() {
-        TODO("Finish this")
+        val form = createTokenForm(
+                clientId = disabledClient.clientKey,
+                code = authCodeHandler.createAuthCode(disabledClient.id, authUser.id, 1000000)
+        )
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = form
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

@@ -16,6 +16,7 @@ import io.craigmiller160.authserver.security.JwtHandler
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -88,6 +89,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
+    @Disabled
     fun `token() - successful refresh_token grant for client only`() {
         val refreshToken = createToken()
 
@@ -100,6 +102,22 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         }.convert(TokenResponse::class.java)
 
         testTokenResponse(result, GrantType.CLIENT_CREDENTIALS)
+    }
+
+    @Test
+    fun `token() - refresh_token grant for client only not allowed`() {
+        val refreshToken = createToken()
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 400
+            }
+        }
     }
 
     @Test

@@ -145,9 +145,12 @@ class OAuth2Service (
 
         refreshTokenRepo.delete(existingTokenEntity)
 
+        clientRepo.findById(tokenData.clientId)
+                .orElseThrow { InvalidRefreshTokenException("Invalid Refresh Client") }
+
         val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
-            val user = userRepo.findById(userId)
-                    .orElseThrow { InvalidRefreshTokenException("Invalid Refresh UserID") }
+            val user = userRepo.findByUserIdAndClientId(userId, clientUserDetails.client.id)
+                    ?: throw InvalidRefreshTokenException("Invalid Refresh User")
 
             val roles = roleRepo.findAllByUserIdAndClientId(userId, clientUserDetails.client.id)
             Pair(user, roles)

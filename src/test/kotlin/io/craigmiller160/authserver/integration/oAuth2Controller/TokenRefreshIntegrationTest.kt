@@ -5,12 +5,16 @@ import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
+import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
+import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
+import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,9 +35,22 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     @Autowired
     private lateinit var refreshTokenRepo: RefreshTokenRepository
 
+    private lateinit var otherUser: User
+    private val otherUserPassword: String = "password"
+
+    @Autowired
+    private lateinit var userRepo: UserRepository
+
+    @BeforeEach
+    fun setup() {
+        otherUser = TestData.createUser().copy(email = "bob@gmail.com", password = otherUserPassword)
+        otherUser = userRepo.save(otherUser)
+    }
+
     @AfterEach
     fun clean() {
         refreshTokenRepo.deleteAll()
+        userRepo.deleteAll()
     }
 
     private fun createForm(refreshToken: String): Form {
@@ -43,10 +60,10 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         )
     }
 
-    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, userId: Long = 0): String {
-        val clientUserDetails = ClientUserDetails(authClient)
+    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, clientId: Long = authClient.id, userId: Long = 0): String {
+        val clientUserDetails = ClientUserDetails(authClient.copy(id = clientId))
         val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
-        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, authClient.id, null, LocalDateTime.now()))
+        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, clientId, null, LocalDateTime.now()))
         return refreshToken
     }
 
@@ -146,12 +163,34 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with bad client ID`() {
-        TODO("Finish this")
+        val refreshToken = createToken(clientId = 10000)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test
     fun `token() - refresh_token user not in client`() {
-        TODO("Finish this")
+        val refreshToken = createToken(userId = otherUser.id)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
@@ -60,10 +61,10 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         )
     }
 
-    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, clientId: Long = authClient.id, userId: Long = 0): String {
-        val clientUserDetails = ClientUserDetails(authClient.copy(id = clientId))
+    private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, client: Client = authClient, userId: Long = 0): String {
+        val clientUserDetails = ClientUserDetails(client)
         val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
-        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, clientId, userId, LocalDateTime.now()))
+        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, client.id, userId, LocalDateTime.now()))
         return refreshToken
     }
 
@@ -171,12 +172,24 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with expired token`() {
-        TODO("Finish this")
+        val client = authClient.copy(refreshTokenTimeoutSecs = -1000)
+        val refreshToken = createToken(client = client)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test
     fun `token() - refresh_token grant with bad client ID`() {
-        val refreshToken = createToken(clientId = 10000)
+        val refreshToken = createToken(client = authClient.copy(id = 10000))
 
         apiProcessor.call {
             request {

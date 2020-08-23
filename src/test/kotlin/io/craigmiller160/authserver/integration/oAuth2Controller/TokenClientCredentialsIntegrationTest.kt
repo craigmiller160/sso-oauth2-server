@@ -48,7 +48,21 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
     @Test
     fun `token() - client_credentials grant with disabled client`() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = formOf("grant_type" to "client_credentials")
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

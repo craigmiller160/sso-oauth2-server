@@ -8,6 +8,7 @@ import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -37,6 +38,7 @@ class OAuth2ControllerTest {
     private val authCode = "authCode"
 
     @Test
+    @Disabled
     fun test_token_clientCredentials() {
         val tokenResponse = TokenResponse("clientCredentials", "", "")
         `when`(oAuth2Service.clientCredentials()).thenReturn(tokenResponse)

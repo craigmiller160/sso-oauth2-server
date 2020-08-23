@@ -169,4 +169,9 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
         }
     }
 
+    @Test
+    fun `token() - auth_code grant with disabled user`() {
+        TODO("Finish this")
+    }
+
 }

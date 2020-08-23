@@ -240,4 +240,9 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         }
     }
 
+    @Test
+    fun `token() - refresh_token grant with disabled user`() {
+        TODO("Finish this")
+    }
+
 }

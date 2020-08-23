@@ -185,4 +185,9 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         }
     }
 
+    @Test
+    fun `authCodeLogin() - auth_code login with disabled user`() {
+        TODO("Finish this")
+    }
+
 }

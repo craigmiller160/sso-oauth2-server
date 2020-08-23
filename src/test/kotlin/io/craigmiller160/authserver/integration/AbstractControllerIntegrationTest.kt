@@ -49,7 +49,8 @@ abstract class AbstractControllerIntegrationTest {
     private lateinit var clientRepo: ClientRepository
     protected lateinit var authClient: Client
     protected lateinit var authUser: User
-    protected lateinit var authClientUser: ClientUser
+    private lateinit var authClientUser: ClientUser
+    private lateinit var disabledClientUser: ClientUser
     protected lateinit var authUserPassword: String
     protected lateinit var disabledClient: Client
 
@@ -103,11 +104,15 @@ abstract class AbstractControllerIntegrationTest {
                 enabled = false
         )
         disabledClient = clientRepo.save(disabledClient)
+
+        disabledClientUser = ClientUser(0, authUser.id, disabledClient.id)
+        disabledClientUser = clientUserRepo.save(disabledClientUser)
     }
 
     @AfterEach
     fun apiProcessorCleanup() {
         clientUserRepo.delete(authClientUser)
+        clientUserRepo.delete(disabledClientUser)
         clientRepo.delete(authClient)
         clientRepo.delete(disabledClient)
         userRepo.delete(authUser)

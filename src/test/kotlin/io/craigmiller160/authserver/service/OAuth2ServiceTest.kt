@@ -254,8 +254,8 @@ class OAuth2ServiceTest {
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
-        `when`(userRepo.findById(tokenData.userId!!))
-                .thenReturn(Optional.of(user))
+        `when`(userRepo.findByUserIdAndClientId(tokenData.userId!!, client.id))
+                .thenReturn(user)
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
                 .thenReturn(roles)
         `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
@@ -325,7 +325,7 @@ class OAuth2ServiceTest {
                 .thenReturn(Optional.of(refreshTokenEntity))
 
         val ex = assertThrows<InvalidRefreshTokenException> { oAuth2Service.refresh(refreshToken) }
-        assertEquals("Invalid Refresh UserID", ex.message)
+        assertEquals("Invalid Refresh User", ex.message)
     }
 
     @Test

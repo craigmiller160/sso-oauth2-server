@@ -63,7 +63,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, clientId: Long = authClient.id, userId: Long = 0): String {
         val clientUserDetails = ClientUserDetails(authClient.copy(id = clientId))
         val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
-        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, clientId, null, LocalDateTime.now()))
+        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, clientId, userId, LocalDateTime.now()))
         return refreshToken
     }
 
@@ -103,7 +103,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - successful refresh_token grant with user`() {
-        val refreshToken = createToken(GrantType.PASSWORD, authUser.id)
+        val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
 
         val result = apiProcessor.call {
             request {

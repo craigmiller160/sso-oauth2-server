@@ -44,7 +44,7 @@ class JwtHandlerTest {
             refreshTokenTimeoutSecs = 300
     )
     private val clientUserDetails = ClientUserDetails(client)
-    private val user = TestData.createUser()
+    private val user = TestData.createUser().copy(id = 1)
     private val origTokenId = "origTokenId"
 
     @InjectMocks

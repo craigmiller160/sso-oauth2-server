@@ -108,7 +108,7 @@ class JwtHandler(
 
         val userId = claims.getLongClaim("userId")
         if (userId == null || userId <= 0) {
-            throw InvalidRefreshTokenException("Refresh token has no user id")
+            throw BadRequestException("Refresh token has no user id")
         }
         val grantType = claims.getStringClaim("grantType")
         if (!GrantType.isGrantTypeSupported(grantType)) {

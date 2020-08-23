@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
+import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
@@ -25,8 +26,8 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     private val responseType = "code"
     private val errorUri = "/ui/login.html"
 
-    private fun createLoginForm(clientId: String = validClientKey) = formOf(
-            "username" to authUser.email,
+    private fun createLoginForm(clientId: String = validClientKey, user: User = authUser) = formOf(
+            "username" to user.email,
             "password" to authUserPassword,
             "clientId" to clientId,
             "redirectUri" to authClient.redirectUri!!,
@@ -187,7 +188,18 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `authCodeLogin() - auth_code login with disabled user`() {
-        TODO("Finish this")
+        val form = createLoginForm(user = disabledUser)
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/auth"
+                method = HttpMethod.POST
+                body = form
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

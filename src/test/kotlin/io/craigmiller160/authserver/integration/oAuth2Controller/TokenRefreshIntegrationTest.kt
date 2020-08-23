@@ -136,7 +136,20 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with bad signature`() {
-        TODO("Finish this")
+        val initRefreshToken = createToken()
+        val tokenParts = initRefreshToken.split(".")
+        val refreshToken = "${tokenParts[0]}.${tokenParts[1]}.ABCDEFG"
+
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                this.body = createForm(refreshToken)
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
     @Test

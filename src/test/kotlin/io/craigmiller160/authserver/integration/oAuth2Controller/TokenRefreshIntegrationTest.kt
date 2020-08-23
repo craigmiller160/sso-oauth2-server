@@ -173,7 +173,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with revoked token`() {
-        val refreshToken = createToken()
+        val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = authUser.id)
         refreshTokenRepo.deleteAll()
 
         apiProcessor.call {
@@ -223,7 +223,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant user not in client`() {
-        val refreshToken = createToken(userId = otherUser.id)
+        val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = otherUser.id)
 
         apiProcessor.call {
             request {
@@ -260,7 +260,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - refresh_token grant with disabled user`() {
-        val refreshToken = createToken(userId = disabledUser.id)
+        val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = disabledUser.id)
 
         apiProcessor.call {
             request {

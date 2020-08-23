@@ -18,6 +18,7 @@ import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -205,6 +206,7 @@ class JwtHandlerTest {
     }
 
     @Test
+    @Disabled
     fun test_parseRefreshToken() {
         val token = createJwt(false, 1000)
 

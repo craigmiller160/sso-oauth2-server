@@ -137,7 +137,21 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - password grant with disabled client`() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                this.body = createTokenForm()
+                overrideAuth {
+                    type = AuthType.BASIC
+                    userName = disabledClient.clientKey
+                    password = validClientSecret
+                }
+            }
+            response {
+                status = 401
+            }
+        }
     }
 
 }

@@ -204,7 +204,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - refresh_token user not in client`() {
+    fun `token() - refresh_token grant user not in client`() {
         val refreshToken = createToken(userId = otherUser.id)
 
         apiProcessor.call {
@@ -217,6 +217,11 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
                 status = 401
             }
         }
+    }
+
+    @Test
+    fun `token() - refresh_token grant with disabled client`() {
+        TODO("Finish this")
     }
 
 }

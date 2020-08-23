@@ -46,4 +46,9 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
         testTokenResponse(tokenResponse, "client_credentials")
     }
 
+    @Test
+    fun `token() - client_credentials grant with disabled client`() {
+        TODO("Finish this")
+    }
+
 }

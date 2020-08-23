@@ -130,7 +130,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
-    fun `token() - auth_code user not in client`() {
+    fun `token() - auth_code grant user not in client`() {
         apiProcessor.call {
             request {
                 path = "/oauth/token"
@@ -143,6 +143,11 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
                 status = 401
             }
         }
+    }
+
+    @Test
+    fun `token() - auth_code grant with disabled client`() {
+        TODO("Finish this")
     }
 
 }

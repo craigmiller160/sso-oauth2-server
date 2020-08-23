@@ -164,4 +164,9 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         validateErrorLocation(location!!, form)
     }
 
+    @Test
+    fun `authCodeLogin() - auth_code login with disabled client`() {
+        TODO("Finish this")
+    }
+
 }

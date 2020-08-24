@@ -10,14 +10,14 @@
 	</parent>
 	<groupId>io.craigmiller160</groupId>
 	<artifactId>sso-oauth2-server</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
 	<description>SSO Auth Server</description>
 
 	<properties>
 		<web.utils.version>1.0.0</web.utils.version>
-		<api.test.processor.version>1.0.0-SNAPSHOT</api.test.processor.version>
+		<api.test.processor.version>1.0.0</api.test.processor.version>
 		<legacy.date.converter.version>1.0.1</legacy.date.converter.version>
 		<java.version>11</java.version>
 		<kotlin.version>1.3.72</kotlin.version>

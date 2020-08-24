@@ -27,7 +27,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
         client1 = TestData.createClient()
         client2 = TestData.createClient().copy(
                 clientKey = "key2",
-                allowAuthCode = false
+                redirectUri = ""
         )
 
         client1 = clientRepo.save(client1)

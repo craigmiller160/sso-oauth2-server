@@ -53,7 +53,7 @@ class UIServiceTest {
         val request = TestData.createPageRequest()
 
         `when`(clientRepo.findByClientKey(request.client_id))
-                .thenReturn(TestData.createClient().copy(allowAuthCode = false))
+                .thenReturn(TestData.createClient().copy(redirectUri = ""))
 
         val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
         assertEquals("Client does not support Auth Code", ex.message)

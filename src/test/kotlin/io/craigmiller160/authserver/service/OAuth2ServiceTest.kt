@@ -410,7 +410,7 @@ class OAuth2ServiceTest {
     fun test_validateAuthCodeLogin_authCodeNotSupported() {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
-                .thenReturn(client.copy(allowAuthCode = false))
+                .thenReturn(client.copy(redirectUri = ""))
         `when`(userRepo.findByEmailAndClientId(login.username, client.id))
                 .thenReturn(user)
 

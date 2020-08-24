@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import java.nio.file.Paths
 import java.security.KeyPair
 import java.security.KeyStore
@@ -32,21 +33,21 @@ class TokenConfig (
 
     @PostConstruct
     fun loadKeys() {
-        val keyStoreFile = evaluatePath()
-
-        val keyStore = KeyStore.getInstance(keyStoreType)
-        keyStoreFile.inputStream()
-                .use { stream -> keyStore.load(stream, keyStorePassword.toCharArray()) }
+        val keyStore = evaluatePath().use { stream ->
+            val store = KeyStore.getInstance(keyStoreType)
+            store.load(stream, keyStorePassword.toCharArray())
+            store
+        }
         privateKey = keyStore.getKey(keyStoreAlias, keyStorePassword.toCharArray()) as PrivateKey
         publicKey = keyStore.getCertificate(keyStoreAlias).publicKey
         keyPair = KeyPair(publicKey, privateKey)
     }
 
-    private fun evaluatePath(): File {
+    private fun evaluatePath(): InputStream {
         if (keyStorePath.startsWith("classpath:")) {
             val path = keyStorePath.replace(Regex("^classpath:"), "")
-            val url = javaClass.classLoader.getResource(path) ?: throw FileNotFoundException(keyStorePath)
-            return File(url.toURI())
+            return javaClass.classLoader.getResourceAsStream(path)
+                    ?: throw FileNotFoundException(keyStorePath)
         }
 
         val file = File(keyStorePath)
@@ -54,7 +55,7 @@ class TokenConfig (
             throw FileNotFoundException(keyStorePath)
         }
 
-        return file
+        return file.inputStream()
     }
 
     fun jwkSet(): JWKSet {

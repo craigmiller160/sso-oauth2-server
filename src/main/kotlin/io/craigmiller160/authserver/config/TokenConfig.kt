@@ -46,7 +46,7 @@ class TokenConfig (
         if (keyStorePath.startsWith("classpath:")) {
             val path = keyStorePath.replace(Regex("^classpath:"), "")
             val url = javaClass.classLoader.getResource(path) ?: throw FileNotFoundException(keyStorePath)
-            return Paths.get(url.toURI()).toFile()
+            return File(url.toURI())
         }
 
         val file = File(keyStorePath)

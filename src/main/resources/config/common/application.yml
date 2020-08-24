@@ -8,6 +8,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  datasource:
+    url: jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/oauth2_server
 
 security:
   token:

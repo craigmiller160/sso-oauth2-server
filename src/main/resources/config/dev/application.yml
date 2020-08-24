@@ -7,7 +7,8 @@ spring:
       hibernate:
         default_schema: dev
   datasource:
-    url: jdbc:postgresql://localhost:30001/oauth2_server
+    host: localhost
+    port: 30001
     username: user
     password: password
 

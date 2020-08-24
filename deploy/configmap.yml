@@ -5,7 +5,6 @@ metadata:
 data:
   spring.profiles.active: prod
   spring.config.location: classpath:/config/common/,classpath:/config/prod/
-  spring.datasource.url: jdbc:postgresql://postgres-service:5432/oauth2_server
   spring.datasource.host: postgres-service
   spring.datasource.port: "5432"
   spring.datasource.username: user

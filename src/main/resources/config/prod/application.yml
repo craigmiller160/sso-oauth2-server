@@ -6,10 +6,6 @@ spring:
     properties:
       hibernate:
         default_schema: prod
-  datasource:
-    url: # TODO
-    username: # TODO
-    password: # TODO
 
 logging:
   level:

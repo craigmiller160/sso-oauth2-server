@@ -1,0 +1,13 @@
+server:
+  port: 8443
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: prod
+
+logging:
+  level:
+    io.craigmiller160.authserver: INFO
+    io.craigmiller160.webutils: INFO

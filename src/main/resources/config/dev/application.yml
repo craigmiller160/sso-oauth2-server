@@ -1,0 +1,18 @@
+server:
+  port: 7003
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: dev
+  datasource:
+    host: localhost
+    port: 30001
+    username: user
+    password: password
+
+logging:
+  level:
+    io.craigmiller160.authserver: DEBUG
+    io.craigmiller160.webutils: DEBUG

@@ -12,6 +12,14 @@ Then, go to the `schema.sql` file. First, execute the first two lines to create 
 
 Lastly, run the `data.sql` file. This populates data in the `dev` schema only, to help with testing. Prod data will need to be written manually.
 
+## Running Locally
+
+To run the app locally, the provided run script must be used.
+
+```
+sh run.sh
+```
+
 ## Supported Authentications
 
 This application supports OAuth2 `client_credentials`, `password`, `refresh_token`, and `auth_code` grant types.
@@ -27,6 +35,8 @@ This application supports OAuth2 `client_credentials`, `password`, `refresh_toke
 The `client_credentials` grant type is the simplest one. It allows a client (generally a single application) to authenticate itself. There is no fine-grained access roles at all in this, just a simple yes/no authentication check.
 
 The client key/secret are provided via Basic Auth. Otherwise, just the grant type is set in the urlencoded body.
+
+NOTE: client_credentials support has been disabled for the time being and cannot be used.
 
 ### password
 

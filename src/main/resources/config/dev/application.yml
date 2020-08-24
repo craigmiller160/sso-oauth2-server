@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: dev
+  datasource:
+    url: jdbc:postgresql://localhost:30001/oauth2_server
+    username: user
+    password: password
+
+logging:
+  level:
+    io.craigmiller160.authserver: DEBUG
+    io.craigmiller160.webutils: DEBUG

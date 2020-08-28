@@ -51,7 +51,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6 offset-md-3">
-                    <form action="/oauth/auth" method="POST" class="login-form">
+                    <form id="login-form" method="POST" class="login-form">
                         <div class="form-group">
                             <label for="username">Username</label>
                             <input id="username" name="username" class="form-control" type="email" required />
@@ -80,14 +80,18 @@
         const header = document.querySelector('head');
         const rootDiv = document.querySelector('#root');
         const usernameField = document.querySelector('#username');
+        const loginForm = document.querySelector('#login-form');
         const cssPath = '/ui/resources/css/bootstrap.min.css';
+        const loginPath = '/oauth/auth';
         let fail = false;
 
-        const addBootstrapStyles = () => {
+        const setupPageWithBasePath = () => {
             const pathParts = window.location.pathname.split('/');
             const uiIndex = pathParts.findIndex((part) => part === 'ui');
             const basePath = pathParts.slice(0, uiIndex).join('/');
             const cssUri = `${basePath}${cssPath}`;
+
+            loginForm.action = `${basePath}${loginPath}`;
 
             const link = document.createElement('link');
             link.rel = 'stylesheet';
@@ -119,7 +123,7 @@
             fail = decodeURIComponent(queryParams.fail) === 'true';
         };
 
-        addBootstrapStyles()
+        setupPageWithBasePath()
             .then(() => populateQueryParamValues())
             .then(() => {
                 if (fail) {

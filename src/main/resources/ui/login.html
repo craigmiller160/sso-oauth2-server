@@ -64,6 +64,7 @@
                         <input id="redirectUri" type="hidden" name="redirectUri" />
                         <input id="responseType" type="hidden" name="responseType" />
                         <input id="state" type="hidden" name="state" />
+                        <input id="basePath" type="hidden" name="basePath" />
                         <button id="submitBtn" type="submit" class="btn btn-success">Login</button>
                     </form>
                 </div>
@@ -80,6 +81,7 @@
         const header = document.querySelector('head');
         const rootDiv = document.querySelector('#root');
         const usernameField = document.querySelector('#username');
+        const basePathField = document.querySelector('#basePath');
         const loginForm = document.querySelector('#login-form');
         const cssPath = '/ui/resources/css/bootstrap.min.css';
         const loginPath = '/oauth/auth';
@@ -89,6 +91,7 @@
             const pathParts = window.location.pathname.split('/');
             const uiIndex = pathParts.findIndex((part) => part === 'ui');
             const basePath = pathParts.slice(0, uiIndex).join('/');
+            basePathField.value = basePath;
             const cssUri = `${basePath}${cssPath}`;
 
             loginForm.action = `${basePath}${loginPath}`;

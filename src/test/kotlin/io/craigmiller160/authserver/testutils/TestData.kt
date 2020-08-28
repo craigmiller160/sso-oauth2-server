@@ -19,6 +19,7 @@ object TestData {
                 clientId = "Key",
                 redirectUri = "http://somewhere.com",
                 responseType = "code",
+                basePath = "/oauth",
                 state = "state"
         )
     }

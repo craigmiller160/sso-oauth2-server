@@ -58,7 +58,7 @@ class OAuth2Controller(
                     "state" to login.state,
                     "fail" to "true"
             ))
-            val failRedirectUri = "${login.basePath}/ui/login?$failParams" // TODO update tests
+            val failRedirectUri = "${login.basePath}/ui/login?$failParams"
             res.status = 302
             res.addHeader("Location", failRedirectUri)
         }

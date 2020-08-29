@@ -24,7 +24,8 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     private val state = "STATE"
     private val responseType = "code"
-    private val errorUri = "/ui/login.html"
+    private val errorUri = "/oauth2/ui/login"
+    private val basePath = "/oauth2"
 
     private fun createLoginForm(clientId: String = validClientKey, user: User = authUser) = formOf(
             "username" to user.email,
@@ -32,7 +33,8 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
             "clientId" to clientId,
             "redirectUri" to authClient.redirectUri!!,
             "responseType" to responseType,
-            "state" to state
+            "state" to state,
+            "basePath" to basePath
     )
 
     private fun handleUrl(url: String): Pair<String,Map<String,String>> {

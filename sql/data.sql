@@ -4,11 +4,11 @@ VALUES (1, 'craig@gmail.com', 'Craig', 'Miller', '{bcrypt}$2a$10$HYKpEK6BFUFH99f
        (3, 'auth@gmail.com', 'Auth', 'Code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true);
 SELECT setval('dev.users_id_seq', 3, true);
 
-INSERT INTO dev.clients (id, name, client_key, client_secret, enabled, allow_client_credentials, allow_password, allow_auth_code, access_token_timeout_secs, refresh_token_timeout_secs, auth_code_timeout_secs, redirect_uri)
-VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, true, false, false, 300, 3600, null, null),
-       (2, 'PasswordApp', 'password', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, false, true, false, 300, 3600, null, null),
-       (3, 'AuthCodeApp', 'auth_code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, false, false, true, 300, 3600, 60, 'http://somewhere.com'),
-       (4, 'auth-management-service', 'a4cc4fef-564e-44c1-82af-45572f124c1a', '{bcrypt}$2a$10$Mo7pB5wHzuChfanS1c9vOOKRmdn0.TEWDi43yjd6jstdkHtmT/FXa', true, false, true, true, 300, 3600, 60, 'https://localhost:3000/api/oauth/authcode/code');
+INSERT INTO dev.clients (id, name, client_key, client_secret, enabled, access_token_timeout_secs, refresh_token_timeout_secs, auth_code_timeout_secs, redirect_uri)
+VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, null, null),
+       (2, 'PasswordApp', 'password', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, null, null),
+       (3, 'AuthCodeApp', 'auth_code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, 60, 'http://somewhere.com'),
+       (4, 'auth-management-service', 'a4cc4fef-564e-44c1-82af-45572f124c1a', '{bcrypt}$2a$10$Mo7pB5wHzuChfanS1c9vOOKRmdn0.TEWDi43yjd6jstdkHtmT/FXa', true, 300, 3600, 60, 'https://localhost:3000/api/oauth/authcode/code');
 SELECT setval('dev.clients_id_seq', 4, true);
 
 INSERT INTO dev.roles (id, name, client_id)

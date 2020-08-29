@@ -15,6 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -37,7 +38,7 @@ class OAuth2Controller(
     }
 
     @PostMapping("/auth")
-    fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
+    fun authCodeLogin(login: AuthCodeLogin, req: HttpServletRequest, res: HttpServletResponse) {
         try {
             oAuth2Service.validateAuthCodeLogin(login)
             val authCode = oAuth2Service.authCodeLogin(login)
@@ -57,7 +58,7 @@ class OAuth2Controller(
                     "state" to login.state,
                     "fail" to "true"
             ))
-            val failRedirectUri = "/ui/login.html?$failParams"
+            val failRedirectUri = "${login.basePath}/ui/login?$failParams"
             res.status = 302
             res.addHeader("Location", failRedirectUri)
         }

@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>OAuth2 Login</title>
-    <link rel="stylesheet" href="/ui/resources/css/bootstrap.min.css">
     <style>
         .header {
             background-color: yellow;
@@ -38,44 +37,78 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand navbar-light header">
-        <a class="navbar-brand">
-            <strong>OAuth2 Login</strong>
-        </a>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <p id="error-msg" class="bg-danger text-center error hidden">Login failure, please try again.</p>
+    <div id="root" class="hidden">
+        <nav class="navbar navbar-expand navbar-light header">
+            <a class="navbar-brand">
+                <strong>OAuth2 Login</strong>
+            </a>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <p id="error-msg" class="bg-danger text-center error hidden">Login failure, please try again.</p>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <form action="/oauth/auth" method="POST" class="login-form">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" class="form-control" type="email" required autofocus />
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" class="form-control" type="password" required />
-                    </div>
-                    <input id="clientId" type="hidden" name="clientId" />
-                    <input id="redirectUri" type="hidden" name="redirectUri" />
-                    <input id="responseType" type="hidden" name="responseType" />
-                    <input id="state" type="hidden" name="state" />
-                    <button id="submitBtn" type="submit" class="btn btn-success">Login</button>
-                </form>
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <form id="login-form" method="POST" class="login-form">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" class="form-control" type="email" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input id="password" name="password" class="form-control" type="password" required />
+                        </div>
+                        <input id="clientId" type="hidden" name="clientId" />
+                        <input id="redirectUri" type="hidden" name="redirectUri" />
+                        <input id="responseType" type="hidden" name="responseType" />
+                        <input id="state" type="hidden" name="state" />
+                        <input id="basePath" type="hidden" name="basePath" />
+                        <button id="submitBtn" type="submit" class="btn btn-success">Login</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
     <script>
         const clientIdField = document.querySelector('#clientId');
         const redirectUriField = document.querySelector('#redirectUri');
         const responseTypeField = document.querySelector('#responseType');
         const stateField = document.querySelector('#state');
         const errorMsg = document.querySelector('#error-msg');
+        const header = document.querySelector('head');
+        const rootDiv = document.querySelector('#root');
+        const usernameField = document.querySelector('#username');
+        const basePathField = document.querySelector('#basePath');
+        const loginForm = document.querySelector('#login-form');
+        const cssPath = '/ui/resources/css/bootstrap';
+        const loginPath = '/oauth/auth';
         let fail = false;
+
+        const setupPageWithBasePath = () => {
+            const pathParts = window.location.pathname.split('/');
+            const uiIndex = pathParts.findIndex((part) => part === 'ui');
+            const basePath = pathParts.slice(0, uiIndex).join('/');
+            basePathField.value = basePath;
+            const cssUri = `${basePath}${cssPath}`;
+
+            loginForm.action = `${basePath}${loginPath}`;
+
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssUri;
+
+            return new Promise((resolve) => {
+                link.onload = () => {
+                    rootDiv.classList.remove('hidden');
+                    usernameField.focus();
+                    resolve();
+                }
+                header.appendChild(link);
+            });
+        };
 
         const populateQueryParamValues = () => {
             const queryString = window.location.search.replace('?', '');
@@ -93,11 +126,13 @@
             fail = decodeURIComponent(queryParams.fail) === 'true';
         };
 
-        populateQueryParamValues();
-        if (fail) {
-            errorMsg.classList.remove('hidden');
-        }
-
+        setupPageWithBasePath()
+            .then(() => populateQueryParamValues())
+            .then(() => {
+                if (fail) {
+                    errorMsg.classList.remove('hidden');
+                }
+            });
     </script>
 </body>
 </html>

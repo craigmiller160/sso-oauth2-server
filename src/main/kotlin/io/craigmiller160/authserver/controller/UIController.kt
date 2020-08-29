@@ -19,7 +19,7 @@ class UIController (
 
     @GetMapping("/resources/css/{resourceName}")
     fun getCss(@PathVariable resourceName: String, res: HttpServletResponse) {
-        javaClass.classLoader.getResourceAsStream("ui/css/$resourceName")
+        javaClass.classLoader.getResourceAsStream("ui/css/$resourceName.css")
                 ?.let { resourceStream ->
                     res.contentType = "text/css"
                     IOUtils.copy(resourceStream, res.writer, StandardCharsets.UTF_8)
@@ -32,7 +32,7 @@ class UIController (
     @GetMapping("/{pageName}")
     fun getPage(@PathVariable pageName: String, res: HttpServletResponse, pageRequest: PageRequest) {
         uiService.validateRequest(pageRequest)
-        javaClass.classLoader.getResourceAsStream("ui/$pageName")
+        javaClass.classLoader.getResourceAsStream("ui/$pageName.html")
                 ?.let { pageStream ->
                     res.contentType = "text/html"
                     IOUtils.copy(pageStream, res.writer, StandardCharsets.UTF_8)

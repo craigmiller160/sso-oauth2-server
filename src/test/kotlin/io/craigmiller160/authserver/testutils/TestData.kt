@@ -17,7 +17,7 @@ object TestData {
                 username = "craig@gmail.com",
                 password = "password",
                 clientId = "Key",
-                redirectUri = "http://somewhere.com",
+                redirectUri = "http://somewhere.com/authcode/code",
                 responseType = "code",
                 basePath = "/oauth",
                 state = "state"
@@ -25,7 +25,7 @@ object TestData {
     }
 
     fun createPageRequest(): PageRequest {
-        return PageRequest("Key", "http://somewhere.com", "code")
+        return PageRequest("Key", "http://somewhere.com/authcode/code", "code")
     }
 
     fun createTokenRequest(grantType: String, username: String? = null,

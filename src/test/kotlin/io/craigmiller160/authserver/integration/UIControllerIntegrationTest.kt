@@ -20,18 +20,15 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     @Autowired
     private lateinit var clientRepo: ClientRepository
 
-    private lateinit var client1: Client
     private lateinit var client2: Client
 
     @BeforeEach
     fun setup() {
-        client1 = TestData.createClient()
         client2 = TestData.createClient().copy(
                 clientKey = "key2",
-                clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))
+                clientRedirectUris = listOf()
         )
 
-        client1 = clientRepo.save(client1)
         client2 = clientRepo.save(client2)
     }
 
@@ -72,7 +69,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_login() {
         val result = apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code"
+                path = "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 headers = mapOf(
@@ -88,7 +85,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_noAuthCode() {
         apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client2.clientKey}&redirect_uri=${client2.getRedirectUris()[0]}&response_type=code"
+                path = "/ui/login?client_id=${client2.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 status = 401
@@ -100,7 +97,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_other() {
         apiProcessor.call {
             request {
-                path = "/ui/foo?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code"
+                path = "/ui/foo?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 status = 404
@@ -112,7 +109,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_badParams() {
         apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code2"
+                path = "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code2"
             }
             response {
                 status = 401

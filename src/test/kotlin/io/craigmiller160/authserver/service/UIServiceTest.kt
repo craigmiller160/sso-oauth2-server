@@ -25,9 +25,11 @@ class UIServiceTest {
     @Test
     fun test_validateRequest() {
         val request = TestData.createPageRequest()
+        val client = TestData.createClient()
+                .copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
 
         `when`(clientRepo.findByClientKey(request.client_id))
-                .thenReturn(TestData.createClient())
+                .thenReturn(client)
 
         uiService.validateRequest(request)
         // No tests needed if an exception is not thrown

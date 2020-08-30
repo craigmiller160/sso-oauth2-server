@@ -79,6 +79,7 @@ class OAuth2ServiceTest {
     private val authCode = "ABCDEFG"
 
     private val client = TestData.createClient()
+            .copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
     private val clientUserDetails = ClientUserDetails(client)
     private val user = User(
             id = 1L,

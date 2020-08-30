@@ -24,7 +24,7 @@ data class Client (
         val refreshTokenTimeoutSecs: Int,
         val authCodeTimeoutSecs: Int,
 
-        @OneToMany(cascade = [CascadeType.ALL, CascadeType.REMOVE], fetch = FetchType.EAGER, orphanRemoval = true)
+        @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
         @JoinColumn(name = "clientId", insertable = false, updatable = false)
         val clientRedirectUris: List<ClientRedirectUri>
 ) {

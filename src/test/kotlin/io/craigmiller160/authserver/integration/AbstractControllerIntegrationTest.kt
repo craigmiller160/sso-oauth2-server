@@ -61,9 +61,6 @@ abstract class AbstractControllerIntegrationTest {
     @Autowired
     private lateinit var tokenConfig: TokenConfig
 
-    @Autowired
-    private lateinit var clientRedirectUriRepo: ClientRedirectUriRepository
-
     private val bcryptEncoder = BCryptPasswordEncoder()
 
     protected val validClientKey = "ValidClientKey"
@@ -128,7 +125,6 @@ abstract class AbstractControllerIntegrationTest {
 
     @AfterEach
     fun apiProcessorCleanup() {
-        clientRedirectUriRepo.deleteAll() // TODO trying this
         clientUserRepo.delete(authClientUser)
         clientUserRepo.delete(disabledClientClientUser)
         clientUserRepo.delete(disabledUserClientUser)

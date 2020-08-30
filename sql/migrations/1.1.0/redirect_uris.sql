@@ -1,3 +1,4 @@
+-- DON'T FORGET TO SET search_path FIRST
 
 ALTER TABLE clients
 DROP COLUMN redirect_uri;

@@ -12,7 +12,9 @@ VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5y
 SELECT setval('dev.clients_id_seq', 4, true);
 
 INSERT INTO dev.client_redirect_uris (client_id, redirect_uri)
-values (3, 'http://somewhere.com'), (4, 'https://localhost:3000/api/oauth/authcode/code');
+values (3, 'http://somewhere.com'),
+       (4, 'https://localhost:3000/api/oauth/authcode/code'),
+       (4, 'https://192.168.4.27:3000/api/oauth/authcode/code');
 
 INSERT INTO dev.roles (id, name, client_id)
 VALUES (1, 'ROLE_READ', 2),

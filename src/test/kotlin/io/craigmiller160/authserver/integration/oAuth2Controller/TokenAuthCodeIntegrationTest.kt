@@ -36,7 +36,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
     private fun createTokenForm(
             clientId: String = validClientKey,
-            redirectUri: String = authClient.getRedirectUris()[0]!!,
+            redirectUri: String = authClient.getRedirectUris()[0],
             code: String = authCodeHandler.createAuthCode(authClient.id, authUser.id, 1000000)
     ) = formOf(
             "grant_type" to GrantType.AUTH_CODE,

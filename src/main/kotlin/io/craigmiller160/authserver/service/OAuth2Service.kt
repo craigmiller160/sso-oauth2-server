@@ -80,7 +80,7 @@ class OAuth2Service (
             throw InvalidLoginException("Invalid client id")
         }
 
-        if (clientUserDetails.client.getRedirectUris().contains(tokenRequest.redirect_uri)) {
+        if (!clientUserDetails.client.getRedirectUris().contains(tokenRequest.redirect_uri)) {
             throw InvalidLoginException("Invalid redirect uri")
         }
 

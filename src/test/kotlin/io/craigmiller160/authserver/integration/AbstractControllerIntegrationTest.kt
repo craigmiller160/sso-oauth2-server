@@ -95,7 +95,6 @@ abstract class AbstractControllerIntegrationTest {
         val clientRedirectUri = ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
         authClient = authClient.copy(clientRedirectUris = listOf(clientRedirectUri))
         authClient = clientRepo.save(authClient)
-        println(authClient) // TODO delete this
 
         authUser = TestData.createUser()
         authUser = userRepo.save(authUser)

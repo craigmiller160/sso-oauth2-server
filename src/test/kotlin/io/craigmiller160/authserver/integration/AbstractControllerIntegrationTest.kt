@@ -7,8 +7,10 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.repository.ClientRedirectUriRepository
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -59,6 +61,9 @@ abstract class AbstractControllerIntegrationTest {
     @Autowired
     private lateinit var tokenConfig: TokenConfig
 
+    @Autowired
+    private lateinit var clientRedirectUriRepo: ClientRedirectUriRepository
+
     private val bcryptEncoder = BCryptPasswordEncoder()
 
     protected val validClientKey = "ValidClientKey"
@@ -90,6 +95,10 @@ abstract class AbstractControllerIntegrationTest {
                 clientSecret = "{bcrypt}$encodedSecret"
         )
         authClient = clientRepo.save(authClient)
+        val clientRedirectUri = ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
+        authClient = authClient.copy(clientRedirectUris = listOf(clientRedirectUri))
+        authClient = clientRepo.save(authClient)
+        println(authClient) // TODO delete this
 
         authUser = TestData.createUser()
         authUser = userRepo.save(authUser)
@@ -119,6 +128,7 @@ abstract class AbstractControllerIntegrationTest {
 
     @AfterEach
     fun apiProcessorCleanup() {
+        clientRedirectUriRepo.deleteAll() // TODO trying this
         clientUserRepo.delete(authClientUser)
         clientUserRepo.delete(disabledClientClientUser)
         clientUserRepo.delete(disabledUserClientUser)

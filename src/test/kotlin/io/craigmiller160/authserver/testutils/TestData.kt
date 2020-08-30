@@ -44,7 +44,7 @@ object TestData {
             accessTokenTimeoutSecs = accessTokenTimeoutSecs,
             refreshTokenTimeoutSecs = refreshTokenTimeoutSecs,
             authCodeTimeoutSecs = 0,
-            clientRedirectUris = listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code"))
+            clientRedirectUris = listOf()
     )
 
     fun createUser() = User(

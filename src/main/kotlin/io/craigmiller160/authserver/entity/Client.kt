@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.entity
 
 import javax.persistence.CascadeType
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -23,8 +24,8 @@ data class Client (
         val refreshTokenTimeoutSecs: Int,
         val authCodeTimeoutSecs: Int,
 
-        @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name = "client_id")
+        @OneToMany(cascade = [CascadeType.ALL, CascadeType.REMOVE], fetch = FetchType.EAGER, orphanRemoval = true)
+        @JoinColumn(name = "clientId", insertable = false, updatable = false)
         val clientRedirectUris: List<ClientRedirectUri>
 ) {
 

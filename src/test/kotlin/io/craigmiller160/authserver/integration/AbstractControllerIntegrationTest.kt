@@ -7,8 +7,10 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
+import io.craigmiller160.authserver.repository.ClientRedirectUriRepository
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -89,6 +91,9 @@ abstract class AbstractControllerIntegrationTest {
                 clientKey = validClientKey,
                 clientSecret = "{bcrypt}$encodedSecret"
         )
+        authClient = clientRepo.save(authClient)
+        val clientRedirectUri = ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
+        authClient = authClient.copy(clientRedirectUris = listOf(clientRedirectUri))
         authClient = clientRepo.save(authClient)
 
         authUser = TestData.createUser()

@@ -4,6 +4,7 @@ import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.PageRequest
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.ClientUserRole
 import io.craigmiller160.authserver.entity.Role
@@ -43,7 +44,7 @@ object TestData {
             accessTokenTimeoutSecs = accessTokenTimeoutSecs,
             refreshTokenTimeoutSecs = refreshTokenTimeoutSecs,
             authCodeTimeoutSecs = 0,
-            redirectUri = "http://somewhere.com/authcode/code"
+            clientRedirectUris = listOf()
     )
 
     fun createUser() = User(

@@ -31,7 +31,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
             "username" to user.email,
             "password" to authUserPassword,
             "clientId" to clientId,
-            "redirectUri" to authClient.redirectUri!!,
+            "redirectUri" to authClient.getRedirectUris()[0],
             "responseType" to responseType,
             "state" to state,
             "basePath" to basePath
@@ -51,7 +51,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
     private fun validateSuccessLocation(location: String) {
         val (uri, query) = handleUrl(location)
-        assertThat(uri, equalTo(authClient.redirectUri))
+        assertThat(uri, equalTo(authClient.getRedirectUris()[0]))
         assertThat(query["code"], notNullValue())
         assertThat(query["state"], equalTo(state))
     }

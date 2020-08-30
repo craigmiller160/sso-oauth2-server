@@ -10,5 +10,5 @@ CREATE TABLE client_redirect_uris (
     client_id BIGINT NOT NULL,
     redirect_uri VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (redirect_uri) REFERENCES clients (id)
+    FOREIGN KEY (client_id) REFERENCES clients (id)
 );

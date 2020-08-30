@@ -34,8 +34,6 @@ data class Client (
         }
 
         fun supportsAuthCode(otherRedirectUri: String): Boolean {
-                TODO("Finish this")
-//                return authCodeTimeoutSecs != null &&
-//                        redirectUri != null && redirectUri == otherRedirectUri
+                return getRedirectUris().contains(otherRedirectUri)
         }
 }

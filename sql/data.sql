@@ -4,12 +4,15 @@ VALUES (1, 'craig@gmail.com', 'Craig', 'Miller', '{bcrypt}$2a$10$HYKpEK6BFUFH99f
        (3, 'auth@gmail.com', 'Auth', 'Code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true);
 SELECT setval('dev.users_id_seq', 3, true);
 
-INSERT INTO dev.clients (id, name, client_key, client_secret, enabled, access_token_timeout_secs, refresh_token_timeout_secs, auth_code_timeout_secs, redirect_uri)
-VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, null, null),
-       (2, 'PasswordApp', 'password', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, null, null),
-       (3, 'AuthCodeApp', 'auth_code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, 60, 'http://somewhere.com'),
-       (4, 'auth-management-service', 'a4cc4fef-564e-44c1-82af-45572f124c1a', '{bcrypt}$2a$10$Mo7pB5wHzuChfanS1c9vOOKRmdn0.TEWDi43yjd6jstdkHtmT/FXa', true, 300, 3600, 60, 'https://localhost:3000/api/oauth/authcode/code');
+INSERT INTO dev.clients (id, name, client_key, client_secret, enabled, access_token_timeout_secs, refresh_token_timeout_secs, auth_code_timeout_secs)
+VALUES (1, 'ClientCredsApp', 'client_creds', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, 60),
+       (2, 'PasswordApp', 'password', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, 60),
+       (3, 'AuthCodeApp', 'auth_code', '{bcrypt}$2a$10$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe', true, 300, 3600, 60),
+       (4, 'auth-management-service', 'a4cc4fef-564e-44c1-82af-45572f124c1a', '{bcrypt}$2a$10$Mo7pB5wHzuChfanS1c9vOOKRmdn0.TEWDi43yjd6jstdkHtmT/FXa', true, 300, 3600, 60);
 SELECT setval('dev.clients_id_seq', 4, true);
+
+INSERT INTO dev.client_redirect_uris (client_id, redirect_uri)
+values (3, 'http://somewhere.com'), (4, 'https://localhost:3000/api/oauth/authcode/code');
 
 INSERT INTO dev.roles (id, name, client_id)
 VALUES (1, 'ROLE_READ', 2),

@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.integration
 
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
@@ -27,7 +28,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
         client1 = TestData.createClient()
         client2 = TestData.createClient().copy(
                 clientKey = "key2",
-                redirectUri = ""
+                clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))
         )
 
         client1 = clientRepo.save(client1)
@@ -71,7 +72,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_login() {
         val result = apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.redirectUri}&response_type=code"
+                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 headers = mapOf(
@@ -87,7 +88,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_noAuthCode() {
         apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client2.clientKey}&redirect_uri=${client2.redirectUri}&response_type=code"
+                path = "/ui/login?client_id=${client2.clientKey}&redirect_uri=${client2.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 status = 401
@@ -99,7 +100,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_other() {
         apiProcessor.call {
             request {
-                path = "/ui/foo?client_id=${client1.clientKey}&redirect_uri=${client1.redirectUri}&response_type=code"
+                path = "/ui/foo?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code"
             }
             response {
                 status = 404
@@ -111,7 +112,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     fun test_getPage_badParams() {
         apiProcessor.call {
             request {
-                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.redirectUri}&response_type=code2"
+                path = "/ui/login?client_id=${client1.clientKey}&redirect_uri=${client1.getRedirectUris()[0]}&response_type=code2"
             }
             response {
                 status = 401

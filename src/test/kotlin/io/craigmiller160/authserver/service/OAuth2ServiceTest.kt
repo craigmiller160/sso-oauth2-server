@@ -6,6 +6,7 @@ import io.craigmiller160.authserver.dto.RefreshTokenData
 import io.craigmiller160.authserver.dto.TokenRequest
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.Client
+import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
@@ -181,7 +182,7 @@ class OAuth2ServiceTest {
     @Test
     fun test_authCode() {
         setupSecurityContext()
-        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.getRedirectUris()[0], code = authCode)
 
         `when`(userRepo.findByUserIdAndClientId(user.id, client.id))
                 .thenReturn(user)
@@ -206,7 +207,7 @@ class OAuth2ServiceTest {
     @Test
     fun test_authCode_invalidClientKey() {
         setupSecurityContext()
-        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "abc", redirectUri = client.redirectUri, code = authCode)
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = "abc", redirectUri = client.getRedirectUris()[0], code = authCode)
 
         val ex = assertThrows<InvalidLoginException> { oAuth2Service.authCode(request) }
         assertEquals("Invalid client id", ex.message)
@@ -224,7 +225,7 @@ class OAuth2ServiceTest {
     @Test
     fun test_authCode_invalidAuthCodeClientId() {
         setupSecurityContext()
-        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.getRedirectUris()[0], code = authCode)
 
         `when`(authCodeHandler.validateAuthCode(authCode))
                 .thenReturn(Pair(2, user.id))
@@ -236,7 +237,7 @@ class OAuth2ServiceTest {
     @Test
     fun test_authCode_invalidUser() {
         setupSecurityContext()
-        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.redirectUri, code = authCode)
+        val request = TestData.createTokenRequest(GrantType.AUTH_CODE, clientId = client.clientKey, redirectUri = client.getRedirectUris()[0], code = authCode)
 
         `when`(authCodeHandler.validateAuthCode(authCode))
                 .thenReturn(Pair(client.id, user.id))
@@ -410,7 +411,7 @@ class OAuth2ServiceTest {
     fun test_validateAuthCodeLogin_authCodeNotSupported() {
         val login = TestData.createAuthCodeLogin()
         `when`(clientRepo.findByClientKey(client.clientKey))
-                .thenReturn(client.copy(redirectUri = ""))
+                .thenReturn(client.copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))))
         `when`(userRepo.findByEmailAndClientId(login.username, client.id))
                 .thenReturn(user)
 

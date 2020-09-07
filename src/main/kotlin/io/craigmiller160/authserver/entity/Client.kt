@@ -1,14 +1,6 @@
 package io.craigmiller160.authserver.entity
 
-import javax.persistence.CascadeType
-import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "clients")
@@ -16,7 +8,9 @@ data class Client (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
+        @Column(unique = true)
         val name: String,
+        @Column(unique = true)
         val clientKey: String,
         val clientSecret: String,
         val enabled: Boolean,

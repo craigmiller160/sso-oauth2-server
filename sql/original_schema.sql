@@ -38,13 +38,16 @@ ADD CONSTRAINT clients_client_key_unique UNIQUE (client_key);
 
 CREATE TABLE roles (
     id BIGSERIAL NOT NULL,
-    name VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
     client_id BIGINT NOT NULL,
     PRIMARY KEY (id)
 );
 
 ALTER TABLE roles
 ADD CONSTRAINT roles_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id);
+
+ALTER TABLE roles
+ADD CONSTRAINT roles_name_client_id_unique UNIQUE (name, client_id);
 
 CREATE TABLE client_users (
     id BIGSERIAL NOT NULL,

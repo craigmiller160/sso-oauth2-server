@@ -4,15 +4,19 @@ CREATE SCHEMA prod;
 -- SET search_path TO dev;
 -- SET search_path TO prod;
 
+CREATE SEQUENCE users_id_seq START 1;
+
 CREATE TABLE users (
-    id BIGSERIAL NOT NULL,
+    id BIGINT NOT NULL DEFAULT nextval('users_id_seq'::regclass),
     email VARCHAR(255) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (id)
+    enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+ALTER TABLE users
+ADD CONSTRAINT users_id_pk PRIMARY KEY (id);
 
 ALTER TABLE users
 ADD CONSTRAINT users_email_unique UNIQUE (email);

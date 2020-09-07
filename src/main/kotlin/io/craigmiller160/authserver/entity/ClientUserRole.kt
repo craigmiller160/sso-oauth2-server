@@ -1,13 +1,18 @@
 package io.craigmiller160.authserver.entity
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
-@Table(name = "client_user_roles")
+@Table(
+        name = "client_user_roles",
+        uniqueConstraints = [
+                UniqueConstraint(columnNames = [
+                        "clientId",
+                        "userId",
+                        "roleId"
+                ])
+        ]
+)
 data class ClientUserRole (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

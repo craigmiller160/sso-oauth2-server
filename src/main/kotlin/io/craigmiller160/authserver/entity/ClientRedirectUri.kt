@@ -1,13 +1,17 @@
 package io.craigmiller160.authserver.entity
 
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
-@Table(name = "client_redirect_uris")
+@Table(
+        name = "client_redirect_uris",
+        uniqueConstraints = [
+                UniqueConstraint(columnNames = [
+                        "clientId",
+                        "redirectUri"
+                ])
+        ]
+)
 data class ClientRedirectUri (
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

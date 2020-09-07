@@ -12,17 +12,15 @@ CREATE TABLE users (
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT FALSE
+    enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT users_id_pk PRIMARY KEY (id),
+    CONSTRAINT users_email_unique UNIQUE (email)
 );
 
-ALTER TABLE users
-ADD CONSTRAINT users_id_pk PRIMARY KEY (id);
-
-ALTER TABLE users
-ADD CONSTRAINT users_email_unique UNIQUE (email);
+CREATE SEQUENCE clients_id_seq START 1;
 
 CREATE TABLE clients (
-    id BIGSERIAL NOT NULL,
+    id BIGINT NOT NULL DEFAULT nextval('clients_id_seq'::regclass),
     name VARCHAR(255) NOT NULL,
     client_key VARCHAR(255) NOT NULL,
     client_secret VARCHAR(255) NOT NULL,
@@ -31,63 +29,47 @@ CREATE TABLE clients (
     refresh_token_timeout_secs INT NOT NULL,
     auth_code_timeout_secs INT,
     redirect_uri VARCHAR(255),
-    PRIMARY KEY (id)
+    CONSTRAINT clients_id_pk PRIMARY KEY (id),
+    CONSTRAINT clients_name_unique UNIQUE (name),
+    CONSTRAINT clients_client_key_unique UNIQUE (client_key)
 );
 
-ALTER TABLE clients
-ADD CONSTRAINT clients_name_unique UNIQUE (name);
-
-ALTER TABLE clients
-ADD CONSTRAINT clients_client_key_unique UNIQUE (client_key);
+CREATE SEQUENCE roles_id_seq START 1;
 
 CREATE TABLE roles (
-    id BIGSERIAL NOT NULL,
+    id BIGINT NOT NULL DEFAULT nextval('roles_id_seq'::regclass),
     name VARCHAR(255) NOT NULL,
     client_id BIGINT NOT NULL,
-    PRIMARY KEY (id)
+    CONSTRAINT roles_id_pk PRIMARY KEY (id),
+    CONSTRAINT roles_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id),
+    CONSTRAINT roles_name_client_id_unique UNIQUE (name, client_id)
 );
 
-ALTER TABLE roles
-ADD CONSTRAINT roles_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id);
-
-ALTER TABLE roles
-ADD CONSTRAINT roles_name_client_id_unique UNIQUE (name, client_id);
+CREATE SEQUENCE client_users_id_seq START 1;
 
 CREATE TABLE client_users (
-    id BIGSERIAL NOT NULL,
+    id BIGINT NOT NULL DEFAULT nextval('client_users_id_seq'::regclass),
     user_id BIGINT NOT NULL,
     client_id BIGINT NOT NULL,
-    PRIMARY KEY (id)
+    CONSTRAINT client_users_id_pk PRIMARY KEY (id),
+    CONSTRAINT client_users_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT client_users_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id),
+    CONSTRAINT client_users_user_id_client_id_unique UNIQUE (user_id, client_id)
 );
 
-ALTER TABLE client_users
-ADD CONSTRAINT client_users_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE client_users
-ADD CONSTRAINT client_users_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id);
-
-ALTER TABLE client_users
-ADD CONSTRAINT client_users_user_id_client_id_unique UNIQUE (user_id, client_id);
+CREATE SEQUENCE client_user_roles_id_seq START 1;
 
 CREATE TABLE client_user_roles (
-    id BIGSERIAL NOT NULL,
+    id BIGINT NOT NULL DEFAULT nextval('client_user_roles'::regclass),
     client_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,
-    PRIMARY KEY (id)
+    CONSTRAINT client_user_roles_id_pk PRIMARY KEY (id),
+    CONSTRAINT client_user_roles_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT client_user_roles_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id),
+    CONSTRAINT client_user_roles_role_id_fk FOREIGN KEY (role_id) REFERENCES roles (id),
+    CONSTRAINT client_user_roles_client_id_user_id_role_id_unique UNIQUE (client_id, user_id, role_id)
 );
-
-ALTER TABLE client_user_roles
-ADD CONSTRAINT client_user_roles_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE client_user_roles
-ADD CONSTRAINT client_user_roles_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id);
-
-ALTER TABLE client_user_roles
-ADD CONSTRAINT client_user_roles_role_id_fk FOREIGN KEY (role_id) REFERENCES roles (id);
-
-ALTER TABLE client_user_roles
-ADD CONSTRAINT client_user_roles_client_id_user_id_role_id_unique UNIQUE (client_id, user_id, role_id);
 
 CREATE TABLE refresh_tokens (
     id VARCHAR(255) NOT NULL,
@@ -95,17 +77,11 @@ CREATE TABLE refresh_tokens (
     client_id BIGINT NOT NULL,
     user_id BIGINT DEFAULT NULL,
     timestamp TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY (id)
+    CONSTRAINT refresh_tokens_id_pk PRIMARY KEY (id),
+    CONSTRAINT refresh_tokens_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id),
+    CONSTRAINT refresh_tokens_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT refresh_tokens_client_id_user_id_unique UNIQUE (client_id, user_id)
 );
-
-ALTER TABLE refresh_tokens
-ADD CONSTRAINT refresh_tokens_client_id_fk FOREIGN KEY (client_id) REFERENCES clients (id);
-
-ALTER TABLE refresh_tokens
-ADD CONSTRAINT refresh_tokens_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);
-
-ALTER TABLE refresh_tokens
-ADD CONSTRAINT refresh_tokens_client_id_user_id_unique UNIQUE (client_id, user_id);
 
 CREATE OR REPLACE FUNCTION validate_password()
     RETURNS trigger AS

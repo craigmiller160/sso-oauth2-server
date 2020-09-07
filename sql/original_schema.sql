@@ -60,7 +60,7 @@ CREATE TABLE client_users (
 CREATE SEQUENCE client_user_roles_id_seq START 1;
 
 CREATE TABLE client_user_roles (
-    id BIGINT NOT NULL DEFAULT nextval('client_user_roles'::regclass),
+    id BIGINT NOT NULL DEFAULT nextval('client_user_roles_id_seq'::regclass),
     client_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,

@@ -1,5 +1,5 @@
 /*
- *     Auth Management Service
+ *     SSO OAuth2 Auth Server
  *     Copyright (C) 2020 Craig Miller
  *
  *     This program is free software: you can redistribute it and/or modify

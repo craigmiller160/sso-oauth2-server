@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sso-oauth2-server
-          image: localhost:32000/sso-oauth2-server:1.2.0
+          image: localhost:32000/sso-oauth2-server:1.2.1
           ports:
             - containerPort: 8443
           envFrom:

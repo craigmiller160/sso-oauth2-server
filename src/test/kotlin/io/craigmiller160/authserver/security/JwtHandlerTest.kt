@@ -45,7 +45,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.security.KeyPair
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Base64
 import java.util.Date
 
@@ -218,9 +219,9 @@ class JwtHandlerTest {
     }
 
     private fun generateExp(expSecs: Int): Date {
-        val now = LocalDateTime.now()
+        val now = ZonedDateTime.now(ZoneId.of("UTC"))
         val exp = now.plusSeconds(expSecs.toLong())
-        return legacyDateConverter.convertLocalDateTimeToDate(exp)
+        return legacyDateConverter.convertZonedDateTimeToDate(exp)
     }
 
     @Test

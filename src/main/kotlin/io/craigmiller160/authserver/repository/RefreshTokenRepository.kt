@@ -25,6 +25,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import javax.transaction.Transactional
 
 @Repository
@@ -33,7 +34,7 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
     @Transactional
     @Modifying
     @Query("DELETE FROM RefreshToken WHERE timestamp < :maxTimestamp")
-    fun removeOldTokens(@Param("maxTimestamp") maxTimestamp: LocalDateTime): Int
+    fun removeOldTokens(@Param("maxTimestamp") maxTimestamp: ZonedDateTime): Int
 
     @Transactional
     @Modifying

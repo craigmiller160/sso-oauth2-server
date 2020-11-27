@@ -39,7 +39,8 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -54,7 +55,7 @@ class OAuth2Service (
 ) {
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
-        val refreshTokenEntity = RefreshToken(tokenId, refreshToken, clientId, userId, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenId, refreshToken, clientId, userId, ZonedDateTime.now(ZoneId.of("UTC")))
         userId?.let { refreshTokenRepo.removeClientUserRefresh(clientId, userId) }
                 ?: refreshTokenRepo.removeClientOnlyRefresh(clientId)
         refreshTokenRepo.save(refreshTokenEntity)

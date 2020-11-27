@@ -62,6 +62,8 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
@@ -271,7 +273,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, user.id, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, user.id, ZonedDateTime.now(ZoneId.of("UTC")))
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
@@ -303,7 +305,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, null, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, null, ZonedDateTime.now(ZoneId.of("UTC")))
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
@@ -340,7 +342,7 @@ class OAuth2ServiceTest {
         `when`(jwtHandler.parseRefreshToken(refreshToken, client.id))
                 .thenReturn(tokenData)
 
-        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, 2L, LocalDateTime.now())
+        val refreshTokenEntity = RefreshToken(tokenData.tokenId, refreshToken, client.id, 2L, ZonedDateTime.now(ZoneId.of("UTC")))
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))

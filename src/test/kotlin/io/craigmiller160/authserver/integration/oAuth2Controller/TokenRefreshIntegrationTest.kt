@@ -42,6 +42,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
@@ -83,7 +85,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, client: Client = authClient, userId: Long = 0): String {
         val clientUserDetails = ClientUserDetails(client)
         val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
-        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, client.id, userId, LocalDateTime.now()))
+        refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, client.id, userId, ZonedDateTime.now(ZoneId.of("UTC"))))
         return refreshToken
     }
 

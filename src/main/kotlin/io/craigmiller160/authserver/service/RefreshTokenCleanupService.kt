@@ -24,7 +24,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Service
 class RefreshTokenCleanupService (
@@ -37,7 +38,7 @@ class RefreshTokenCleanupService (
     @Scheduled(fixedRate = 1 * 60 * 60 * 1000) // Run every hour
     fun cleanupRefreshTokens() {
         log.info("Cleaning up refresh tokens older than ${tokenConfig.deleteOlderThanSecs} seconds")
-        val maxTimestamp = LocalDateTime.now().minusSeconds(tokenConfig.deleteOlderThanSecs)
+        val maxTimestamp = ZonedDateTime.now(ZoneId.of("UTC")).minusSeconds(tokenConfig.deleteOlderThanSecs)
         refreshTokenRepo.removeOldTokens(maxTimestamp)
     }
 

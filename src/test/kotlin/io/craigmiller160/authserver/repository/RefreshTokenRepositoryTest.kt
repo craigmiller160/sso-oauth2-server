@@ -26,6 +26,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @DataJpaTest
 class RefreshTokenRepositoryTest {
@@ -40,10 +42,10 @@ class RefreshTokenRepositoryTest {
 
     @BeforeEach
     fun setup() {
-        token1 = RefreshToken("1", "ABC", 1, null, LocalDateTime.of(2020, 1, 1, 1, 1))
-        token2 = RefreshToken("2", "DEF", 2, 1, LocalDateTime.of(2020, 2, 2, 2, 2))
-        token3 = RefreshToken("3", "GHI", 2, 2, LocalDateTime.now())
-        token4 = RefreshToken("4", "JKL", 1, 1, LocalDateTime.now())
+        token1 = RefreshToken("1", "ABC", 1, null, ZonedDateTime.of(LocalDateTime.of(2020, 1, 1, 1, 1), ZoneId.of("UTC")))
+        token2 = RefreshToken("2", "DEF", 2, 1, ZonedDateTime.of(LocalDateTime.of(2020, 2, 2, 2, 2), ZoneId.of("UTC")))
+        token3 = RefreshToken("3", "GHI", 2, 2, ZonedDateTime.now(ZoneId.of("UTC")))
+        token4 = RefreshToken("4", "JKL", 1, 1, ZonedDateTime.now(ZoneId.of("UTC")))
 
         token1 = refreshTokenRepo.save(token1)
         token2 = refreshTokenRepo.save(token2)
@@ -58,7 +60,7 @@ class RefreshTokenRepositoryTest {
 
     @Test
     fun test_removeOldTokens() {
-        val maxTimestamp = LocalDateTime.now().minusDays(1)
+        val maxTimestamp = ZonedDateTime.now(ZoneId.of("UTC")).minusDays(1)
         val result = refreshTokenRepo.removeOldTokens(maxTimestamp)
         assertEquals(2, result)
 

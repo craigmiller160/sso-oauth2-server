@@ -35,6 +35,8 @@ import io.craigmiller160.date.converter.LegacyDateConverter
 import org.springframework.stereotype.Component
 import java.security.interfaces.RSAPublicKey
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Date
 import java.util.UUID
 
@@ -46,9 +48,14 @@ class JwtHandler(
     private val legacyDateConverter = LegacyDateConverter()
 
     private fun generateExp(expSecs: Int): Date {
-        val now = LocalDateTime.now()
+        val now = ZonedDateTime.now(ZoneId.of("UTC"))
         val exp = now.plusSeconds(expSecs.toLong())
-        return legacyDateConverter.convertLocalDateTimeToDate(exp)
+        return legacyDateConverter.convertZonedDateTimeToDate(exp)
+    }
+
+    private fun generateNow(): Date {
+        val now = ZonedDateTime.now(ZoneId.of("UTC"))
+        return legacyDateConverter.convertZonedDateTimeToDate(now)
     }
 
     fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): Pair<String,String> {
@@ -72,11 +79,12 @@ class JwtHandler(
     }
 
     private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
+        val now = generateNow()
         return JWTClaimsSet.Builder()
-                .issueTime(Date())
+                .issueTime(now)
                 .expirationTime(generateExp(expSecs))
                 .jwtID(UUID.randomUUID().toString())
-                .notBeforeTime(Date())
+                .notBeforeTime(now)
     }
 
     private fun createToken(claims: JWTClaimsSet): String {
@@ -113,8 +121,8 @@ class JwtHandler(
         }
 
         val claims = jwt.jwtClaimsSet
-        val now = LocalDateTime.now()
-        val exp = legacyDateConverter.convertDateToLocalDateTime(claims.expirationTime)
+        val now = ZonedDateTime.now(ZoneId.of("UTC"))
+        val exp = legacyDateConverter.convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
         if(exp < now) {
             throw InvalidRefreshTokenException("Expired")
         }

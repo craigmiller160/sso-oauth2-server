@@ -1,5 +1,5 @@
 <project name="video-manager-server" default="copy" basedir="../">
-    <description>VideoManagerServer supplemental build script</description>
+    <description>sso-oauth2-server supplemental build script</description>
 
     <target name="clean">
         <delete dir="deploy/build" />

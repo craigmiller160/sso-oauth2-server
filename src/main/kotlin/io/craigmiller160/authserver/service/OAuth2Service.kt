@@ -36,6 +36,8 @@ import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -53,6 +55,8 @@ class OAuth2Service (
         private val clientRepo: ClientRepository,
         private val authCodeHandler: AuthCodeHandler
 ) {
+
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
         val refreshTokenEntity = RefreshToken(tokenId, refreshToken, clientId, userId, ZonedDateTime.now(ZoneId.of("UTC")))
@@ -94,6 +98,7 @@ class OAuth2Service (
 
     @Transactional
     fun authCode(tokenRequest: TokenRequest): TokenResponse {
+        log.info("AUTH CODE: ${tokenRequest.code}") // TODO delete this
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         if (clientUserDetails.client.clientKey != tokenRequest.client_id) {
             throw InvalidLoginException("Invalid client id")

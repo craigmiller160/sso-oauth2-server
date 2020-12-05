@@ -46,6 +46,7 @@ class OAuth2Controller(
 
     @PostMapping("/token", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun token(tokenRequest: TokenRequest): TokenResponse {
+        log.info("RECEIVED TOKEN REQUEST: ${tokenRequest.grant_type}") // TODO delete this
         validateTokenRequest(tokenRequest)
         return when (tokenRequest.grant_type) {
             GrantType.PASSWORD -> oAuth2Service.password(tokenRequest)

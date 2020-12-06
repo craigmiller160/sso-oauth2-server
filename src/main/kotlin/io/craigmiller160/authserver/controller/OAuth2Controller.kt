@@ -46,6 +46,7 @@ class OAuth2Controller(
 
     @PostMapping("/token", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun token(tokenRequest: TokenRequest): TokenResponse {
+        log.debug("Received token request: $tokenRequest")
         validateTokenRequest(tokenRequest)
         return when (tokenRequest.grant_type) {
             GrantType.PASSWORD -> oAuth2Service.password(tokenRequest)
@@ -57,6 +58,7 @@ class OAuth2Controller(
 
     @PostMapping("/auth")
     fun authCodeLogin(login: AuthCodeLogin, req: HttpServletRequest, res: HttpServletResponse) {
+        log.debug("Attempting login with Authorization Code: $login")
         try {
             oAuth2Service.validateAuthCodeLogin(login)
             val authCode = oAuth2Service.authCodeLogin(login)

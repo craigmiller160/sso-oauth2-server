@@ -18,6 +18,7 @@
 
 package io.craigmiller160.authserver.entity
 
+import org.hibernate.annotations.Type
 import java.time.ZonedDateTime
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -30,6 +31,7 @@ data class RefreshToken (
         @Id
         val id: String,
         @Lob
+        @Type(type = "org.hibernate.type.TextType")
         val refreshToken: String,
         val clientId: Long,
         val userId: Long?,

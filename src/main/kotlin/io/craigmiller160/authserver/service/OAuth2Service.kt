@@ -56,8 +56,6 @@ class OAuth2Service (
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
         val refreshTokenEntity = RefreshToken(tokenId, refreshToken, clientId, userId, ZonedDateTime.now(ZoneId.of("UTC")))
-        userId?.let { refreshTokenRepo.removeClientUserRefresh(clientId, userId) }
-                ?: refreshTokenRepo.removeClientOnlyRefresh(clientId)
         refreshTokenRepo.save(refreshTokenEntity)
     }
 

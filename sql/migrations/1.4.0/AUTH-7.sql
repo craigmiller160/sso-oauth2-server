@@ -16,24 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.craigmiller160.authserver.entity
+-- Don't forget to set search_path first
 
-import org.hibernate.annotations.Type
-import java.time.ZonedDateTime
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Lob
-import javax.persistence.Table
-
-@Entity
-@Table(name = "refresh_tokens")
-data class RefreshToken (
-        @Id
-        val id: String,
-        @Lob
-        @Type(type = "org.hibernate.type.TextType")
-        val refreshToken: String,
-        val clientId: Long,
-        val userId: Long?,
-        val timestamp: ZonedDateTime
-)
+ALTER TABLE refresh_tokens
+DROP CONSTRAINT refresh_tokens_client_id_user_id_unique;

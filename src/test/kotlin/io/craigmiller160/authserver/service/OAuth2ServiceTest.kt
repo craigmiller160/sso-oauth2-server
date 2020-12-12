@@ -151,8 +151,6 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
-        verify(refreshTokenRepo, times(1))
-                .removeClientOnlyRefresh(client.id)
     }
 
     @Test
@@ -174,8 +172,6 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
-        verify(refreshTokenRepo, times(1))
-                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
@@ -220,8 +216,6 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .save(isA<RefreshToken>())
-        verify(refreshTokenRepo, times(1))
-                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
@@ -293,8 +287,6 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .delete(refreshTokenEntity)
-        verify(refreshTokenRepo, times(1))
-                .removeClientUserRefresh(client.id, user.id)
     }
 
     @Test
@@ -321,8 +313,6 @@ class OAuth2ServiceTest {
 
         verify(refreshTokenRepo, times(1))
                 .delete(refreshTokenEntity)
-        verify(refreshTokenRepo, times(1))
-                .removeClientOnlyRefresh(client.id)
     }
 
     @Test

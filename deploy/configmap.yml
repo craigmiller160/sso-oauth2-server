@@ -7,5 +7,4 @@ data:
   spring.config.location: classpath:/config/common/,classpath:/config/prod/
   spring.datasource.host: postgres-service
   spring.datasource.port: "5432"
-  spring.datasource.username: user
-  spring.datasource.password: password
+  spring.datasource.username: postgres_root

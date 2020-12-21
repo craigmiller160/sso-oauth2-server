@@ -1,4 +1,8 @@
 server:
+  servlet:
+    session:
+      cookie:
+        name: CRAIGSESSIONID
   ssl:
     key-store-type: PKCS12
     key-store: classpath:keys/auth-server.p12

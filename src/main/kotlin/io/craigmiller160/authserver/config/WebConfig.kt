@@ -30,7 +30,7 @@ class WebConfig (
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(requestLogger)
-                .addPathPatterns("/**/**")
+                .addPathPatterns("/**")
     }
 
 }

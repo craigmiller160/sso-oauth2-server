@@ -47,7 +47,7 @@ class WebSecurityConfig(
             http.csrf()
                     .disable()
                     .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                     .and()
                     .requestMatchers()
                     .antMatchers("/oauth/**/*", "/jwk", "/ui/**/*", "/actuator/**")

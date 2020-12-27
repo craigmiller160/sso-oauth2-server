@@ -28,12 +28,12 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
-import io.craigmiller160.authserver.repository.ClientRedirectUriRepository
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.date.converter.LegacyDateConverter
+import org.apache.catalina.filters.RestCsrfPreventionFilter
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert
@@ -45,6 +45,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 import java.util.Base64
@@ -88,6 +90,9 @@ abstract class AbstractControllerIntegrationTest {
     protected val refreshTokenTimeoutSecs = 1000
 
     private val dateConverter = LegacyDateConverter()
+
+    @MockBean
+    private lateinit var csrfFilter: FilterRegistrationBean<RestCsrfPreventionFilter>
 
     @BeforeEach
     fun apiProcessorSetup() {
@@ -214,5 +219,4 @@ abstract class AbstractControllerIntegrationTest {
             assertThat(accessClaims.getClaim("lastName"), nullValue())
         }
     }
-
 }

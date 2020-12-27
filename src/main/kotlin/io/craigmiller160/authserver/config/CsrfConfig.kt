@@ -30,6 +30,7 @@ class CsrfConfig {
     fun restCsrfPreventionFilter(): FilterRegistrationBean<RestCsrfPreventionFilter> {
         val filter = RestCsrfPreventionFilter()
         filter.denyStatus = 403
+        filter.setPathsAcceptingParams("/oauth/auth")
         val filterRegistration = FilterRegistrationBean(filter)
         filterRegistration.order = Integer.MIN_VALUE
         return filterRegistration

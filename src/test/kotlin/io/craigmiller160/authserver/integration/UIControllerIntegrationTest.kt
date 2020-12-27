@@ -135,4 +135,9 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
         }
     }
 
+    @Test
+    fun test_getCsrf() {
+        TODO("Finish this")
+    }
+
 }

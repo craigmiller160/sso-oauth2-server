@@ -86,29 +86,41 @@
         const loginForm = document.querySelector('#login-form');
         const cssPath = '/ui/resources/css/bootstrap';
         const loginPath = '/oauth/auth';
+        const healthcheckPath = '/ui/csrf';
         let fail = false;
 
-        const setupPageWithBasePath = () => {
+        const getCsrfToken = () =>
+            fetch(healthcheckPath, {
+                method: 'GET',
+                headers: {
+                    'x-csrf-token': 'fetch'
+                }
+            })
+            .then((res) => res.headers['x-csrf-token']);
+
+        const setupLoginFormAction = () => {
             const pathParts = window.location.pathname.split('/');
             const uiIndex = pathParts.findIndex((part) => part === 'ui');
             const basePath = pathParts.slice(0, uiIndex).join('/');
             basePathField.value = basePath;
             const cssUri = `${basePath}${cssPath}`;
 
-            loginForm.action = `${basePath}${loginPath}`;
-
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = cssUri;
 
-            return new Promise((resolve) => {
-                link.onload = () => {
-                    rootDiv.classList.remove('hidden');
-                    usernameField.focus();
-                    resolve();
-                }
-                header.appendChild(link);
-            });
+            getCsrfToken()
+                .then((csrfToken) => {
+                    loginForm.action = `${basePath}${loginPath}?X-CSRF-Token=${csrfToken}`;
+                    return new Promise((resolve) => {
+                        link.onload = () => {
+                            rootDiv.classList.remove('hidden');
+                            usernameField.focus();
+                            resolve();
+                        }
+                        header.appendChild(link);
+                    });
+                });
         };
 
         const populateQueryParamValues = () => {
@@ -127,7 +139,7 @@
             fail = decodeURIComponent(queryParams.fail) === 'true';
         };
 
-        setupPageWithBasePath()
+        setupLoginFormAction()
             .then(() => populateQueryParamValues())
             .then(() => {
                 if (fail) {

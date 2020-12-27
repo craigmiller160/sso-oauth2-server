@@ -33,7 +33,7 @@ class CsrfConfig {
         filter.setPathsAcceptingParams("/oauth/auth")
         val filterRegistration = FilterRegistrationBean(filter)
         filterRegistration.order = Integer.MIN_VALUE
-        filterRegistration.urlPatterns = listOf("/oauth/auth")
+        filterRegistration.urlPatterns = listOf("/oauth/auth", "/ui/csrf")
         return filterRegistration
     }
 

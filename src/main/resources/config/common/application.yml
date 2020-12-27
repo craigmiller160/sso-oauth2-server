@@ -4,7 +4,7 @@ server:
   servlet:
     session:
       cookie:
-        name: CRAIGSESSIONID
+        name: SSO-OAUTH2-SERVER-SESSIONID
   ssl:
     key-store-type: PKCS12
     key-store: classpath:keys/auth-server.p12

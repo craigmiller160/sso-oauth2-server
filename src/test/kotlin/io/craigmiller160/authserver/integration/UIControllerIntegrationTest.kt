@@ -137,7 +137,14 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun test_getCsrf() {
-        TODO("Finish this")
+        apiProcessor.call {
+            request {
+                path = "/ui/csrf"
+            }
+            response {
+                status = 204
+            }
+        }
     }
 
 }

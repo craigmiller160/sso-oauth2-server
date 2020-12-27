@@ -86,17 +86,17 @@
         const loginForm = document.querySelector('#login-form');
         const cssPath = '/ui/resources/css/bootstrap';
         const loginPath = '/oauth/auth';
-        const healthcheckPath = '/ui/csrf';
+        const csrfPath = '/ui/csrf';
         let fail = false;
 
-        const getCsrfToken = () =>
-            fetch(healthcheckPath, {
+        const getCsrfToken = (basePath) =>
+            fetch(`${basePath}${csrfPath}`, {
                 method: 'GET',
                 headers: {
                     'x-csrf-token': 'fetch'
                 }
             })
-            .then((res) => res.headers['x-csrf-token']);
+            .then((res) => res.headers.get('x-csrf-token'));
 
         const setupLoginFormAction = () => {
             const pathParts = window.location.pathname.split('/');
@@ -109,7 +109,7 @@
             link.rel = 'stylesheet';
             link.href = cssUri;
 
-            getCsrfToken()
+            return getCsrfToken(basePath)
                 .then((csrfToken) => {
                     loginForm.action = `${basePath}${loginPath}?X-CSRF-Token=${csrfToken}`;
                     return new Promise((resolve) => {

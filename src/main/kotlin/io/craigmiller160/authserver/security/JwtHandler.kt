@@ -67,9 +67,10 @@ class JwtHandler(
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)
-                    .claim("userEmail", user.email)
-                    .claim("firstName", user.firstName)
-                    .claim("lastName", user.lastName)
+                .claim("userId", user.id)
+                .claim("userEmail", user.email)
+                .claim("firstName", user.firstName)
+                .claim("lastName", user.lastName)
         } ?: claimBuilder.subject(clientUserDetails.client.name)
 
         val claims = claimBuilder.build()

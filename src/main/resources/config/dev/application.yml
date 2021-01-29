@@ -7,7 +7,7 @@ spring:
       hibernate:
         default_schema: dev
   datasource:
-    host: localhost
+    host: craigmiller160.ddns.net
     port: 30001
     username: postgres_root
     password: ${POSTGRES_ROOT_PASSWORD}

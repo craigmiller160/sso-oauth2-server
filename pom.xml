@@ -10,15 +10,15 @@
 	</parent>
 	<groupId>io.craigmiller160</groupId>
 	<artifactId>sso-oauth2-server</artifactId>
-	<version>1.6.1</version>
+	<version>1.6.2</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
 	<description>SSO Auth Server</description>
 
 	<properties>
-		<web.utils.version>1.1.0</web.utils.version>
-		<api.test.processor.version>1.0.0</api.test.processor.version>
-		<legacy.date.converter.version>1.1.0</legacy.date.converter.version>
+		<web.utils.version>1.1.2</web.utils.version>
+		<api.test.processor.version>1.2.2</api.test.processor.version>
+		<legacy.date.converter.version>1.1.2</legacy.date.converter.version>
 		<java.version>11</java.version>
 		<kotlin.version>1.4.21</kotlin.version>
 		<postgres.version>42.2.18</postgres.version>
@@ -196,18 +196,18 @@
 					</execution>
 				</executions>
 			</plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>6.0.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.owasp</groupId>-->
+<!--                <artifactId>dependency-check-maven</artifactId>-->
+<!--                <version>6.0.3</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 		</plugins>
 	</build>
 

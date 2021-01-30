@@ -19,7 +19,6 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate.jdbc.time_zone: UTC
-
     hibernate:
       ddl-auto: none
   datasource:

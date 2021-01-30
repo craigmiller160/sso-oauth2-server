@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
         - name: sso-oauth2-server
-          # TODO this doesn't have to be external...
-          image: craigmiller160.ddns.net:30004/sso-oauth2-server:1.6.2
+          image: nexus-service:8083/sso-oauth2-server:1.6.2
           ports:
             - containerPort: 8443
           envFrom:

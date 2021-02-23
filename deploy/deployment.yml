@@ -39,10 +39,11 @@ kind: Service
 metadata:
   name: sso-oauth2-server-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: sso-oauth2-server
   ports:
     - port: 8443
       targetPort: 8443
+      nodePort: 30006
       protocol: TCP

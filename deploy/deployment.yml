@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sso-oauth2-server
-          image: craigmiller160.ddns.net:30004/sso-oauth2-server:1.6.3
+          image: craigmiller160.ddns.net:30004/sso-oauth2-server:1.6.4
           ports:
             - containerPort: 8443
           envFrom:

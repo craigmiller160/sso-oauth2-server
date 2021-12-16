@@ -10,10 +10,22 @@
 	</parent>
 	<groupId>io.craigmiller160</groupId>
 	<artifactId>sso-oauth2-server</artifactId>
-	<version>1.6.3</version>
+	<version>1.6.4</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
 	<description>SSO Auth Server</description>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-bom</artifactId>
+				<version>${log4j2.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<distributionManagement>
 		<repository>
@@ -29,6 +41,7 @@
 	</distributionManagement>
 
 	<properties>
+		<log4j2.version>2.16.0</log4j2.version>
 		<web.utils.version>1.1.2</web.utils.version>
 		<api.test.processor.version>1.2.2</api.test.processor.version>
 		<legacy.date.converter.version>1.1.2</legacy.date.converter.version>

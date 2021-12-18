@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.craigmiller160</groupId>
 	<artifactId>sso-oauth2-server</artifactId>
-	<version>1.6.6</version>
+	<version>1.6.7</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
 	<description>SSO Auth Server</description>
@@ -48,7 +48,7 @@
 	</distributionManagement>
 
 	<properties>
-		<log4j2.version>2.16.0</log4j2.version>
+		<log4j2.version>2.17.0</log4j2.version>
 		<web.utils.version>1.1.3</web.utils.version>
 		<api.test.processor.version>1.2.2</api.test.processor.version>
 		<legacy.date.converter.version>1.1.2</legacy.date.converter.version>

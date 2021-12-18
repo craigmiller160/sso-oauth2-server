@@ -1,4 +1,4 @@
-FROM openjdk:15.0.2-slim
+FROM openjdk:17.0.1-slim
 
 COPY build/sso-oauth2-server-*.jar /sso-oauth2-server.jar
 

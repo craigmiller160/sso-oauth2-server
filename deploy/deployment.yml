@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sso-oauth2-server
-          image: craigmiller160.ddns.net:30004/sso-oauth2-server:latest
+          image: craigmiller160.ddns.net:30004/sso-oauth2-server:${KUBE_IMG_VERSION}
           ports:
             - containerPort: 8443
           envFrom:

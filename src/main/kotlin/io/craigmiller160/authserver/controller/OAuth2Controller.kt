@@ -29,6 +29,7 @@ import io.craigmiller160.authserver.utils.encodeUriParams
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -39,14 +40,16 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @RequestMapping("/oauth")
 class OAuth2Controller(
-        private val oAuth2Service: OAuth2Service
+        private val oAuth2Service: OAuth2Service,
+        @Value("\${spring.profiles.active}")
+        private val profile: String
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/token", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun token(tokenRequest: TokenRequest): TokenResponse {
-        log.debug("Received token request: $tokenRequest")
+        logTokenRequest(tokenRequest)
         validateTokenRequest(tokenRequest)
         return when (tokenRequest.grant_type) {
             GrantType.PASSWORD -> oAuth2Service.password(tokenRequest)
@@ -56,9 +59,25 @@ class OAuth2Controller(
         }
     }
 
+    private fun logTokenRequest(tokenRequest: TokenRequest) {
+        val loggableRequest = when(profile) {
+            "prod" -> tokenRequest.copy(password = null, code = null)
+            else -> tokenRequest
+        }
+        log.debug("Received token request: $loggableRequest")
+    }
+
+    private fun logAuthCodeLogin(login: AuthCodeLogin) {
+        val loggableLogin = when (profile) {
+            "prod" -> login.copy(password = "")
+            else -> login
+        }
+        log.debug("Attempting login with Authorization Code: $loggableLogin")
+    }
+
     @PostMapping("/auth")
     fun authCodeLogin(login: AuthCodeLogin, req: HttpServletRequest, res: HttpServletResponse) {
-        log.debug("Attempting login with Authorization Code: $login")
+        logAuthCodeLogin(login)
         try {
             oAuth2Service.validateAuthCodeLogin(login)
             val authCode = oAuth2Service.authCodeLogin(login)

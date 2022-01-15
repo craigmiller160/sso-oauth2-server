@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.craigmiller160</groupId>
 	<artifactId>sso-oauth2-server</artifactId>
-	<version>1.6.7</version>
+	<version>1.6.8</version>
 	<name>SSO OAuth2 Authentication Server</name>
 	<packaging>jar</packaging>
 	<description>SSO Auth Server</description>

@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/oauth")
 class OAuth2Controller(
         private val oAuth2Service: OAuth2Service,
-        @Value("\${spring.profiles.active}")
+        @Value("\${spring.profiles.active:}")
         private val profile: String
 ) {
 
@@ -60,17 +60,19 @@ class OAuth2Controller(
     }
 
     private fun logTokenRequest(tokenRequest: TokenRequest) {
-        val loggableRequest = when(profile) {
-            "prod" -> tokenRequest.copy(password = null, code = null)
-            else -> tokenRequest
+        val loggableRequest = if (profile.contains("prod")) {
+            tokenRequest.copy(password = null, code = null)
+        } else {
+            tokenRequest
         }
         log.debug("Received token request: $loggableRequest")
     }
 
     private fun logAuthCodeLogin(login: AuthCodeLogin) {
-        val loggableLogin = when (profile) {
-            "prod" -> login.copy(password = "")
-            else -> login
+        val loggableLogin = if (profile.contains("prod")) {
+            login.copy(password = "")
+        } else {
+            login
         }
         log.debug("Attempting login with Authorization Code: $loggableLogin")
     }

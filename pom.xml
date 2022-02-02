@@ -54,7 +54,7 @@
 		<legacy.date.converter.version>1.1.2</legacy.date.converter.version>
 		<java.version>17</java.version>
 		<kotlin.version>1.6.10</kotlin.version>
-		<postgres.version>42.3.1</postgres.version>
+		<postgres.version>42.3.2</postgres.version>
 		<nimbus.jose.version>9.15.2</nimbus.jose.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<junit.version>4.13</junit.version>

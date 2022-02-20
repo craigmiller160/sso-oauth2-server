@@ -124,8 +124,28 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
+    @Disabled
     fun `token() - called multiple times with the same refresh token, client only`() {
-        TODO("Finish this")
+        val refreshToken = createToken()
+
+        val result1 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        val result2 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result1, GrantType.CLIENT_CREDENTIALS)
+        testTokenResponse(result2, GrantType.CLIENT_CREDENTIALS)
     }
 
     @Test
@@ -161,7 +181,26 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     @Test
     fun `token() - called multiple times with the same refresh token, with user`() {
-        TODO("Finish this")
+        val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
+
+        val result1 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        val result2 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result1, GrantType.PASSWORD, isUser = true)
+        testTokenResponse(result2, GrantType.PASSWORD, isUser = true)
     }
 
     @Test

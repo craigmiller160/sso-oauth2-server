@@ -124,6 +124,11 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
+    fun `token() - called multiple times with the same refresh token, client only`() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun `token() - refresh_token grant for client only not allowed`() {
         val refreshToken = createToken()
 
@@ -152,6 +157,11 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         }.convert(TokenResponse::class.java)
 
         testTokenResponse(result, GrantType.PASSWORD, isUser = true)
+    }
+
+    @Test
+    fun `token() - called multiple times with the same refresh token, with user`() {
+        TODO("Finish this")
     }
 
     @Test

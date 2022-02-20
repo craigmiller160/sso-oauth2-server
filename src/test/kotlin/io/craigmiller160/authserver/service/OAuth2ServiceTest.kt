@@ -274,7 +274,7 @@ class OAuth2ServiceTest {
                 .thenReturn(user)
         `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id))
                 .thenReturn(roles)
-        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles))
+        `when`(jwtHandler.createAccessToken(clientUserDetails, user, roles, tokenData.tokenId))
                 .thenReturn(Pair(accessToken, tokenId))
         `when`(jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, user.id, tokenId))
                 .thenReturn(Pair(refreshToken, tokenData.tokenId))
@@ -285,7 +285,7 @@ class OAuth2ServiceTest {
                 hasProperty("refreshToken", equalTo(refreshToken))
         ))
 
-        verify(refreshTokenRepo, times(1))
+        verify(refreshTokenRepo, times(0))
                 .delete(refreshTokenEntity)
     }
 
@@ -300,7 +300,7 @@ class OAuth2ServiceTest {
 
         `when`(refreshTokenRepo.findById(tokenData.tokenId))
                 .thenReturn(Optional.of(refreshTokenEntity))
-        `when`(jwtHandler.createAccessToken(clientUserDetails))
+        `when`(jwtHandler.createAccessToken(clientUserDetails, null, listOf(), tokenId))
                 .thenReturn(Pair(accessToken, tokenId))
         `when`(jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenId = tokenId))
                 .thenReturn(Pair(refreshToken, tokenData.tokenId))
@@ -311,7 +311,7 @@ class OAuth2ServiceTest {
                 hasProperty("refreshToken", equalTo(refreshToken))
         ))
 
-        verify(refreshTokenRepo, times(1))
+        verify(refreshTokenRepo, times(0))
                 .delete(refreshTokenEntity)
     }
 

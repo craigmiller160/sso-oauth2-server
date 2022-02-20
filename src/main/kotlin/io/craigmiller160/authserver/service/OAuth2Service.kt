@@ -163,19 +163,11 @@ class OAuth2Service (
 
     @Transactional
     fun refresh(origRefreshToken: String): TokenResponse {
-        // TODO delete the notes
-        /*
-        1) Need consistent refresh token primary key
-        2) Need to update refresh token record instead of deleting/creating new
-         */
-
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 
         val existingTokenEntity = refreshTokenRepo.findById(tokenData.tokenId)
                 .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") }
-
-        refreshTokenRepo.delete(existingTokenEntity)
 
         val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
             val user = userRepo.findByUserIdAndClientId(userId, clientUserDetails.client.id)
@@ -189,7 +181,7 @@ class OAuth2Service (
             Pair(user, roles)
         }
 
-        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf(), tokenData.tokenId)
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenData.userId ?: 0, accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, tokenData.clientId, tokenData.userId)
 

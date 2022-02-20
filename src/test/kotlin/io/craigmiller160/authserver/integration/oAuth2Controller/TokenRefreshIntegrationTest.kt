@@ -33,6 +33,7 @@ import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -201,6 +202,8 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
         testTokenResponse(result1, GrantType.PASSWORD, isUser = true)
         testTokenResponse(result2, GrantType.PASSWORD, isUser = true)
+
+        assertEquals(1, refreshTokenRepo.count())
     }
 
     @Test

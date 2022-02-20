@@ -103,6 +103,11 @@ class JwtHandlerTest {
     }
 
     @Test
+    fun test_createAccessToken_clientOnly_withExistingJwtId() {
+        TODO("Finish this")
+    }
+
+    @Test
     fun test_createAccessToken_clientAndUser() {
         val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
         val parts = token.split(".")
@@ -193,6 +198,11 @@ class JwtHandlerTest {
         assertThat(jsonObject.getLong("exp"), notNullValue())
         assertThat(jsonObject.getString("grantType"), equalTo("password"))
         assertThat(jsonObject.getLong("clientId"), equalTo(0L))
+    }
+
+    @Test
+    fun test_createRefreshToken_noUser_withExistingJwtId() {
+        TODO("Finish this")
     }
 
     private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {

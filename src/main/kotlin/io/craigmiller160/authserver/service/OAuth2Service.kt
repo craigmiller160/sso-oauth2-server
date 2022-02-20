@@ -163,6 +163,12 @@ class OAuth2Service (
 
     @Transactional
     fun refresh(origRefreshToken: String): TokenResponse {
+        // TODO delete the notes
+        /*
+        1) Need consistent refresh token primary key
+        2) Need to update refresh token record instead of deleting/creating new
+         */
+
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 

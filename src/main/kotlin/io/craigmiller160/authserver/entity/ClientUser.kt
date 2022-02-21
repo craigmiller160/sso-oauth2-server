@@ -37,10 +37,10 @@ data class ClientUser (
         val clientId: Long
 ) {
         @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "client_id")
+        @JoinColumn(name = "clientId", insertable = false, updatable = false)
         lateinit var client: Client
 
         @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "user_id")
+        @JoinColumn(name = "userId", insertable = false, updatable = false)
         lateinit var user: User
 }

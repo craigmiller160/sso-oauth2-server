@@ -21,6 +21,7 @@ package io.craigmiller160.authserver.repository
 import io.craigmiller160.authserver.entity.Role
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -36,9 +37,17 @@ interface RoleRepository : JpaRepository<Role,Long> {
             AND cur.clientId = :clientId
         )
     """)
-    fun findAllByUserIdAndClientId(userId: Long, clientId: Long): List<Role>
+    fun findAllByUserIdAndClientId(@Param("userId") userId: Long, @Param("clientId") clientId: Long): List<Role>
 
-    // TODO add unit test
-    fun findAllByIdIn(roleIds: Collection<Long>): List<Role>
+    @Query("""
+        SELECT r
+        FROM Role r
+        WHERE r.id IN (
+            SELECT cur.roleId
+            FROM ClientUserRole cur
+            WHERE cur.userId = :userId
+        )
+    """)
+    fun findAllByUserId(@Param("userId") userId: Long): List<Role>
 
 }

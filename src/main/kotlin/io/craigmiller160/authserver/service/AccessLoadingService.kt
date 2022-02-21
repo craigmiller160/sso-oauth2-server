@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service
 class AccessLoadingService(
         private val userRepo: UserRepository,
         private val clientRepo: ClientRepository,
-        private val clientUserRepo: ClientUserRepository,
         private val clientUserRoleRepo: ClientUserRoleRepository,
         private val roleRepo: RoleRepository
 ) {
@@ -23,9 +22,7 @@ class AccessLoadingService(
     fun getAccessForUser(userId: Long): UserWithClientsAccess {
         val user = userRepo.findEnabledUserById(userId)
                 ?: throw AccessNotFoundException("No user for ID: $userId")
-        val clientUsers = clientUserRepo.findAllByUserId(userId)
-        val clientIds = clientUsers.map { it.id }
-        val clients = clientRepo.findAllEnabledClientsByIds(clientIds)
+        val clients = clientRepo.findAllEnabledClientsByUserId(userId)
 
         val clientUserRoles = clientUserRoleRepo.findAllByUserId(userId)
         val roleIds = clientUserRoles.map { it.roleId }.toSet()

@@ -28,8 +28,16 @@ import org.springframework.stereotype.Repository
 interface ClientRepository : JpaRepository<Client,Long> {
 
     fun findByClientKey(clientKey: String): Client?
-    // TODO add unit test
-    @Query("SELECT c FROM Client c WHERE c.id IN :clientIds AND c.enabled = true")
-    fun findAllEnabledClientsByIds(@Param("clientIds") clientIds: List<Long>): List<Client>
+
+    // TODO add unit tests
+    @Query("""SELECT c 
+        FROM Client c
+        WHERE c.enabled = true
+        AND c.id IN (
+            SELECT cu
+            FROM ClientUser cu
+            WHERE cu.userId = :userId
+        )""")
+    fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 
 }

@@ -23,6 +23,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ClientUserRepository : JpaRepository<ClientUser,Long> {
-    fun findAllByUserId(userId: Long): List<ClientUser>
-}
+interface ClientUserRepository : JpaRepository<ClientUser,Long>

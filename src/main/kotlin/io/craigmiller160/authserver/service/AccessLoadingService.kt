@@ -1,5 +1,7 @@
 package io.craigmiller160.authserver.service
 
+import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
+import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.exception.AccessNotFoundException
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
@@ -47,21 +49,5 @@ class AccessLoadingService(
                 clients = userClientsMap
         )
     }
-
-    // TODO move to other files
-    data class UserWithClientsAccess(
-            val userId: Long,
-            val email: String,
-            val firstName: String,
-            val lastName: String,
-            val clients: Map<String,ClientWithRolesAccess>
-    )
-
-    // TODO move to other files
-    data class ClientWithRolesAccess(
-            val clientId: Long,
-            val clientName: String,
-            val roles: List<String>
-    )
 
 }

@@ -40,4 +40,18 @@ interface ClientRepository : JpaRepository<Client,Long> {
         )""")
     fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 
+    // TODO add to unit tests
+    @Query("""
+        SELECT c
+        FROM Client c
+        WHERE c.enabled = true
+        AND c.id IN (
+            SELECT cu
+            FROM ClientUser cu
+            WHERE cu.userId = :userId
+            AND cu.clientId = :clientId
+        )
+    """)
+    fun findEnabledClientByUserIdAndClientId(@Param("userId") userId: Long, @Param("clientId") clientId: Long): Client?
+
 }

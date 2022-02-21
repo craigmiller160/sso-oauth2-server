@@ -15,12 +15,10 @@ class AccessLoadingService(
         private val roleRepo: RoleRepository
 ) {
 
-    // TODO very inefficient
     fun getAccessForUser(userId: Long): UserWithClientsAccess {
         val user = userRepo.findEnabledUserById(userId)
                 ?: throw AccessNotFoundException("No user for ID: $userId")
         val clients = clientRepo.findAllEnabledClientsByUserId(userId)
-
         val roles = roleRepo.findAllByUserId(userId)
 
         val userClientsMap = clients.associate { client ->

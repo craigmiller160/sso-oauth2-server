@@ -33,6 +33,7 @@ import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -124,6 +125,31 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     }
 
     @Test
+    @Disabled
+    fun `token() - called multiple times with the same refresh token, client only`() {
+        val refreshToken = createToken()
+
+        val result1 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        val result2 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result1, GrantType.CLIENT_CREDENTIALS)
+        testTokenResponse(result2, GrantType.CLIENT_CREDENTIALS)
+    }
+
+    @Test
     fun `token() - refresh_token grant for client only not allowed`() {
         val refreshToken = createToken()
 
@@ -152,6 +178,32 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         }.convert(TokenResponse::class.java)
 
         testTokenResponse(result, GrantType.PASSWORD, isUser = true)
+    }
+
+    @Test
+    fun `token() - called multiple times with the same refresh token, with user`() {
+        val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
+
+        val result1 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        val result2 = apiProcessor.call {
+            request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+            }
+        }.convert(TokenResponse::class.java)
+
+        testTokenResponse(result1, GrantType.PASSWORD, isUser = true)
+        testTokenResponse(result2, GrantType.PASSWORD, isUser = true)
+
+        assertEquals(1, refreshTokenRepo.count())
     }
 
     @Test

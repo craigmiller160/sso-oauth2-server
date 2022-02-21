@@ -169,8 +169,6 @@ class OAuth2Service (
         val existingTokenEntity = refreshTokenRepo.findById(tokenData.tokenId)
                 .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") }
 
-        refreshTokenRepo.delete(existingTokenEntity)
-
         val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
             val user = userRepo.findByUserIdAndClientId(userId, clientUserDetails.client.id)
                     ?: throw InvalidRefreshTokenException("Invalid Refresh User")
@@ -183,7 +181,7 @@ class OAuth2Service (
             Pair(user, roles)
         }
 
-        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf())
+        val (accessToken, accessTokenId) = jwtHandler.createAccessToken(clientUserDetails, userDataPair?.first, userDataPair?.second ?: listOf(), tokenData.tokenId)
         val (refreshToken, refreshTokenId) = jwtHandler.createRefreshToken(clientUserDetails, tokenData.grantType, tokenData.userId ?: 0, accessTokenId)
         saveRefreshToken(refreshToken, refreshTokenId, tokenData.clientId, tokenData.userId)
 

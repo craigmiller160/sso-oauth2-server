@@ -49,6 +49,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Base64
 import java.util.Date
+import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class JwtHandlerTest {
@@ -89,6 +90,29 @@ class JwtHandlerTest {
         val header = String(Base64.getDecoder().decode(parts[0]))
         val body = String(Base64.getDecoder().decode(parts[1]))
         assertEquals(expectedHeader, header)
+
+        val jsonObject = JSONObject(body)
+        assertEquals(8, jsonObject.length())
+        assertThat(jsonObject.getLong("nbf"), notNullValue())
+        assertThat(jsonObject.getLong("iat"), notNullValue())
+        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+        assertThat(jsonObject.getLong("exp"), notNullValue())
+        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+        assertThat(jsonObject.getString("sub"), equalTo(client.name))
+        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+        assertEquals(0, jsonObject.getJSONArray("roles").length())
+    }
+
+    @Test
+    fun test_createAccessToken_clientOnly_withExistingJwtId() {
+        val existingId = UUID.randomUUID().toString()
+        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, null, listOf(), existingId)
+        val parts = token.split(".")
+        val header = String(Base64.getDecoder().decode(parts[0]))
+        val body = String(Base64.getDecoder().decode(parts[1]))
+        assertEquals(expectedHeader, header)
+
+        assertEquals(existingId, tokenId)
 
         val jsonObject = JSONObject(body)
         assertEquals(8, jsonObject.length())

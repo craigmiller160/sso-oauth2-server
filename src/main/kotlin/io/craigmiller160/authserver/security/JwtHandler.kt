@@ -57,13 +57,17 @@ class JwtHandler(
         return legacyDateConverter.convertZonedDateTimeToDate(now)
     }
 
-    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf()): Pair<String,String> {
+    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf(), existingTokenId: String? = null): Pair<String,String> {
         val roleNames = roles.map { it.name }
 
         var claimBuilder = createDefaultClaims(clientUserDetails.client.accessTokenTimeoutSecs)
                 .claim("clientKey", clientUserDetails.username)
                 .claim("clientName", clientUserDetails.client.name)
                 .claim("roles", roleNames)
+
+        claimBuilder = existingTokenId
+                ?.let { claimBuilder.jwtID(existingTokenId) }
+                ?: claimBuilder
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)

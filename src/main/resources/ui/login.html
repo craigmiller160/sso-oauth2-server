@@ -108,19 +108,16 @@
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = cssUri;
+            loginForm.action = `${basePath}${loginPath}`;
 
-            return getCsrfToken(basePath)
-                .then((csrfToken) => {
-                    loginForm.action = `${basePath}${loginPath}?X-CSRF-Token=${csrfToken}`;
-                    return new Promise((resolve) => {
-                        link.onload = () => {
-                            rootDiv.classList.remove('hidden');
-                            usernameField.focus();
-                            resolve();
-                        }
-                        header.appendChild(link);
-                    });
-                });
+            return new Promise((resolve) => {
+                link.onload = () => {
+                    rootDiv.classList.remove('hidden');
+                    usernameField.focus();
+                    resolve();
+                }
+                header.appendChild(link);
+            });
         };
 
         const populateQueryParamValues = () => {

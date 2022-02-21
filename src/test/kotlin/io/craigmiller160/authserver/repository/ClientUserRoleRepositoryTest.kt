@@ -78,19 +78,7 @@ class ClientUserRoleRepositoryTest {
     }
 
     @Test
-    fun test_findAllForUserEagerFetchRole() {
-        println("InsideTests") // TODO delete this
-        val result = clientUserRoleRepo.findAllForUserEagerFetchRole(user.id)
-        println("AfterSelect") // TODO delete this
-        assertEquals(1, result.size)
-        val entityResult = result.first()
-        println("BeforeDetach") // TODO delete this
-        entityManager.detach(entityResult)
-
-        println("BeforeAssertion") // TODO delete this
-        assertEquals(entityResult.id, clientUserRole.id)
-        assertEquals(entityResult.role.id, role.id)
-        assertNull(entityResult.user)
-        assertNull(entityResult.client)
+    fun test_findAllByUserId() {
+        TODO("Finish this")
     }
 }

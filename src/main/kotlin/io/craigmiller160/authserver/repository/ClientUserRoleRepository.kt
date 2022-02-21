@@ -26,6 +26,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ClientUserRoleRepository : JpaRepository<ClientUserRole,Long> {
-    @Query("SELECT cur FROM ClientUserRole cur JOIN FETCH cur.role WHERE cur.userId = :userId")
-    fun findAllForUserEagerFetchRole(@Param("userId") userId: Long): List<ClientUserRole>
+    fun findAllByUserId(userId: Long): List<ClientUserRole>
 }

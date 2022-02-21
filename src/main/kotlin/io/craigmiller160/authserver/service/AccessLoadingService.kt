@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.service
 
+import io.craigmiller160.authserver.exception.AccessNotFoundException
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.ClientUserRoleRepository
@@ -29,8 +30,8 @@ class AccessLoadingService(
          * 3) Get all Clients for User
          * 4) Get all Roles for Client & User
          */
-        val user = userRepo.findById(userId)
-                .orElseThrow { RuntimeException() }
+        val user = userRepo.findEnabledUserById(userId)
+                ?: throw AccessNotFoundException("No user for ID: $userId")
         val clientUsers = clientUserRepo.findAllByUserId(userId)
         val clientIds = clientUsers.map { it.id }
         val clients = clientRepo.findAllByIdIn(clientIds)
@@ -39,7 +40,7 @@ class AccessLoadingService(
         val roleIds = clientUserRoles.map { it.roleId }.toSet()
         val roles = roleRepo.findAllByIdIn(roleIds)
 
-        val userClientsMap = clients.map { client ->
+        val userClientsMap = clients.associate { client ->
             val clientRoles = roles.filter { role -> role.clientId == client.id }
             val clientWithRolesAccess = ClientWithRolesAccess(
                     clientId = client.id,
@@ -48,7 +49,6 @@ class AccessLoadingService(
             )
             client.clientKey to clientWithRolesAccess
         }
-                .toMap()
 
         return UserWithClientsAccess(
                 userId = userId,

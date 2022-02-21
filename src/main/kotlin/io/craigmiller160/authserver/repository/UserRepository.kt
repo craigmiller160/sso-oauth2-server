@@ -21,6 +21,7 @@ package io.craigmiller160.authserver.repository
 import io.craigmiller160.authserver.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -50,5 +51,9 @@ interface UserRepository : JpaRepository<User,Long> {
         )
     """)
     fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
+
+    // TODO write test
+    @Query("SELECT u FROM User u WHERE u.id = :userId AND u.enabled = true")
+    fun findEnabledUserById(@Param("userId") userId: Long): User?
 
 }

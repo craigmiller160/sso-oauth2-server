@@ -34,7 +34,7 @@ class AccessLoadingService(
                 ?: throw AccessNotFoundException("No user for ID: $userId")
         val clientUsers = clientUserRepo.findAllByUserId(userId)
         val clientIds = clientUsers.map { it.id }
-        val clients = clientRepo.findAllByIdIn(clientIds)
+        val clients = clientRepo.findAllEnabledClientsByIds(clientIds)
 
         val clientUserRoles = clientUserRoleRepo.findAllByUserId(userId)
         val roleIds = clientUserRoles.map { it.roleId }.toSet()

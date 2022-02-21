@@ -20,6 +20,8 @@ package io.craigmiller160.authserver.repository
 
 import io.craigmiller160.authserver.entity.Client
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -27,6 +29,7 @@ interface ClientRepository : JpaRepository<Client,Long> {
 
     fun findByClientKey(clientKey: String): Client?
     // TODO add unit test
-    fun findAllByIdIn(clientIds: List<Long>): List<Client>
+    @Query("SELECT c FROM Client c WHERE c.id IN :clientIds AND c.enabled = true")
+    fun findAllEnabledClientsByIds(@Param("clientIds") clientIds: List<Long>): List<Client>
 
 }

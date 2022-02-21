@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.computations.either
 import arrow.core.flatMap
+import arrow.core.leftIfNull
 import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.entity.Client
@@ -26,20 +27,20 @@ private fun createGetUserById(userRepo: UserRepository): (Long) -> Either<Throwa
 
 private fun createGetClients(clientRepo: ClientRepository): (Long,Long?) -> Either<Throwable,List<Client>> {
     return fun(userId: Long, clientId: Long?): Either<Throwable,List<Client>> {
-        clientId?.let { actualClientId ->
-            clientRepo.findEnabledClientByUserIdAndClientId(userId, actualClientId)
-                    ?.let { client -> Either.Right(listOf(client)) }
-                    ?: Either.Left(AccessNotFoundException("Unable to find client for User ID $userId and Client ID $clientId"))
+        val clientsEither = clientId?.let { actualClientId ->
+            Either.catch { clientRepo.findEnabledClientByUserIdAndClientId(userId, actualClientId) }
+                    .leftIfNull { AccessNotFoundException("Unable to find client for User ID $userId and Client ID $clientId") }
+                    .map { listOf(it) }
         }
-                ?: clientRepo.findAllEnabledClientsByUserId(userId)
-                        .let { Either.Right(it) }
+                ?: Either.catch { clientRepo.findAllEnabledClientsByUserId(userId) }
+        return clientsEither.mapLeft { ex -> AccessNotFoundException("Error querying for access clients", ex) }
     }
 }
 
 private fun createGetRoles(roleRepo: RoleRepository): (Long,Long?) -> Either<Throwable,List<Role>> {
     return fun (userId: Long, clientId: Long?): Either<Throwable,List<Role>> {
         val rolesEither = clientId?.let { actualClientId ->
-            Either.catch { roleRepo.findAllByUserIdAndClientId(userId, clientId) }
+            Either.catch { roleRepo.findAllByUserIdAndClientId(userId, actualClientId) }
         }
                 ?: Either.catch { roleRepo.findAllByUserId(userId) }
         return rolesEither.mapLeft { ex -> AccessNotFoundException("Error querying for access roles", ex) }

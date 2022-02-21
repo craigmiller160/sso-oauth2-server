@@ -19,9 +19,12 @@
 package io.craigmiller160.authserver.entity
 
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Entity
@@ -31,5 +34,11 @@ data class ClientUser (
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
         val userId: Long,
-        val clientId: Long
+        val clientId: Long,
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "client_id")
+        val client: Client,
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "user_id")
+        val user: User
 )

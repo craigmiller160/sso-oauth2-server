@@ -46,6 +46,6 @@ data class ClientUserRole (
         lateinit var user: User
 
         @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "roleId")
+        @JoinColumn(name = "roleId", insertable = false, updatable = false)
         lateinit var role: Role
 }

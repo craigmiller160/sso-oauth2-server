@@ -5,6 +5,8 @@ import io.craigmiller160.authserver.repository.ClientUserRoleRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -73,11 +75,21 @@ class ClientUserRoleTest {
 
     @Test
     fun `able to lazy load joined entities`() {
-        TODO("Finish this")
+        val dbClientUserRoleOptional = clientUserRoleRepo.findById(clientUserRole.id)
+        Assertions.assertTrue { dbClientUserRoleOptional.isPresent }
+        val dbClientUserRole = dbClientUserRoleOptional.get()
+
+        assertEquals(this.user.id, dbClientUserRole.user.id)
+        assertEquals(this.client.id, dbClientUserRole.client.id)
+        assertEquals(this.role.id, dbClientUserRole.role.id)
     }
 
     @Test
     fun `does not cascade deletes`() {
-        TODO("Finish this")
+        clientUserRoleRepo.deleteById(clientUserRole.id)
+        assertEquals(0, clientUserRoleRepo.count())
+        assertEquals(1, roleRepo.count())
+        assertEquals(1, userRepo.count())
+        assertEquals(1, clientRepo.count())
     }
 }

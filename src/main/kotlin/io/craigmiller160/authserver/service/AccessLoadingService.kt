@@ -4,8 +4,6 @@ import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.exception.AccessNotFoundException
 import io.craigmiller160.authserver.repository.ClientRepository
-import io.craigmiller160.authserver.repository.ClientUserRepository
-import io.craigmiller160.authserver.repository.ClientUserRoleRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service
 class AccessLoadingService(
         private val userRepo: UserRepository,
         private val clientRepo: ClientRepository,
-        private val clientUserRoleRepo: ClientUserRoleRepository,
         private val roleRepo: RoleRepository
 ) {
 

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
 @SpringBootTest
@@ -78,11 +79,15 @@ class ClientUserRoleRepositoryTest {
 
     @Test
     fun test_findAllForUserEagerFetchRole() {
+        println("InsideTests") // TODO delete this
         val result = clientUserRoleRepo.findAllForUserEagerFetchRole(user.id)
+        println("AfterSelect") // TODO delete this
         assertEquals(1, result.size)
         val entityResult = result.first()
+        println("BeforeDetach") // TODO delete this
         entityManager.detach(entityResult)
 
+        println("BeforeAssertion") // TODO delete this
         assertEquals(entityResult.id, clientUserRole.id)
         assertEquals(entityResult.role.id, role.id)
         assertNull(entityResult.user)

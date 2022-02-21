@@ -34,11 +34,13 @@ data class ClientUser (
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Long,
         val userId: Long,
-        val clientId: Long,
+        val clientId: Long
+) {
         @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "client_id")
-        val client: Client,
+        lateinit var client: Client
+
         @OneToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "user_id")
-        val user: User
-)
+        lateinit var user: User
+}

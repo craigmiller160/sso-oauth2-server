@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 class ClientUserRoleRepositoryTest {
     @Test
-    fun test_findAllByUserIdOrderByClientId() {
+    fun test_findAllForUserEagerFetchRole() {
         TODO("Finish this")
     }
 }

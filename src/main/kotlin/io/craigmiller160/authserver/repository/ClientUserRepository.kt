@@ -20,9 +20,12 @@ package io.craigmiller160.authserver.repository
 
 import io.craigmiller160.authserver.entity.ClientUser
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ClientUserRepository : JpaRepository<ClientUser,Long> {
-    fun findAllByUserIdOrderByClientId(userId: Long): List<ClientUser>
+    @Query("SELECT cu FROM ClientUser cu JOIN FETCH cu.client WHERE cu.userId = :userId")
+    fun findAllForUserEagerFetchClient(@Param("userId") userId: Long): List<ClientUser>
 }

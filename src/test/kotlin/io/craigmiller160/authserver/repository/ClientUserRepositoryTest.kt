@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 
 class ClientUserRepositoryTest {
     @Test
-    fun test_findAllByUserIdOrderByClientId() {
+    fun test_findAllForUserEagerFetchClient() {
         TODO("Finish this")
     }
 }

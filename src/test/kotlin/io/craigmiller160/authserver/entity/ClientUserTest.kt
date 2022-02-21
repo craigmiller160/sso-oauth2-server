@@ -69,8 +69,8 @@ class ClientUserTest {
         assertTrue { dbClientUserOptional.isPresent }
         val dbClientUser = dbClientUserOptional.get()
 
-        assertEquals(this.user, dbClientUser.user)
-        assertEquals(this.client, dbClientUser.client)
+        assertEquals(this.user.id, dbClientUser.user.id)
+        assertEquals(this.client.id, dbClientUser.client.id)
     }
 
     @Test

@@ -17,12 +17,11 @@ import io.craigmiller160.authserver.repository.UserRepository
 import org.springframework.stereotype.Service
 
 private fun createGetUserById(userRepo: UserRepository): (Long) -> Either<Throwable,User> {
-    return fun(userId: Long): Either<Throwable,User> =
-            Either.catch { userRepo.findEnabledUserById(userId) }
-                    .flatMap { user ->
-                        user?.let { Either.Right(it) }
-                                ?: Either.Left(AccessNotFoundException("No user for ID: $userId"))
-                    }
+    return fun(userId: Long): Either<Throwable,User> {
+        val userEither = Either.catch { userRepo.findEnabledUserById(userId) }
+                .leftIfNull { AccessNotFoundException("No user for ID: $userId") }
+        return userEither.mapLeft { ex -> AccessNotFoundException("Error querying for user with ID: $userId", ex) }
+    }
 }
 
 private fun createGetClients(clientRepo: ClientRepository): (Long,Long?) -> Either<Throwable,List<Client>> {
@@ -56,8 +55,6 @@ class AccessLoadingService(
     private val getUserById = createGetUserById(userRepo)
     private val getClients = createGetClients(clientRepo)
     private val getRoles = createGetRoles(roleRepo)
-
-    // TODO need to have a client restriction for legacy calls
 
     fun getAccessForUser(userId: Long): Either<Throwable, UserWithClientsAccess> =
             getAccessForUserAndClient(userId)

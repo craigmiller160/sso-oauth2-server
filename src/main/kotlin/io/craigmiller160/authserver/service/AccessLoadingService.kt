@@ -17,19 +17,8 @@ class AccessLoadingService(
         private val roleRepo: RoleRepository
 ) {
 
-    // TODO factor in enabled check
-
-    // TODO customize exceptions
-
     // TODO very inefficient
-    // TODO consider what the access level should be?
     fun getAccessForUser(userId: Long): UserWithClientsAccess {
-        /*
-         * 1) Get all ClientUsers for User
-         * 2) Get all ClientUserRoles for User
-         * 3) Get all Clients for User
-         * 4) Get all Roles for Client & User
-         */
         val user = userRepo.findEnabledUserById(userId)
                 ?: throw AccessNotFoundException("No user for ID: $userId")
         val clientUsers = clientUserRepo.findAllByUserId(userId)

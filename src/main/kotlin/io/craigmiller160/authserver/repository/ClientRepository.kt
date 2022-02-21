@@ -26,5 +26,7 @@ import org.springframework.stereotype.Repository
 interface ClientRepository : JpaRepository<Client,Long> {
 
     fun findByClientKey(clientKey: String): Client?
+    // TODO add unit test
+    fun findAllByIdIn(clientIds: List<Long>): List<Client>
 
 }

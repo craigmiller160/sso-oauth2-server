@@ -38,4 +38,7 @@ interface RoleRepository : JpaRepository<Role,Long> {
     """)
     fun findAllByUserIdAndClientId(userId: Long, clientId: Long): List<Role>
 
+    // TODO add unit test
+    fun findAllByIdIn(roleIds: Collection<Long>): List<Role>
+
 }

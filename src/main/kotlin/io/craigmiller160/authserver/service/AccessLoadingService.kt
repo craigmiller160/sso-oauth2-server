@@ -25,22 +25,24 @@ private fun createGetUserById(userRepo: UserRepository): (Long) -> Either<Throwa
 }
 
 private fun createGetClients(clientRepo: ClientRepository): (Long,Long?) -> Either<Throwable,List<Client>> {
-    return fun(userId: Long, clientId: Long?): Either<Throwable,List<Client>> =
-            clientId?.let { actualClientId ->
-                clientRepo.findEnabledClientByUserIdAndClientId(userId, actualClientId)
-                        ?.let { client -> Either.Right(listOf(client)) }
-                        ?: Either.Left(AccessNotFoundException("Unable to find client for User ID $userId and Client ID $clientId"))
-            }
-                    ?: clientRepo.findAllEnabledClientsByUserId(userId)
-                            .let { Either.Right(it) }
+    return fun(userId: Long, clientId: Long?): Either<Throwable,List<Client>> {
+        clientId?.let { actualClientId ->
+            clientRepo.findEnabledClientByUserIdAndClientId(userId, actualClientId)
+                    ?.let { client -> Either.Right(listOf(client)) }
+                    ?: Either.Left(AccessNotFoundException("Unable to find client for User ID $userId and Client ID $clientId"))
+        }
+                ?: clientRepo.findAllEnabledClientsByUserId(userId)
+                        .let { Either.Right(it) }
+    }
 }
 
 private fun createGetRoles(roleRepo: RoleRepository): (Long,Long?) -> Either<Throwable,List<Role>> {
     return fun (userId: Long, clientId: Long?): Either<Throwable,List<Role>> {
-        return clientId?.let { actualClientId ->
-            roleRepo.findAllByUserIdAndClientId(userId, clientId).let { Either.Right(it) }
+        val rolesEither = clientId?.let { actualClientId ->
+            Either.catch { roleRepo.findAllByUserIdAndClientId(userId, clientId) }
         }
-                ?: roleRepo.findAllByUserId(userId).let { Either.Right(it) }
+                ?: Either.catch { roleRepo.findAllByUserId(userId) }
+        return rolesEither.mapLeft { ex -> AccessNotFoundException("Error querying for access roles", ex) }
     }
 }
 

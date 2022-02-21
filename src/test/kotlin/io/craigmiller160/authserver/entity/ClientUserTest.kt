@@ -75,6 +75,9 @@ class ClientUserTest {
 
     @Test
     fun `does not cascade deletes`() {
-        TODO("Finish this")
+        clientUserRepo.deleteById(clientUser.id)
+        assertEquals(0, clientUserRepo.count())
+        assertEquals(1, clientRepo.count())
+        assertEquals(1, userRepo.count())
     }
 }

@@ -4,6 +4,8 @@ import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -63,7 +65,12 @@ class ClientUserTest {
 
     @Test
     fun `able to lazy load joined entities`() {
-        TODO("Finish this")
+        val dbClientUserOptional = clientUserRepo.findById(clientUser.id)
+        assertTrue { dbClientUserOptional.isPresent }
+        val dbClientUser = dbClientUserOptional.get()
+
+        assertEquals(this.user, dbClientUser.user)
+        assertEquals(this.client, dbClientUser.client)
     }
 
     @Test

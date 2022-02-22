@@ -72,4 +72,16 @@ class UserRepositoryTest {
         assertNull(result)
     }
 
+    @Test
+    fun test_findEnabledByUserId() {
+        val disabledUser = userRepo.save(TestData.createUser().copy(email = "FooBar", enabled = false))
+
+        val nullResult = userRepo.findEnabledUserById(disabledUser.id)
+        assertNull(nullResult)
+
+        val actualResult = userRepo.findEnabledUserById(user.id)
+        assertNotNull(actualResult)
+        assertEquals(user, actualResult)
+    }
+
 }

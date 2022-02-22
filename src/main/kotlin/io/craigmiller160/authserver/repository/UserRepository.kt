@@ -52,7 +52,6 @@ interface UserRepository : JpaRepository<User,Long> {
     """)
     fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
 
-    // TODO write test
     @Query("SELECT u FROM User u WHERE u.id = :userId AND u.enabled = true")
     fun findEnabledUserById(@Param("userId") userId: Long): User?
 

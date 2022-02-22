@@ -48,9 +48,9 @@ private fun createGetRoles(roleRepo: RoleRepository): (Long,Long?) -> Either<Thr
 
 @Service
 class AccessLoadingService(
-        private val userRepo: UserRepository,
-        private val clientRepo: ClientRepository,
-        private val roleRepo: RoleRepository
+        userRepo: UserRepository,
+        clientRepo: ClientRepository,
+        roleRepo: RoleRepository
 ) {
     private val getUserById = createGetUserById(userRepo)
     private val getClients = createGetClients(clientRepo)

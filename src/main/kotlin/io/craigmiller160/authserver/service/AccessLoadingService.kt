@@ -11,7 +11,6 @@ import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import org.springframework.stereotype.Service
 
-
 @Service
 class AccessLoadingService(
         private val userRepo: UserRepository,

@@ -87,4 +87,9 @@ class RoleRepositoryTest {
         assertTrue(results.contains(role2))
     }
 
+    @Test
+    fun test_findAllByUserId() {
+        TODO("Finish this")
+    }
+
 }

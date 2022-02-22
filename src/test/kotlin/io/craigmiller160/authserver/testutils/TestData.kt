@@ -92,6 +92,12 @@ object TestData {
             clientId = clientId
     )
 
+    fun createRole3(clientId: Long) = Role(
+            id = 0,
+            name = "Role3",
+            clientId = clientId
+    )
+
     fun createClientUserRole(userId: Long, clientId: Long, roleId: Long) = ClientUserRole(
             id = 0,
             clientId = clientId,

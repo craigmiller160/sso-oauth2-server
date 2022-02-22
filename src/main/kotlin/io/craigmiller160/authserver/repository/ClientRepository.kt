@@ -29,7 +29,6 @@ interface ClientRepository : JpaRepository<Client,Long> {
 
     fun findByClientKey(clientKey: String): Client?
 
-    // TODO add unit tests
     @Query("""SELECT c 
         FROM Client c
         WHERE c.enabled = true

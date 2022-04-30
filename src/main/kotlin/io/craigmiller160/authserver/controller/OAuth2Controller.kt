@@ -26,7 +26,6 @@ import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
 import io.craigmiller160.authserver.utils.encodeUriParams
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -106,17 +105,17 @@ class OAuth2Controller(
     }
 
     private fun validateTokenRequest(tokenRequest: TokenRequest) {
-        if (GrantType.PASSWORD == tokenRequest.grant_type && (StringUtils.isBlank(tokenRequest.username) || StringUtils.isBlank(tokenRequest.password))) {
+        if (GrantType.PASSWORD == tokenRequest.grant_type && (tokenRequest.username.isNullOrBlank() || tokenRequest.password.isNullOrBlank())) {
             throw BadRequestException("Invalid token request")
         }
 
-        if (GrantType.REFRESH_TOKEN == tokenRequest.grant_type && StringUtils.isBlank(tokenRequest.refresh_token)) {
+        if (GrantType.REFRESH_TOKEN == tokenRequest.grant_type && tokenRequest.refresh_token.isNullOrBlank()) {
             throw BadRequestException("Invalid token request")
         }
 
         if (GrantType.AUTH_CODE == tokenRequest.grant_type &&
-                (StringUtils.isBlank(tokenRequest.client_id) || StringUtils.isBlank(tokenRequest.code) ||
-                        StringUtils.isBlank(tokenRequest.redirect_uri))) {
+                (tokenRequest.client_id.isNullOrBlank() || tokenRequest.code.isNullOrBlank() ||
+                        tokenRequest.redirect_uri.isNullOrBlank())) {
             throw BadRequestException("Invalid token request")
         }
     }

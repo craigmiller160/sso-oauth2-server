@@ -61,6 +61,7 @@
 		<commons.lang.version>3.12.0</commons.lang.version>
 		<hamcrest.date.version>2.0.7</hamcrest.date.version>
 		<mockito.version>4.0.0</mockito.version>
+		<spotless.version>2.22.3</spotless.version>
 	</properties>
 
 	<dependencies>
@@ -214,6 +215,24 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>${spotless.version}</version>
+				<configuration>
+					<kotlin>
+						<ktlint />
+					</kotlin>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

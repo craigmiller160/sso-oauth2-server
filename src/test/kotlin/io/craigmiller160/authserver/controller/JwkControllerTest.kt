@@ -32,25 +32,19 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 class JwkControllerTest {
 
-    @Mock
-    private lateinit var tokenConfig: TokenConfig
-    @Mock
-    private lateinit var jwkSet: JWKSet
+  @Mock private lateinit var tokenConfig: TokenConfig
+  @Mock private lateinit var jwkSet: JWKSet
 
-    @InjectMocks
-    private lateinit var jwkController: JwkController
+  @InjectMocks private lateinit var jwkController: JwkController
 
-    @Test
-    fun test_getKey() {
-        val jsonObject = JSONObject()
-        jsonObject.put("Hello", "World")
-        `when`(tokenConfig.jwkSet())
-                .thenReturn(jwkSet)
-        `when`(jwkSet.toJSONObject())
-                .thenReturn(jsonObject)
+  @Test
+  fun test_getKey() {
+    val jsonObject = JSONObject()
+    jsonObject.put("Hello", "World")
+    `when`(tokenConfig.jwkSet()).thenReturn(jwkSet)
+    `when`(jwkSet.toJSONObject()).thenReturn(jsonObject)
 
-        val result = jwkController.getKey()
-        assertEquals(jsonObject, result)
-    }
-
+    val result = jwkController.getKey()
+    assertEquals(jsonObject, result)
+  }
 }

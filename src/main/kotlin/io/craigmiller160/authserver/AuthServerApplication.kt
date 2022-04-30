@@ -21,9 +21,8 @@ package io.craigmiller160.authserver
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication
-class AuthServerApplication
+@SpringBootApplication class AuthServerApplication
 
 fun main(args: Array<String>) {
-	runApplication<AuthServerApplication>(*args)
+  runApplication<AuthServerApplication>(*args)
 }

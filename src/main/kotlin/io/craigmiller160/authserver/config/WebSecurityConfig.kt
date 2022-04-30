@@ -33,47 +33,48 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true
-)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 class WebSecurityConfig(
-        private val clientUserDetailsService: ClientUserDetailsService,
-        private val authEntryPoint: AuthEntryPoint
+  private val clientUserDetailsService: ClientUserDetailsService,
+  private val authEntryPoint: AuthEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
-    override fun configure(http: HttpSecurity?) {
-        http?.let {
-            http.csrf()
-                    .disable()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                    .and()
-                    .requestMatchers()
-                    .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
-                    .and()
-                    .authorizeRequests()
-                    .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health").permitAll()
-                    .anyRequest().fullyAuthenticated()
-                    .and()
-                    .requiresChannel().anyRequest().requiresSecure()
-                    .and()
-                    .httpBasic()
-                    .and()
-                    .exceptionHandling().authenticationEntryPoint(authEntryPoint)
-        }
+  override fun configure(http: HttpSecurity?) {
+    http?.let {
+      http
+        .csrf()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+        .and()
+        .requestMatchers()
+        .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
+        .and()
+        .authorizeRequests()
+        .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health")
+        .permitAll()
+        .anyRequest()
+        .fullyAuthenticated()
+        .and()
+        .requiresChannel()
+        .anyRequest()
+        .requiresSecure()
+        .and()
+        .httpBasic()
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint(authEntryPoint)
     }
+  }
 
-    override fun configure(auth: AuthenticationManagerBuilder?) {
-        auth?.let {
-            auth.userDetailsService(clientUserDetailsService)
-                    .passwordEncoder(passwordEncoder())
-        }
+  override fun configure(auth: AuthenticationManagerBuilder?) {
+    auth?.let {
+      auth.userDetailsService(clientUserDetailsService).passwordEncoder(passwordEncoder())
     }
+  }
 
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder()
-    }
-
+  @Bean
+  fun passwordEncoder(): PasswordEncoder {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder()
+  }
 }

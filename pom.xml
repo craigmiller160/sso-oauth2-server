@@ -225,7 +225,7 @@
 							<include>src/main/kotlin/**/*.kt</include>
 							<include>src/test/kotlin/**/*.kt</include>
 						</includes>
-						<ktlint />
+						<ktfmt />
 					</kotlin>
 				</configuration>
 				<executions>

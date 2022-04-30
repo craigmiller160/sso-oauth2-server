@@ -25,7 +25,6 @@ object GrantType {
     const val AUTH_CODE = "authorization_code"
 
     fun isGrantTypeSupported(grantType: String): Boolean {
-        return PASSWORD == grantType || REFRESH_TOKEN == grantType || AUTH_CODE == grantType;
+        return PASSWORD == grantType || REFRESH_TOKEN == grantType || AUTH_CODE == grantType
     }
-
 }

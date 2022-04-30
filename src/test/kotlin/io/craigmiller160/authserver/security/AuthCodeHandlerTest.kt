@@ -58,9 +58,9 @@ class AuthCodeHandlerTest {
     @Test
     fun test_createAuthCode_and_validateAuthCode() {
         `when`(tokenConfig.privateKey)
-                .thenReturn(keyPair.private)
+            .thenReturn(keyPair.private)
         `when`(tokenConfig.publicKey)
-                .thenReturn(keyPair.public)
+            .thenReturn(keyPair.public)
 
         val authCode = authCodeHandler.createAuthCode(clientId, userId, expSecs)
         assertNotNull(authCode)
@@ -73,9 +73,9 @@ class AuthCodeHandlerTest {
     @Test
     fun test_validateAuthCode_expired() {
         `when`(tokenConfig.privateKey)
-                .thenReturn(keyPair.private)
+            .thenReturn(keyPair.private)
         `when`(tokenConfig.publicKey)
-                .thenReturn(keyPair.public)
+            .thenReturn(keyPair.public)
 
         val authCode = authCodeHandler.createAuthCode(clientId, userId, -100)
         assertNotNull(authCode)
@@ -87,7 +87,7 @@ class AuthCodeHandlerTest {
     @Test
     fun test_validateAuthCode_invalidEncryption() {
         `when`(tokenConfig.publicKey)
-                .thenReturn(keyPair.public)
+            .thenReturn(keyPair.public)
 
         val cipher = Cipher.getInstance("RSA")
         cipher.init(Cipher.ENCRYPT_MODE, keyPair.public)
@@ -98,5 +98,4 @@ class AuthCodeHandlerTest {
         val ex = assertThrows<AuthCodeException> { authCodeHandler.validateAuthCode(encrypted) }
         assertEquals("Invalid Auth Code encryption", ex.message)
     }
-
 }

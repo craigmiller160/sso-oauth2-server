@@ -71,5 +71,4 @@ class UserRepositoryTest {
         val result = userRepo.findByEmailAndClientId(user.email, 0)
         assertNull(result)
     }
-
 }

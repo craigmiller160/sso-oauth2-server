@@ -22,10 +22,8 @@ import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
-import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.testutils.TestData
@@ -36,7 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
@@ -50,12 +47,12 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
     private lateinit var userRepo: UserRepository
 
     private fun createTokenForm(
-            username: String = authUser.email,
-            password: String = authUserPassword
+        username: String = authUser.email,
+        password: String = authUserPassword
     ) = formOf(
-            "grant_type" to GrantType.PASSWORD,
-            "username" to username,
-            "password" to password
+        "grant_type" to GrantType.PASSWORD,
+        "username" to username,
+        "password" to password
     )
 
     @BeforeEach
@@ -185,5 +182,4 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
     }
-
 }

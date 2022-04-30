@@ -91,5 +91,4 @@ class RefreshTokenRepositoryTest {
         val remaining = refreshTokenRepo.findById("3").get()
         assertEquals(token3, remaining)
     }
-
 }

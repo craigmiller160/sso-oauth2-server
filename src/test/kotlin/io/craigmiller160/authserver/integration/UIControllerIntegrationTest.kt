@@ -19,7 +19,6 @@
 package io.craigmiller160.authserver.integration
 
 import io.craigmiller160.authserver.entity.Client
-import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
@@ -43,8 +42,8 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     @BeforeEach
     fun setup() {
         client2 = TestData.createClient().copy(
-                clientKey = "key2",
-                clientRedirectUris = listOf()
+            clientKey = "key2",
+            clientRedirectUris = listOf()
         )
 
         client2 = clientRepo.save(client2)
@@ -63,7 +62,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
             }
             response {
                 headers = mapOf(
-                        "Content-Type" to "text/css"
+                    "Content-Type" to "text/css"
                 )
             }
         }
@@ -91,7 +90,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
             }
             response {
                 headers = mapOf(
-                        "Content-Type" to "text/html"
+                    "Content-Type" to "text/html"
                 )
             }
         }
@@ -146,5 +145,4 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
     }
-
 }

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ClientUserDetailsService(
-        private val clientRepo: ClientRepository
+    private val clientRepo: ClientRepository
 ) : UserDetailsService {
 
     override fun loadUserByUsername(clientKey: String?): UserDetails {
@@ -37,10 +37,9 @@ class ClientUserDetailsService(
         }
 
         val client = clientRepo.findByClientKey(clientKey)
-                ?: throw UsernameNotFoundException("No client found for Client Key $clientKey")
+            ?: throw UsernameNotFoundException("No client found for Client Key $clientKey")
         val clientUserDetails = ClientUserDetails(client)
         AccountStatusUserDetailsChecker().check(clientUserDetails)
         return clientUserDetails
     }
-
 }

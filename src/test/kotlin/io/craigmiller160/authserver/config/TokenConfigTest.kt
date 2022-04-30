@@ -39,10 +39,10 @@ class TokenConfigTest {
     @BeforeEach
     fun setup() {
         tokenConfig = TokenConfig(
-                "",
-                keyStoreType,
-                keyStorePassword,
-                keyStoreAlias
+            "",
+            keyStoreType,
+            keyStorePassword,
+            keyStoreAlias
         )
     }
 
@@ -80,5 +80,4 @@ class TokenConfigTest {
         val ex = assertThrows<FileNotFoundException> { tokenConfig.loadKeys() }
         assertEquals(file.absolutePath, ex.message)
     }
-
 }

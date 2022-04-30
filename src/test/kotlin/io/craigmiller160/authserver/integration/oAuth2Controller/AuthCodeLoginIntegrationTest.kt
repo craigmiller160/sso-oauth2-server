@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -46,24 +45,24 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     private val basePath = "/oauth2"
 
     private fun createLoginForm(clientId: String = validClientKey, user: User = authUser) = formOf(
-            "username" to user.email,
-            "password" to authUserPassword,
-            "clientId" to clientId,
-            "redirectUri" to authClient.getRedirectUris()[0],
-            "responseType" to responseType,
-            "state" to state,
-            "basePath" to basePath
+        "username" to user.email,
+        "password" to authUserPassword,
+        "clientId" to clientId,
+        "redirectUri" to authClient.getRedirectUris()[0],
+        "responseType" to responseType,
+        "state" to state,
+        "basePath" to basePath
     )
 
-    private fun handleUrl(url: String): Pair<String,Map<String,String>> {
+    private fun handleUrl(url: String): Pair<String, Map<String, String>> {
         val uri = url.split("?")[0]
         val query = url.split("?")[1]
-                .split("&")
-                .map { keyValue ->
-                    val parts = keyValue.split("=")
-                    Pair(parts[0], parts[1])
-                }
-                .toMap()
+            .split("&")
+            .map { keyValue ->
+                val parts = keyValue.split("=")
+                Pair(parts[0], parts[1])
+            }
+            .toMap()
         return Pair(uri, query)
     }
 
@@ -74,7 +73,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         assertThat(query["state"], equalTo(state))
     }
 
-    private fun validateErrorLocation(location: String, form: Map<String,String>) {
+    private fun validateErrorLocation(location: String, form: Map<String, String>) {
         val (uri, query) = handleUrl(location)
         assertThat(uri, equalTo(errorUri))
         assertThat(query["code"], nullValue())
@@ -144,24 +143,24 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         badUserForm["name"] = "BadUserForm"
 
         listOf(noStateForm, badResponseTypeForm, badClientForm, badUserForm, badAuthCodeForm)
-                .forEach { form ->
-                    println("Testing Form: ${form["name"]}")
+            .forEach { form ->
+                println("Testing Form: ${form["name"]}")
 
-                    val result = apiProcessor.call {
-                        request {
-                            path = "/oauth/auth"
-                            method = HttpMethod.POST
-                            body = form
-                        }
-                        response {
-                            status = 302
-                        }
+                val result = apiProcessor.call {
+                    request {
+                        path = "/oauth/auth"
+                        method = HttpMethod.POST
+                        body = form
                     }
-
-                    val location = result.response.getHeader("Location")
-                    assertNotNull(location)
-                    validateErrorLocation(location!!, form)
+                    response {
+                        status = 302
+                    }
                 }
+
+                val location = result.response.getHeader("Location")
+                assertNotNull(location)
+                validateErrorLocation(location!!, form)
+            }
     }
 
     @Test
@@ -225,5 +224,4 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
         assertNotNull(location)
         validateErrorLocation(location!!, form)
     }
-
 }

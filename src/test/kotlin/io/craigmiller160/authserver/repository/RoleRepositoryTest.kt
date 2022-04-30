@@ -86,5 +86,4 @@ class RoleRepositoryTest {
         assertTrue(results.contains(role1))
         assertTrue(results.contains(role2))
     }
-
 }

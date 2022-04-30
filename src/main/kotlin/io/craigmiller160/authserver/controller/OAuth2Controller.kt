@@ -39,9 +39,9 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 @RequestMapping("/oauth")
 class OAuth2Controller(
-        private val oAuth2Service: OAuth2Service,
-        @Value("\${spring.profiles.active:}")
-        private val profile: String
+    private val oAuth2Service: OAuth2Service,
+    @Value("\${spring.profiles.active:}")
+    private val profile: String
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -82,22 +82,26 @@ class OAuth2Controller(
         try {
             oAuth2Service.validateAuthCodeLogin(login)
             val authCode = oAuth2Service.authCodeLogin(login)
-            val successParams = encodeUriParams(mapOf(
+            val successParams = encodeUriParams(
+                mapOf(
                     "code" to authCode,
                     "state" to login.state
-            ))
+                )
+            )
             val successRedirectUrl = "${login.redirectUri}?$successParams"
             res.status = 302
             res.addHeader("Location", successRedirectUrl)
         } catch (ex: Exception) {
             log.error("Error during login", ex)
-            val failParams = encodeUriParams(mapOf(
+            val failParams = encodeUriParams(
+                mapOf(
                     "response_type" to login.responseType,
                     "client_id" to login.clientId,
                     "redirect_uri" to login.redirectUri,
                     "state" to login.state,
                     "fail" to "true"
-            ))
+                )
+            )
             val failRedirectUri = "${login.basePath}/ui/login?$failParams"
             res.status = 302
             res.addHeader("Location", failRedirectUri)
@@ -114,10 +118,12 @@ class OAuth2Controller(
         }
 
         if (GrantType.AUTH_CODE == tokenRequest.grant_type &&
-                (tokenRequest.client_id.isNullOrBlank() || tokenRequest.code.isNullOrBlank() ||
-                        tokenRequest.redirect_uri.isNullOrBlank())) {
+            (
+                tokenRequest.client_id.isNullOrBlank() || tokenRequest.code.isNullOrBlank() ||
+                    tokenRequest.redirect_uri.isNullOrBlank()
+                )
+        ) {
             throw BadRequestException("Invalid token request")
         }
     }
-
 }

@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Configuration
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
-import java.nio.file.Paths
 import java.security.KeyPair
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -37,12 +36,12 @@ import javax.annotation.PostConstruct
 
 @Configuration
 @ConfigurationProperties(prefix = "security.token")
-class TokenConfig (
-        var keyStorePath: String = "",
-        var keyStoreType: String = "",
-        var keyStorePassword: String = "",
-        var keyStoreAlias: String = "",
-        var deleteOlderThanSecs: Long = 0
+class TokenConfig(
+    var keyStorePath: String = "",
+    var keyStoreType: String = "",
+    var keyStorePassword: String = "",
+    var keyStoreAlias: String = "",
+    var deleteOlderThanSecs: Long = 0
 ) {
 
     lateinit var publicKey: PublicKey
@@ -65,7 +64,7 @@ class TokenConfig (
         if (keyStorePath.startsWith("classpath:")) {
             val path = keyStorePath.replace(Regex("^classpath:"), "")
             return javaClass.classLoader.getResourceAsStream(path)
-                    ?: throw FileNotFoundException(keyStorePath)
+                ?: throw FileNotFoundException(keyStorePath)
         }
 
         val file = File(keyStorePath)
@@ -78,10 +77,9 @@ class TokenConfig (
 
     fun jwkSet(): JWKSet {
         val builder = RSAKey.Builder(publicKey as RSAPublicKey)
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(JWSAlgorithm.RS256)
-                .keyID("oauth-jwt")
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(JWSAlgorithm.RS256)
+            .keyID("oauth-jwt")
         return JWKSet(builder.build())
     }
-
 }

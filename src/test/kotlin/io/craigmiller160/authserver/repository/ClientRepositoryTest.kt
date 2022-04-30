@@ -18,7 +18,6 @@
 
 package io.craigmiller160.authserver.repository
 
-import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -58,5 +57,4 @@ class ClientRepositoryTest {
         val result = clientRepo.findByClientKey("abc")
         assertNull(result)
     }
-
 }

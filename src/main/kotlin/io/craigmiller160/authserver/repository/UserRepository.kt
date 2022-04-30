@@ -24,9 +24,10 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository : JpaRepository<User,Long> {
+interface UserRepository : JpaRepository<User, Long> {
 
-    @Query("""
+    @Query(
+        """
         SELECT u 
         FROM User u 
         WHERE u.email = :email
@@ -35,10 +36,12 @@ interface UserRepository : JpaRepository<User,Long> {
             FROM ClientUser cu
             WHERE cu.clientId = :clientId
         )
-    """)
+    """
+    )
     fun findByEmailAndClientId(email: String, clientId: Long): User?
 
-    @Query("""
+    @Query(
+        """
         SELECT u
         FROM User u
         WHERE u.id = :userId
@@ -48,7 +51,7 @@ interface UserRepository : JpaRepository<User,Long> {
             WHERE cu.clientId = :clientId
             AND cu.userId = :userId
         )
-    """)
+    """
+    )
     fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
-
 }

@@ -50,28 +50,28 @@ object JwtUtils {
 
     fun createJwkSet(keyPair: KeyPair): JWKSet {
         val builder = RSAKey.Builder(keyPair.public as RSAPublicKey)
-                .keyUse(KeyUse.SIGNATURE)
-                .algorithm(JWSAlgorithm.RS256)
-                .keyID("oauth-jwt")
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(JWSAlgorithm.RS256)
+            .keyID("oauth-jwt")
         return JWKSet(builder.build())
     }
 
     fun createJwt(expMinutes: Long = 100): SignedJWT {
         val header = JWSHeader.Builder(JWSAlgorithm.RS256)
-                .build()
+            .build()
 
         val exp = ZonedDateTime.now(ZoneId.of("UTC")).plusMinutes(expMinutes)
         val expDate = Date.from(exp.toInstant())
 
         val claims = JWTClaimsSet.Builder()
-                .jwtID("JWTID")
-                .issueTime(Date())
-                .subject(USERNAME)
-                .expirationTime(expDate)
-                .claim(ROLES_CLAIM, listOf(ROLE_1, ROLE_2))
-                .claim("clientKey", CLIENT_KEY)
-                .claim("clientName", CLIENT_NAME)
-                .build()
+            .jwtID("JWTID")
+            .issueTime(Date())
+            .subject(USERNAME)
+            .expirationTime(expDate)
+            .claim(ROLES_CLAIM, listOf(ROLE_1, ROLE_2))
+            .claim("clientKey", CLIENT_KEY)
+            .claim("clientName", CLIENT_NAME)
+            .build()
         return SignedJWT(header, claims)
     }
 
@@ -80,5 +80,4 @@ object JwtUtils {
         jwt.sign(signer)
         return jwt.serialize()
     }
-
 }

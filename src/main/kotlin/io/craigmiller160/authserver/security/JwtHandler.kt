@@ -41,7 +41,7 @@ import java.util.UUID
 
 @Component
 class JwtHandler(
-        private val tokenConfig: TokenConfig
+    private val tokenConfig: TokenConfig
 ) {
 
     private val legacyDateConverter = LegacyDateConverter()
@@ -57,17 +57,17 @@ class JwtHandler(
         return legacyDateConverter.convertZonedDateTimeToDate(now)
     }
 
-    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf(), existingTokenId: String? = null): Pair<String,String> {
+    fun createAccessToken(clientUserDetails: ClientUserDetails, user: User? = null, roles: List<Role> = listOf(), existingTokenId: String? = null): Pair<String, String> {
         val roleNames = roles.map { it.name }
 
         var claimBuilder = createDefaultClaims(clientUserDetails.client.accessTokenTimeoutSecs)
-                .claim("clientKey", clientUserDetails.username)
-                .claim("clientName", clientUserDetails.client.name)
-                .claim("roles", roleNames)
+            .claim("clientKey", clientUserDetails.username)
+            .claim("clientName", clientUserDetails.client.name)
+            .claim("roles", roleNames)
 
         claimBuilder = existingTokenId
-                ?.let { claimBuilder.jwtID(existingTokenId) }
-                ?: claimBuilder
+            ?.let { claimBuilder.jwtID(existingTokenId) }
+            ?: claimBuilder
 
         claimBuilder = user?.let {
             claimBuilder.subject(user.email)
@@ -85,15 +85,15 @@ class JwtHandler(
     private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
         val now = generateNow()
         return JWTClaimsSet.Builder()
-                .issueTime(now)
-                .expirationTime(generateExp(expSecs))
-                .jwtID(UUID.randomUUID().toString())
-                .notBeforeTime(now)
+            .issueTime(now)
+            .expirationTime(generateExp(expSecs))
+            .jwtID(UUID.randomUUID().toString())
+            .notBeforeTime(now)
     }
 
     private fun createToken(claims: JWTClaimsSet): String {
         val header = JWSHeader.Builder(JWSAlgorithm.RS256)
-                .build()
+            .build()
         val jwt = SignedJWT(header, claims)
         val signer = RSASSASigner(tokenConfig.privateKey)
 
@@ -101,11 +101,11 @@ class JwtHandler(
         return jwt.serialize()
     }
 
-    fun createRefreshToken(clientUserDetails: ClientUserDetails, grantType: String, userId: Long = 0, tokenId: String): Pair<String,String> {
+    fun createRefreshToken(clientUserDetails: ClientUserDetails, grantType: String, userId: Long = 0, tokenId: String): Pair<String, String> {
         var claimBuilder = createDefaultClaims(clientUserDetails.client.refreshTokenTimeoutSecs)
-                .claim("grantType", grantType)
-                .claim("clientId", clientUserDetails.client.id)
-                .jwtID(tokenId)
+            .claim("grantType", grantType)
+            .claim("clientId", clientUserDetails.client.id)
+            .jwtID(tokenId)
 
         if (userId > 0) {
             claimBuilder = claimBuilder.claim("userId", userId)
@@ -127,7 +127,7 @@ class JwtHandler(
         val claims = jwt.jwtClaimsSet
         val now = ZonedDateTime.now(ZoneId.of("UTC"))
         val exp = legacyDateConverter.convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
-        if(exp < now) {
+        if (exp < now) {
             throw InvalidRefreshTokenException("Expired")
         }
 
@@ -148,5 +148,4 @@ class JwtHandler(
 
         return RefreshTokenData(tokenId, grantType, refreshClientId, userId)
     }
-
 }

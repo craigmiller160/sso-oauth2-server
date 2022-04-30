@@ -43,14 +43,14 @@ import java.time.ZonedDateTime
 import javax.transaction.Transactional
 
 @Service
-class OAuth2Service (
-        private val jwtHandler: JwtHandler,
-        private val refreshTokenRepo: RefreshTokenRepository,
-        private val userRepo: UserRepository,
-        private val roleRepo: RoleRepository,
-        private val passwordEncoder: PasswordEncoder,
-        private val clientRepo: ClientRepository,
-        private val authCodeHandler: AuthCodeHandler
+class OAuth2Service(
+    private val jwtHandler: JwtHandler,
+    private val refreshTokenRepo: RefreshTokenRepository,
+    private val userRepo: UserRepository,
+    private val roleRepo: RoleRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val clientRepo: ClientRepository,
+    private val authCodeHandler: AuthCodeHandler
 ) {
 
     private fun saveRefreshToken(refreshToken: String, tokenId: String, clientId: Long, userId: Long? = null) {
@@ -71,7 +71,7 @@ class OAuth2Service (
     fun password(tokenRequest: TokenRequest): TokenResponse {
         val clientUserDetails = SecurityContextHolder.getContext().authentication.principal as ClientUserDetails
         val user = userRepo.findByEmailAndClientId(tokenRequest.username ?: "", clientUserDetails.client.id)
-                ?: throw InvalidLoginException("User does not exist for client")
+            ?: throw InvalidLoginException("User does not exist for client")
 
         if (!user.enabled) {
             throw InvalidLoginException("User is disabled")
@@ -106,7 +106,7 @@ class OAuth2Service (
         }
 
         val user = userRepo.findByUserIdAndClientId(userId, clientId)
-                ?: throw InvalidLoginException("Invalid user")
+            ?: throw InvalidLoginException("Invalid user")
 
         if (!user.enabled) {
             throw InvalidLoginException("User is disabled")
@@ -123,10 +123,10 @@ class OAuth2Service (
     @Transactional
     fun authCodeLogin(login: AuthCodeLogin): String {
         val client = clientRepo.findByClientKey(login.clientId)
-                ?: throw AuthCodeException("Client not supported")
+            ?: throw AuthCodeException("Client not supported")
 
         val user = userRepo.findByEmailAndClientId(login.username, client.id)
-                ?: throw AuthCodeException("User not found")
+            ?: throw AuthCodeException("User not found")
 
         if (!passwordEncoder.matches(login.password, user.password)) {
             throw AuthCodeException("Invalid credentials")
@@ -146,10 +146,10 @@ class OAuth2Service (
         }
 
         val client = clientRepo.findByClientKey(login.clientId)
-                ?: throw AuthCodeException("Client not supported")
+            ?: throw AuthCodeException("Client not supported")
 
         val user = userRepo.findByEmailAndClientId(login.username, client.id)
-                ?: throw AuthCodeException("User not found")
+            ?: throw AuthCodeException("User not found")
 
         if (!user.enabled) {
             throw AuthCodeException("User is disabled")
@@ -166,11 +166,11 @@ class OAuth2Service (
         val tokenData = jwtHandler.parseRefreshToken(origRefreshToken, clientUserDetails.client.id)
 
         val existingTokenEntity = refreshTokenRepo.findById(tokenData.tokenId)
-                .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") }
+            .orElseThrow { InvalidRefreshTokenException("Refresh Token Revoked") }
 
-        val userDataPair: Pair<User,List<Role>>? = tokenData.userId?.let { userId ->
+        val userDataPair: Pair<User, List<Role>>? = tokenData.userId?.let { userId ->
             val user = userRepo.findByUserIdAndClientId(userId, clientUserDetails.client.id)
-                    ?: throw InvalidRefreshTokenException("Invalid Refresh User")
+                ?: throw InvalidRefreshTokenException("Invalid Refresh User")
 
             if (!user.enabled) {
                 throw InvalidLoginException("User is disabled")
@@ -186,5 +186,4 @@ class OAuth2Service (
 
         return TokenResponse(accessToken, refreshToken, accessTokenId)
     }
-
 }

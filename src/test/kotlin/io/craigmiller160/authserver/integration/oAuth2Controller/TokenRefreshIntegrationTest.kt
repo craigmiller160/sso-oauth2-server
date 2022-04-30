@@ -77,14 +77,14 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
     private fun createForm(refreshToken: String): Form {
         return formOf(
-                "grant_type" to GrantType.REFRESH_TOKEN,
-                "refresh_token" to refreshToken
+            "grant_type" to GrantType.REFRESH_TOKEN,
+            "refresh_token" to refreshToken
         )
     }
 
     private fun createToken(originalGrantType: String = GrantType.CLIENT_CREDENTIALS, client: Client = authClient, userId: Long = 0): String {
         val clientUserDetails = ClientUserDetails(client)
-        val refreshToken =  jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
+        val refreshToken = jwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId).first
         refreshTokenRepo.save(RefreshToken(tokenId, refreshToken, client.id, userId, ZonedDateTime.now(ZoneId.of("UTC"))))
         return refreshToken
     }
@@ -344,5 +344,4 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
             }
         }
     }
-
 }

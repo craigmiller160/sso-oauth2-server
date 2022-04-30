@@ -60,8 +60,8 @@ class JwtHandlerTest {
     private lateinit var tokenConfig: TokenConfig
 
     private val client = TestData.createClient(
-            accessTokenTimeoutSecs = 300,
-            refreshTokenTimeoutSecs = 300
+        accessTokenTimeoutSecs = 300,
+        refreshTokenTimeoutSecs = 300
     )
     private val clientUserDetails = ClientUserDetails(client)
     private val user = TestData.createUser().copy(id = 1)
@@ -80,7 +80,7 @@ class JwtHandlerTest {
     fun setup() {
         keyPair = JwtUtils.createKeyPair()
         `when`(tokenConfig.privateKey)
-                .thenReturn(keyPair.private)
+            .thenReturn(keyPair.private)
     }
 
     @Test
@@ -221,14 +221,14 @@ class JwtHandlerTest {
 
     private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {
         `when`(tokenConfig.publicKey)
-                .thenReturn(pair.public)
+            .thenReturn(pair.public)
 
         val grantType = if (withUser) "password" else "client_credentials"
         var claimBuilder = JWTClaimsSet.Builder()
-                .claim("clientId", client.id)
-                .claim("grantType", grantType)
-                .expirationTime(generateExp(exp))
-                .jwtID(tokenId)
+            .claim("clientId", client.id)
+            .claim("grantType", grantType)
+            .expirationTime(generateExp(exp))
+            .jwtID(tokenId)
 
         if (withUser) {
             claimBuilder = claimBuilder.claim("userId", user.id)
@@ -236,7 +236,7 @@ class JwtHandlerTest {
 
         val claims = claimBuilder.build()
         val header = JWSHeader.Builder(JWSAlgorithm.RS256)
-                .build()
+            .build()
         val jwt = SignedJWT(header, claims)
         val signer = RSASSASigner(tokenConfig.privateKey)
 
@@ -300,5 +300,4 @@ class JwtHandlerTest {
         val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, 20) }
         assertEquals("Invalid Client ID", ex.message)
     }
-
 }

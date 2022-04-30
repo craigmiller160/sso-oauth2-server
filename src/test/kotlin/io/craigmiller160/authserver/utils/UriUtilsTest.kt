@@ -32,5 +32,4 @@ class UriUtilsTest {
         val result = encodeUriParams(params)
         assertEquals("one=two&three=four", result)
     }
-
 }

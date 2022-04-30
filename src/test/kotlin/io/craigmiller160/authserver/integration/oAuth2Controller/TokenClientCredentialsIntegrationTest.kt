@@ -99,5 +99,4 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
             }
         }
     }
-
 }

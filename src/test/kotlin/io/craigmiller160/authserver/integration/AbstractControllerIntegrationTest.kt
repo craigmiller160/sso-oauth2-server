@@ -110,9 +110,9 @@ abstract class AbstractControllerIntegrationTest {
         val encodedSecret = bcryptEncoder.encode(validClientSecret)
 
         authClient = TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs).copy(
-                name = validClientName,
-                clientKey = validClientKey,
-                clientSecret = "{bcrypt}$encodedSecret"
+            name = validClientName,
+            clientKey = validClientKey,
+            clientSecret = "{bcrypt}$encodedSecret"
         )
         authClient = clientRepo.save(authClient)
         val clientRedirectUri = ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
@@ -128,10 +128,10 @@ abstract class AbstractControllerIntegrationTest {
         authClientUser = clientUserRepo.save(authClientUser)
 
         disabledClient = TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs).copy(
-                name = "DisabledClient",
-                clientKey = "DisabledKey",
-                clientSecret = "{bcrypt}$encodedSecret",
-                enabled = false
+            name = "DisabledClient",
+            clientKey = "DisabledKey",
+            clientSecret = "{bcrypt}$encodedSecret",
+            enabled = false
         )
         disabledClient = clientRepo.save(disabledClient)
 

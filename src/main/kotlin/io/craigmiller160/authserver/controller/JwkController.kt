@@ -25,13 +25,12 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/jwk")
-class JwkController (
-        private val tokenConfig: TokenConfig
+class JwkController(
+    private val tokenConfig: TokenConfig
 ) {
 
     @GetMapping
     fun getKey(): Map<String, Any> {
         return tokenConfig.jwkSet().toJSONObject()
     }
-
 }

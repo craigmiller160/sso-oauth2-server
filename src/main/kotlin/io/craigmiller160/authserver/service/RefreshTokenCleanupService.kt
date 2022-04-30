@@ -28,9 +28,9 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Service
-class RefreshTokenCleanupService (
-        private val refreshTokenRepo: RefreshTokenRepository,
-        private val tokenConfig: TokenConfig
+class RefreshTokenCleanupService(
+    private val refreshTokenRepo: RefreshTokenRepository,
+    private val tokenConfig: TokenConfig
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -41,5 +41,4 @@ class RefreshTokenCleanupService (
         val maxTimestamp = ZonedDateTime.now(ZoneId.of("UTC")).minusSeconds(tokenConfig.deleteOlderThanSecs)
         refreshTokenRepo.removeOldTokens(maxTimestamp)
     }
-
 }

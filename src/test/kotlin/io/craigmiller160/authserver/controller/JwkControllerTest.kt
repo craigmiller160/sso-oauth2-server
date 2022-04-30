@@ -45,12 +45,11 @@ class JwkControllerTest {
         val jsonObject = JSONObject()
         jsonObject.put("Hello", "World")
         `when`(tokenConfig.jwkSet())
-                .thenReturn(jwkSet)
+            .thenReturn(jwkSet)
         `when`(jwkSet.toJSONObject())
-                .thenReturn(jsonObject)
+            .thenReturn(jsonObject)
 
         val result = jwkController.getKey()
         assertEquals(jsonObject, result)
     }
-
 }

@@ -28,7 +28,7 @@ import java.time.ZonedDateTime
 import javax.transaction.Transactional
 
 @Repository
-interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
+interface RefreshTokenRepository : JpaRepository<RefreshToken, String> {
 
     @Transactional
     @Modifying
@@ -44,5 +44,4 @@ interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
     @Modifying
     @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId = :userId")
     fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long): Int
-
 }

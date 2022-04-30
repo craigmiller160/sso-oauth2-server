@@ -26,8 +26,8 @@ import java.util.Base64
 import javax.crypto.Cipher
 
 @Component
-class AuthCodeHandler (
-        private val tokenConfig: TokenConfig
+class AuthCodeHandler(
+    private val tokenConfig: TokenConfig
 ) {
 
     private val delimiter = "|"
@@ -42,7 +42,7 @@ class AuthCodeHandler (
         return Base64.getEncoder().encodeToString(encryptedBytes)
     }
 
-    fun validateAuthCode(authCode: String): Pair<Long,Long> {
+    fun validateAuthCode(authCode: String): Pair<Long, Long> {
         val encryptedBytes = Base64.getDecoder().decode(authCode)
         val cipher = Cipher.getInstance("RSA")
         cipher.init(Cipher.DECRYPT_MODE, tokenConfig.publicKey)
@@ -62,5 +62,4 @@ class AuthCodeHandler (
 
         return Pair(clientId.toLong(), userId.toLong())
     }
-
 }

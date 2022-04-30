@@ -20,13 +20,11 @@ package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.dto.PageRequest
 import io.craigmiller160.authserver.service.UIService
-import org.apache.commons.io.IOUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import java.nio.charset.StandardCharsets
 import javax.servlet.http.HttpServletResponse
 
@@ -44,7 +42,7 @@ class UIController (
         javaClass.classLoader.getResourceAsStream("ui/css/$resourceName.css")
                 ?.let { resourceStream ->
                     res.contentType = "text/css"
-                    IOUtils.copy(resourceStream, res.writer, StandardCharsets.UTF_8)
+                    resourceStream.copyTo(res.outputStream)
                 }
                 ?: res.apply {
                     status = 404
@@ -57,7 +55,7 @@ class UIController (
         javaClass.classLoader.getResourceAsStream("ui/$pageName.html")
                 ?.let { pageStream ->
                     res.contentType = "text/html"
-                    IOUtils.copy(pageStream, res.writer, StandardCharsets.UTF_8)
+                    pageStream.copyTo(res.outputStream)
                 }
                 ?: res.apply {
                     status = 404

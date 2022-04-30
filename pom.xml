@@ -58,9 +58,9 @@
 		<nimbus.jose.version>9.15.2</nimbus.jose.version>
 		<hamcrest.version>2.2</hamcrest.version>
 		<junit.version>4.13</junit.version>
-		<mockito.kotlin.version>1.6.0</mockito.kotlin.version>
 		<commons.lang.version>3.12.0</commons.lang.version>
 		<hamcrest.date.version>2.0.7</hamcrest.date.version>
+		<mockito.version>4.0.0</mockito.version>
 	</properties>
 
 	<dependencies>
@@ -126,17 +126,11 @@
 			<version>${commons.lang.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.nhaarman</groupId>
+			<groupId>org.mockito.kotlin</groupId>
 			<artifactId>mockito-kotlin</artifactId>
-			<version>${mockito.kotlin.version}</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

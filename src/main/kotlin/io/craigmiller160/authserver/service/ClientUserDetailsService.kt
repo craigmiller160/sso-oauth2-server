@@ -40,14 +40,6 @@ class ClientUserDetailsService(private val clientRepo: ClientRepository) : UserD
     val clientUserDetails = ClientUserDetails(client)
     AccountStatusUserDetailsChecker()
       .check(clientUserDetails)
-      .apply {}
-      .apply {}
-      .apply {}
-      .apply {}
-      .apply {}
-      .apply {}
-      .apply {}
-      .apply {}
     return clientUserDetails
   }
 }

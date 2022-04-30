@@ -1,13 +1,9 @@
 package io.craigmiller160.authserver.service
 
-import io.craigmiller160.authserver.repository.ClientRepository
-import io.craigmiller160.authserver.repository.RoleRepository
-import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.exception.AccessNotFoundException
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -24,7 +20,9 @@ class AccessLoadingServiceTest {
     @Test
     fun `getAccessForUser() - no user found`() {
         val result = accessLoadingService.getAccessForUser(1L)
-        result.shouldBeLeft()
+        result.shouldBeLeft(
+                AccessNotFoundException("Error getting access for User with ID: 1", AccessNotFoundException("Could not find User for ID: 1"))
+        )
     }
 
     @Test

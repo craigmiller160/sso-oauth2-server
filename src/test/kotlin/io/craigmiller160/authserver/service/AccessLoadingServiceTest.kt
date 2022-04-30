@@ -75,7 +75,7 @@ class AccessLoadingServiceTest {
   fun `getAccessForUser() - single client, no roles`() {
     val user = userRepo.save(createUser())
     val client = clientRepo.save(createClient())
-    val clientUser = clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client.id))
+    clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client.id))
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
@@ -93,7 +93,27 @@ class AccessLoadingServiceTest {
 
   @Test
   fun `getAccessForUser() - multiple clients, no roles`() {
-    TODO("Finish this")
+    val user = userRepo.save(createUser())
+    val client1 = clientRepo.save(createClient())
+    val client2 = clientRepo.save(createClient())
+    clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client1.id))
+    clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client2.id))
+
+    val result = accessLoadingService.getAccessForUser(user.id)
+    result.shouldBeRight(
+      UserWithClientsAccess(
+        userId = user.id,
+        email = user.email,
+        firstName = user.firstName,
+        lastName = user.lastName,
+        clients =
+          mapOf(
+            client1.clientKey to
+              ClientWithRolesAccess(
+                clientId = client1.id, clientName = client1.name, roles = listOf()),
+            client2.clientKey to
+              ClientWithRolesAccess(
+                clientId = client2.id, clientName = client2.name, roles = listOf()))))
   }
 
   @Test

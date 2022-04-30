@@ -35,7 +35,6 @@ import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.JwtHandler
-import org.apache.commons.lang3.StringUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -138,7 +137,7 @@ class OAuth2Service (
 
     @Transactional
     fun validateAuthCodeLogin(login: AuthCodeLogin) {
-        if (StringUtils.isBlank(login.state)) {
+        if (login.state.isBlank()) {
             throw AuthCodeException("No state property")
         }
 

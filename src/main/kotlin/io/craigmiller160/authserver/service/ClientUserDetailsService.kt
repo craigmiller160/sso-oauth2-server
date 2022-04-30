@@ -38,8 +38,7 @@ class ClientUserDetailsService(private val clientRepo: ClientRepository) : UserD
       clientRepo.findByClientKey(clientKey)
         ?: throw UsernameNotFoundException("No client found for Client Key $clientKey")
     val clientUserDetails = ClientUserDetails(client)
-    AccountStatusUserDetailsChecker()
-      .check(clientUserDetails)
+    AccountStatusUserDetailsChecker().check(clientUserDetails)
     return clientUserDetails
   }
 }

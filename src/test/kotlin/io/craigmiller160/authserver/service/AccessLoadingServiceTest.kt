@@ -32,10 +32,8 @@ class AccessLoadingServiceTest {
   @Autowired private lateinit var userRepo: UserRepository
   @Autowired private lateinit var clientRepo: ClientRepository
   @Autowired private lateinit var clientUserRepo: ClientUserRepository
-  @Autowired
-  private lateinit var roleRepo: RoleRepository
-  @Autowired
-  private lateinit var clientUserRoleRepo: ClientUserRoleRepository
+  @Autowired private lateinit var roleRepo: RoleRepository
+  @Autowired private lateinit var clientUserRoleRepo: ClientUserRoleRepository
 
   private fun createUser(): User =
     User(
@@ -132,33 +130,25 @@ class AccessLoadingServiceTest {
     clientUserRepo.save(ClientUser(id = 0, userId = user.id, clientId = client1.id))
     clientUserRepo.save(ClientUser(id = 0, userId = user.id, clientId = client2.id))
 
-    val role = roleRepo.save(Role(
-            id = 1,
-            clientId = client1.id,
-            name = "TheRole"
-    ))
-    clientUserRoleRepo.save(ClientUserRole(
-            id = 1,
-            clientId = client1.id,
-            userId = user.id,
-            roleId = role.id
-    ))
+    val role = roleRepo.save(Role(id = 1, clientId = client1.id, name = "TheRole"))
+    clientUserRoleRepo.save(
+      ClientUserRole(id = 1, clientId = client1.id, userId = user.id, roleId = role.id))
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-            UserWithClientsAccess(
-                    userId = user.id,
-                    email = user.email,
-                    firstName = user.firstName,
-                    lastName = user.lastName,
-                    clients =
-                    mapOf(
-                            client1.clientKey to
-                                    ClientWithRolesAccess(
-                                            clientId = client1.id, clientName = client1.name, roles = listOf(role.name)),
-                            client2.clientKey to
-                                    ClientWithRolesAccess(
-                                            clientId = client2.id, clientName = client2.name, roles = listOf()))))
+      UserWithClientsAccess(
+        userId = user.id,
+        email = user.email,
+        firstName = user.firstName,
+        lastName = user.lastName,
+        clients =
+          mapOf(
+            client1.clientKey to
+              ClientWithRolesAccess(
+                clientId = client1.id, clientName = client1.name, roles = listOf(role.name)),
+            client2.clientKey to
+              ClientWithRolesAccess(
+                clientId = client2.id, clientName = client2.name, roles = listOf()))))
   }
 
   @Test

@@ -18,7 +18,6 @@
 
 package io.craigmiller160.authserver.service
 
-import com.nhaarman.mockito_kotlin.isA
 import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import org.junit.jupiter.api.Test
@@ -29,6 +28,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.isA
 
 @ExtendWith(MockitoExtension::class)
 class RefreshTokenCleanupServiceTest {

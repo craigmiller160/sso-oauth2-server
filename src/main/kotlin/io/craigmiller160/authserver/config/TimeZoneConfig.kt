@@ -18,14 +18,14 @@
 
 package io.craigmiller160.authserver.config
 
-import org.springframework.context.annotation.Configuration
 import java.util.TimeZone
 import javax.annotation.PostConstruct
+import org.springframework.context.annotation.Configuration
 
 @Configuration
 class TimeZoneConfig {
-    @PostConstruct
-    fun setTimeZone() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-    }
+  @PostConstruct
+  fun setTimeZone() {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+  }
 }

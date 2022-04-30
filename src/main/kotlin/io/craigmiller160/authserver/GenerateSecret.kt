@@ -1,12 +1,12 @@
 package io.craigmiller160.authserver
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import java.util.*
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 fun main() {
-    val secret = UUID.randomUUID().toString()
-    println("SECRET: $secret")
+  val secret = UUID.randomUUID().toString()
+  println("SECRET: $secret")
 
-    val encoder = BCryptPasswordEncoder()
-    println("ENCODED: {bcrypt}${encoder.encode(secret)}")
+  val encoder = BCryptPasswordEncoder()
+  println("ENCODED: {bcrypt}${encoder.encode(secret)}")
 }

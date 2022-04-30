@@ -26,8 +26,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface RoleRepository : JpaRepository<Role, Long> {
 
-    @Query(
-        """
+  @Query(
+    """
         SELECT r
         FROM Role r
         WHERE r.id IN (
@@ -36,7 +36,6 @@ interface RoleRepository : JpaRepository<Role, Long> {
             WHERE cur.userId = :userId
             AND cur.clientId = :clientId
         )
-    """
-    )
-    fun findAllByUserIdAndClientId(userId: Long, clientId: Long): List<Role>
+    """)
+  fun findAllByUserIdAndClientId(userId: Long, clientId: Long): List<Role>
 }

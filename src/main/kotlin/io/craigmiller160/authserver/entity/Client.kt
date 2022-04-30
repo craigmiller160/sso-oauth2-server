@@ -30,26 +30,27 @@ import javax.persistence.Table
 @Entity
 @Table(name = "clients")
 data class Client(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-    val name: String,
-    val clientKey: String,
-    val clientSecret: String,
-    val enabled: Boolean,
-    val accessTokenTimeoutSecs: Int,
-    val refreshTokenTimeoutSecs: Int,
-    val authCodeTimeoutSecs: Int,
-
-    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "clientId")
-    val clientRedirectUris: List<ClientRedirectUri>
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
+  val name: String,
+  val clientKey: String,
+  val clientSecret: String,
+  val enabled: Boolean,
+  val accessTokenTimeoutSecs: Int,
+  val refreshTokenTimeoutSecs: Int,
+  val authCodeTimeoutSecs: Int,
+  @OneToMany(
+    cascade = [CascadeType.ALL],
+    fetch = FetchType.EAGER,
+    orphanRemoval = true,
+    mappedBy = "clientId")
+  val clientRedirectUris: List<ClientRedirectUri>
 ) {
 
-    fun getRedirectUris(): List<String> {
-        return clientRedirectUris.map { it.redirectUri }
-    }
+  fun getRedirectUris(): List<String> {
+    return clientRedirectUris.map { it.redirectUri }
+  }
 
-    fun supportsAuthCode(otherRedirectUri: String): Boolean {
-        return getRedirectUris().contains(otherRedirectUri)
-    }
+  fun supportsAuthCode(otherRedirectUri: String): Boolean {
+    return getRedirectUris().contains(otherRedirectUri)
+  }
 }

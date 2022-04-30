@@ -34,69 +34,66 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest() {
 
-    @Test
-    fun `token() - client_credentials grant invalid client header`() {
-        apiProcessor.call {
-            request {
-                path = "/oauth/token"
-                method = HttpMethod.POST
-                body = formOf("grant_type" to "client_credentials")
-                overrideAuth {
-                    type = AuthType.BASIC
-                    userName = "abc"
-                    password = "def"
-                }
-            }
-            response {
-                status = 401
-            }
+  @Test
+  fun `token() - client_credentials grant invalid client header`() {
+    apiProcessor.call {
+      request {
+        path = "/oauth/token"
+        method = HttpMethod.POST
+        body = formOf("grant_type" to "client_credentials")
+        overrideAuth {
+          type = AuthType.BASIC
+          userName = "abc"
+          password = "def"
         }
+      }
+      response { status = 401 }
     }
+  }
 
-    @Test
-    fun `token() - client_credentials not allowed`() {
-        apiProcessor.call {
-            request {
-                path = "/oauth/token"
-                method = HttpMethod.POST
-                body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
-            }
-            response {
-                status = 400
-            }
+  @Test
+  fun `token() - client_credentials not allowed`() {
+    apiProcessor.call {
+      request {
+        path = "/oauth/token"
+        method = HttpMethod.POST
+        body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
+      }
+      response { status = 400 }
+    }
+  }
+
+  @Test
+  @Disabled
+  fun `token() - client_credentials grant success`() {
+    val tokenResponse =
+      apiProcessor
+        .call {
+          request {
+            path = "/oauth/token"
+            method = HttpMethod.POST
+            body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
+          }
         }
-    }
+        .convert(TokenResponse::class.java)
 
-    @Test
-    @Disabled
-    fun `token() - client_credentials grant success`() {
-        val tokenResponse = apiProcessor.call {
-            request {
-                path = "/oauth/token"
-                method = HttpMethod.POST
-                body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
-            }
-        }.convert(TokenResponse::class.java)
+    testTokenResponse(tokenResponse, "client_credentials")
+  }
 
-        testTokenResponse(tokenResponse, "client_credentials")
-    }
-
-    @Test
-    fun `token() - client_credentials grant with disabled client`() {
-        apiProcessor.call {
-            request {
-                path = "/oauth/token"
-                method = HttpMethod.POST
-                body = formOf("grant_type" to "client_credentials")
-                overrideAuth {
-                    type = AuthType.BASIC
-                    userName = disabledClient.clientKey
-                    password = validClientSecret
-                }
-            }
-            response {
-                status = 401
-            }
+  @Test
+  fun `token() - client_credentials grant with disabled client`() {
+    apiProcessor.call {
+      request {
+        path = "/oauth/token"
+        method = HttpMethod.POST
+        body = formOf("grant_type" to "client_credentials")
+        overrideAuth {
+          type = AuthType.BASIC
+          userName = disabledClient.clientKey
+          password = validClientSecret
         }
+      }
+      response { status = 401 }
     }
+  }
 }

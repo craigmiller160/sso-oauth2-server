@@ -29,6 +29,12 @@ import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.testutils.JwtUtils
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.date.converter.LegacyDateConverter
+import java.security.KeyPair
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Base64
+import java.util.Date
+import java.util.UUID
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.MatcherAssert.assertThat
@@ -44,260 +50,253 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import java.security.KeyPair
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.Base64
-import java.util.Date
-import java.util.UUID
 
 @ExtendWith(MockitoExtension::class)
 class JwtHandlerTest {
 
-    private val legacyDateConverter = LegacyDateConverter()
+  private val legacyDateConverter = LegacyDateConverter()
 
-    @Mock
-    private lateinit var tokenConfig: TokenConfig
+  @Mock private lateinit var tokenConfig: TokenConfig
 
-    private val client = TestData.createClient(
-        accessTokenTimeoutSecs = 300,
-        refreshTokenTimeoutSecs = 300
-    )
-    private val clientUserDetails = ClientUserDetails(client)
-    private val user = TestData.createUser().copy(id = 1)
-    private val origTokenId = "origTokenId"
+  private val client =
+    TestData.createClient(accessTokenTimeoutSecs = 300, refreshTokenTimeoutSecs = 300)
+  private val clientUserDetails = ClientUserDetails(client)
+  private val user = TestData.createUser().copy(id = 1)
+  private val origTokenId = "origTokenId"
 
-    @InjectMocks
-    private lateinit var jwtHandler: JwtHandler
+  @InjectMocks private lateinit var jwtHandler: JwtHandler
 
-    private val accessExpSecs = 10
-    private val refreshExpSecs = 20
-    private val expectedHeader = """{"alg":"RS256"}"""
-    private val tokenId = "ABCDEFG"
-    private lateinit var keyPair: KeyPair
+  private val accessExpSecs = 10
+  private val refreshExpSecs = 20
+  private val expectedHeader = """{"alg":"RS256"}"""
+  private val tokenId = "ABCDEFG"
+  private lateinit var keyPair: KeyPair
 
-    @BeforeEach
-    fun setup() {
-        keyPair = JwtUtils.createKeyPair()
-        `when`(tokenConfig.privateKey)
-            .thenReturn(keyPair.private)
+  @BeforeEach
+  fun setup() {
+    keyPair = JwtUtils.createKeyPair()
+    `when`(tokenConfig.privateKey).thenReturn(keyPair.private)
+  }
+
+  @Test
+  fun test_createAccessToken_clientOnly() {
+    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails)
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+
+    val jsonObject = JSONObject(body)
+    assertEquals(8, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+    assertThat(jsonObject.getString("sub"), equalTo(client.name))
+    assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+    assertEquals(0, jsonObject.getJSONArray("roles").length())
+  }
+
+  @Test
+  fun test_createAccessToken_clientOnly_withExistingJwtId() {
+    val existingId = UUID.randomUUID().toString()
+    val (token, tokenId) =
+      jwtHandler.createAccessToken(clientUserDetails, null, listOf(), existingId)
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+
+    assertEquals(existingId, tokenId)
+
+    val jsonObject = JSONObject(body)
+    assertEquals(8, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+    assertThat(jsonObject.getString("sub"), equalTo(client.name))
+    assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+    assertEquals(0, jsonObject.getJSONArray("roles").length())
+  }
+
+  @Test
+  fun test_createAccessToken_clientAndUser() {
+    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+
+    val jsonObject = JSONObject(body)
+    assertEquals(12, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+    assertThat(jsonObject.getString("sub"), equalTo(user.email))
+    assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
+    assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+    assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+    assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
+    assertThat(jsonObject.getLong("userId"), equalTo(user.id))
+    assertEquals(0, jsonObject.getJSONArray("roles").length())
+  }
+
+  @Test
+  fun test_createAccessToken_clientUserAndRoles() {
+    val role = Role(1L, "Role1", 1L)
+    val roles = listOf(role)
+
+    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+
+    val jsonObject = JSONObject(body)
+    assertEquals(12, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
+    assertThat(jsonObject.getString("sub"), equalTo(user.email))
+    assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
+    assertThat(jsonObject.getString("clientName"), equalTo(client.name))
+    assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
+    assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
+    assertThat(jsonObject.getLong("userId"), equalTo(user.id))
+
+    val rolesArray = jsonObject.getJSONArray("roles")
+    assertEquals(1, rolesArray.length())
+    assertEquals(role.name, rolesArray.getString(0))
+  }
+
+  @Test
+  fun test_createRefreshToken() {
+    val (token, tokenId) =
+      jwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
+    assertEquals(origTokenId, tokenId)
+
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+    val jsonObject = JSONObject(body)
+    assertEquals(7, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("grantType"), equalTo("password"))
+    assertThat(jsonObject.getLong("clientId"), equalTo(0L))
+    assertThat(jsonObject.getLong("userId"), equalTo(1L))
+  }
+
+  @Test
+  fun test_createRefreshToken_noUser() {
+    val (token, tokenId) =
+      jwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
+    assertEquals(origTokenId, tokenId)
+
+    val parts = token.split(".")
+    val header = String(Base64.getDecoder().decode(parts[0]))
+    val body = String(Base64.getDecoder().decode(parts[1]))
+    assertEquals(expectedHeader, header)
+    val jsonObject = JSONObject(body)
+    assertEquals(6, jsonObject.length())
+    assertThat(jsonObject.getLong("nbf"), notNullValue())
+    assertThat(jsonObject.getLong("iat"), notNullValue())
+    assertThat(jsonObject.getString("jti"), equalTo(tokenId))
+    assertThat(jsonObject.getLong("exp"), notNullValue())
+    assertThat(jsonObject.getString("grantType"), equalTo("password"))
+    assertThat(jsonObject.getLong("clientId"), equalTo(0L))
+  }
+
+  private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {
+    `when`(tokenConfig.publicKey).thenReturn(pair.public)
+
+    val grantType = if (withUser) "password" else "client_credentials"
+    var claimBuilder =
+      JWTClaimsSet.Builder()
+        .claim("clientId", client.id)
+        .claim("grantType", grantType)
+        .expirationTime(generateExp(exp))
+        .jwtID(tokenId)
+
+    if (withUser) {
+      claimBuilder = claimBuilder.claim("userId", user.id)
     }
 
-    @Test
-    fun test_createAccessToken_clientOnly() {
-        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails)
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
+    val claims = claimBuilder.build()
+    val header = JWSHeader.Builder(JWSAlgorithm.RS256).build()
+    val jwt = SignedJWT(header, claims)
+    val signer = RSASSASigner(tokenConfig.privateKey)
 
-        val jsonObject = JSONObject(body)
-        assertEquals(8, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
-        assertThat(jsonObject.getString("sub"), equalTo(client.name))
-        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
-        assertEquals(0, jsonObject.getJSONArray("roles").length())
-    }
+    jwt.sign(signer)
+    return jwt.serialize()
+  }
 
-    @Test
-    fun test_createAccessToken_clientOnly_withExistingJwtId() {
-        val existingId = UUID.randomUUID().toString()
-        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, null, listOf(), existingId)
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
+  private fun generateExp(expSecs: Int): Date {
+    val now = ZonedDateTime.now(ZoneId.of("UTC"))
+    val exp = now.plusSeconds(expSecs.toLong())
+    return legacyDateConverter.convertZonedDateTimeToDate(exp)
+  }
 
-        assertEquals(existingId, tokenId)
+  @Test
+  @Disabled
+  fun test_parseRefreshToken() {
+    val token = createJwt(false, 1000)
 
-        val jsonObject = JSONObject(body)
-        assertEquals(8, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
-        assertThat(jsonObject.getString("sub"), equalTo(client.name))
-        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
-        assertEquals(0, jsonObject.getJSONArray("roles").length())
-    }
+    val data = jwtHandler.parseRefreshToken(token, client.id)
 
-    @Test
-    fun test_createAccessToken_clientAndUser() {
-        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
+    assertEquals("client_credentials", data.grantType)
+    assertEquals(client.id, data.clientId)
+    assertEquals(tokenId, data.tokenId)
+    assertNull(data.userId)
+  }
 
-        val jsonObject = JSONObject(body)
-        assertEquals(12, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
-        assertThat(jsonObject.getString("sub"), equalTo(user.email))
-        assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
-        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
-        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
-        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
-        assertThat(jsonObject.getLong("userId"), equalTo(user.id))
-        assertEquals(0, jsonObject.getJSONArray("roles").length())
-    }
+  @Test
+  fun test_parseRefreshToken_withUser() {
+    val token = createJwt(true, 1000)
 
-    @Test
-    fun test_createAccessToken_clientUserAndRoles() {
-        val role = Role(1L, "Role1", 1L)
-        val roles = listOf(role)
+    val data = jwtHandler.parseRefreshToken(token, client.id)
 
-        val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
+    assertEquals("password", data.grantType)
+    assertEquals(client.id, data.clientId)
+    assertEquals(user.id, data.userId)
+    assertEquals(tokenId, data.tokenId)
+  }
 
-        val jsonObject = JSONObject(body)
-        assertEquals(12, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("clientKey"), equalTo(client.clientKey))
-        assertThat(jsonObject.getString("sub"), equalTo(user.email))
-        assertThat(jsonObject.getString("userEmail"), equalTo(user.email))
-        assertThat(jsonObject.getString("clientName"), equalTo(client.name))
-        assertThat(jsonObject.getString("firstName"), equalTo(user.firstName))
-        assertThat(jsonObject.getString("lastName"), equalTo(user.lastName))
-        assertThat(jsonObject.getLong("userId"), equalTo(user.id))
+  @Test
+  fun test_parseRefreshToken_badSignature() {
+    val keyPair = JwtUtils.createKeyPair()
 
-        val rolesArray = jsonObject.getJSONArray("roles")
-        assertEquals(1, rolesArray.length())
-        assertEquals(role.name, rolesArray.getString(0))
-    }
+    val token = createJwt(true, 1000, keyPair)
 
-    @Test
-    fun test_createRefreshToken() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
-        assertEquals(origTokenId, tokenId)
+    val ex =
+      assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+    assertEquals("Bad Signature", ex.message)
+  }
 
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
-        val jsonObject = JSONObject(body)
-        assertEquals(7, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
-        assertThat(jsonObject.getLong("userId"), equalTo(1L))
-    }
+  @Test
+  fun test_parseRefreshToken_expired() {
+    val token = createJwt(true, -1000)
 
-    @Test
-    fun test_createRefreshToken_noUser() {
-        val (token, tokenId) = jwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
-        assertEquals(origTokenId, tokenId)
+    val ex =
+      assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+    assertEquals("Expired", ex.message)
+  }
 
-        val parts = token.split(".")
-        val header = String(Base64.getDecoder().decode(parts[0]))
-        val body = String(Base64.getDecoder().decode(parts[1]))
-        assertEquals(expectedHeader, header)
-        val jsonObject = JSONObject(body)
-        assertEquals(6, jsonObject.length())
-        assertThat(jsonObject.getLong("nbf"), notNullValue())
-        assertThat(jsonObject.getLong("iat"), notNullValue())
-        assertThat(jsonObject.getString("jti"), equalTo(tokenId))
-        assertThat(jsonObject.getLong("exp"), notNullValue())
-        assertThat(jsonObject.getString("grantType"), equalTo("password"))
-        assertThat(jsonObject.getLong("clientId"), equalTo(0L))
-    }
+  @Test
+  fun test_parseRefreshToken_badClientId() {
+    val token = createJwt(true, 1000)
 
-    private fun createJwt(withUser: Boolean, exp: Int, pair: KeyPair = keyPair): String {
-        `when`(tokenConfig.publicKey)
-            .thenReturn(pair.public)
-
-        val grantType = if (withUser) "password" else "client_credentials"
-        var claimBuilder = JWTClaimsSet.Builder()
-            .claim("clientId", client.id)
-            .claim("grantType", grantType)
-            .expirationTime(generateExp(exp))
-            .jwtID(tokenId)
-
-        if (withUser) {
-            claimBuilder = claimBuilder.claim("userId", user.id)
-        }
-
-        val claims = claimBuilder.build()
-        val header = JWSHeader.Builder(JWSAlgorithm.RS256)
-            .build()
-        val jwt = SignedJWT(header, claims)
-        val signer = RSASSASigner(tokenConfig.privateKey)
-
-        jwt.sign(signer)
-        return jwt.serialize()
-    }
-
-    private fun generateExp(expSecs: Int): Date {
-        val now = ZonedDateTime.now(ZoneId.of("UTC"))
-        val exp = now.plusSeconds(expSecs.toLong())
-        return legacyDateConverter.convertZonedDateTimeToDate(exp)
-    }
-
-    @Test
-    @Disabled
-    fun test_parseRefreshToken() {
-        val token = createJwt(false, 1000)
-
-        val data = jwtHandler.parseRefreshToken(token, client.id)
-
-        assertEquals("client_credentials", data.grantType)
-        assertEquals(client.id, data.clientId)
-        assertEquals(tokenId, data.tokenId)
-        assertNull(data.userId)
-    }
-
-    @Test
-    fun test_parseRefreshToken_withUser() {
-        val token = createJwt(true, 1000)
-
-        val data = jwtHandler.parseRefreshToken(token, client.id)
-
-        assertEquals("password", data.grantType)
-        assertEquals(client.id, data.clientId)
-        assertEquals(user.id, data.userId)
-        assertEquals(tokenId, data.tokenId)
-    }
-
-    @Test
-    fun test_parseRefreshToken_badSignature() {
-        val keyPair = JwtUtils.createKeyPair()
-
-        val token = createJwt(true, 1000, keyPair)
-
-        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
-        assertEquals("Bad Signature", ex.message)
-    }
-
-    @Test
-    fun test_parseRefreshToken_expired() {
-        val token = createJwt(true, -1000)
-
-        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
-        assertEquals("Expired", ex.message)
-    }
-
-    @Test
-    fun test_parseRefreshToken_badClientId() {
-        val token = createJwt(true, 1000)
-
-        val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, 20) }
-        assertEquals("Invalid Client ID", ex.message)
-    }
+    val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, 20) }
+    assertEquals("Invalid Client ID", ex.message)
+  }
 }

@@ -27,9 +27,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "client_redirect_uris")
 data class ClientRedirectUri(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-    val clientId: Long,
-    val redirectUri: String
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
+  val clientId: Long,
+  val redirectUri: String
 )

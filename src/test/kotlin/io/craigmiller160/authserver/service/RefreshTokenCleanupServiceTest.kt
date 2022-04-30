@@ -33,21 +33,16 @@ import org.mockito.kotlin.isA
 @ExtendWith(MockitoExtension::class)
 class RefreshTokenCleanupServiceTest {
 
-    @Mock
-    private lateinit var refreshTokenRepo: RefreshTokenRepository
-    @Mock
-    private lateinit var tokenConfig: TokenConfig
+  @Mock private lateinit var refreshTokenRepo: RefreshTokenRepository
+  @Mock private lateinit var tokenConfig: TokenConfig
 
-    @InjectMocks
-    private lateinit var refreshTokenCleanupService: RefreshTokenCleanupService
+  @InjectMocks private lateinit var refreshTokenCleanupService: RefreshTokenCleanupService
 
-    @Test
-    fun test_cleanupRefreshTokens() {
-        `when`(tokenConfig.deleteOlderThanSecs)
-            .thenReturn(1000)
-        refreshTokenCleanupService.cleanupRefreshTokens()
+  @Test
+  fun test_cleanupRefreshTokens() {
+    `when`(tokenConfig.deleteOlderThanSecs).thenReturn(1000)
+    refreshTokenCleanupService.cleanupRefreshTokens()
 
-        verify(refreshTokenRepo, times(1))
-            .removeOldTokens(isA())
-    }
+    verify(refreshTokenRepo, times(1)).removeOldTokens(isA())
+  }
 }

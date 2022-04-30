@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.service
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.kotest.assertions.arrow.core.shouldBeLeft
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -22,7 +23,8 @@ class AccessLoadingServiceTest {
 
     @Test
     fun `getAccessForUser() - no user found`() {
-        TODO("Finish this")
+        val result = accessLoadingService.getAccessForUser(1L)
+        result.shouldBeLeft()
     }
 
     @Test

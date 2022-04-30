@@ -4,10 +4,14 @@ import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientUser
+import io.craigmiller160.authserver.entity.ClientUserRole
+import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.AccessNotFoundException
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
+import io.craigmiller160.authserver.repository.ClientUserRoleRepository
+import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
@@ -28,10 +32,14 @@ class AccessLoadingServiceTest {
   @Autowired private lateinit var userRepo: UserRepository
   @Autowired private lateinit var clientRepo: ClientRepository
   @Autowired private lateinit var clientUserRepo: ClientUserRepository
+  @Autowired
+  private lateinit var roleRepo: RoleRepository
+  @Autowired
+  private lateinit var clientUserRoleRepo: ClientUserRoleRepository
 
   private fun createUser(): User =
     User(
-      id = 1,
+      id = 0,
       email = "craig@gmail.com",
       firstName = "Craig",
       lastName = "Miller",
@@ -39,7 +47,7 @@ class AccessLoadingServiceTest {
       enabled = true)
   private fun createClient(): Client =
     Client(
-      id = 1,
+      id = 0,
       name = "The Client",
       clientKey = UUID.randomUUID().toString(),
       clientSecret = UUID.randomUUID().toString(),
@@ -118,7 +126,39 @@ class AccessLoadingServiceTest {
 
   @Test
   fun `getAccessForUser() - multiple clients, one of which has roles`() {
-    TODO("Finish this")
+    val user = userRepo.save(createUser())
+    val client1 = clientRepo.save(createClient())
+    val client2 = clientRepo.save(createClient())
+    clientUserRepo.save(ClientUser(id = 0, userId = user.id, clientId = client1.id))
+    clientUserRepo.save(ClientUser(id = 0, userId = user.id, clientId = client2.id))
+
+    val role = roleRepo.save(Role(
+            id = 1,
+            clientId = client1.id,
+            name = "TheRole"
+    ))
+    clientUserRoleRepo.save(ClientUserRole(
+            id = 1,
+            clientId = client1.id,
+            userId = user.id,
+            roleId = role.id
+    ))
+
+    val result = accessLoadingService.getAccessForUser(user.id)
+    result.shouldBeRight(
+            UserWithClientsAccess(
+                    userId = user.id,
+                    email = user.email,
+                    firstName = user.firstName,
+                    lastName = user.lastName,
+                    clients =
+                    mapOf(
+                            client1.clientKey to
+                                    ClientWithRolesAccess(
+                                            clientId = client1.id, clientName = client1.name, roles = listOf(role.name)),
+                            client2.clientKey to
+                                    ClientWithRolesAccess(
+                                            clientId = client2.id, clientName = client2.name, roles = listOf()))))
   }
 
   @Test

@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
-import javax.persistence.EntityManager
+import java.util.*
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
@@ -32,8 +31,6 @@ class AccessLoadingServiceTest {
   private lateinit var clientRepo: ClientRepository
   @Autowired
   private lateinit var clientUserRepo: ClientUserRepository
-  @Autowired
-  private lateinit var entityManager: EntityManager
 
   private fun createUser(): User = User(
           id = 1,
@@ -66,7 +63,15 @@ class AccessLoadingServiceTest {
 
   @Test
   fun `getAccessForUser() - no clients for user`() {
-    TODO("Finish this")
+    val user = userRepo.save(createUser())
+    val result = accessLoadingService.getAccessForUser(user.id)
+    result.shouldBeRight(UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients = mapOf()
+    ))
   }
 
   @Test

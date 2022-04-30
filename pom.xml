@@ -221,6 +221,10 @@
 				<version>${spotless.version}</version>
 				<configuration>
 					<kotlin>
+                        <includes>
+							<include>src/main/kotlin/**/*.kt</include>
+							<include>src/test/kotlin/**/*.kt</include>
+						</includes>
 						<ktlint />
 					</kotlin>
 				</configuration>
@@ -228,7 +232,7 @@
 					<execution>
 						<phase>compile</phase>
 						<goals>
-							<goal>check</goal>
+							<goal>apply</goal>
 						</goals>
 					</execution>
 				</executions>

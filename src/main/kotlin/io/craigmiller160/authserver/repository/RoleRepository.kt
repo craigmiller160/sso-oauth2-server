@@ -25,9 +25,10 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface RoleRepository : JpaRepository<Role,Long> {
+interface RoleRepository : JpaRepository<Role, Long> {
 
-    @Query("""
+  @Query(
+    """
         SELECT r
         FROM Role r
         WHERE r.id IN (
@@ -37,9 +38,13 @@ interface RoleRepository : JpaRepository<Role,Long> {
             AND cur.clientId = :clientId
         )
     """)
-    fun findAllByUserIdAndClientId(@Param("userId") userId: Long, @Param("clientId") clientId: Long): List<Role>
+  fun findAllByUserIdAndClientId(
+    @Param("userId") userId: Long,
+    @Param("clientId") clientId: Long
+  ): List<Role>
 
-    @Query("""
+  @Query(
+    """
         SELECT r
         FROM Role r
         WHERE r.id IN (
@@ -48,6 +53,5 @@ interface RoleRepository : JpaRepository<Role,Long> {
             WHERE cur.userId = :userId
         )
     """)
-    fun findAllByUserId(@Param("userId") userId: Long): List<Role>
-
+  fun findAllByUserId(@Param("userId") userId: Long): List<Role>
 }

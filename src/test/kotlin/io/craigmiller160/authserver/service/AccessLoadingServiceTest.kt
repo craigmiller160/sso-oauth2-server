@@ -14,35 +14,34 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class AccessLoadingServiceTest {
 
-    @Autowired
-    private lateinit var accessLoadingService: AccessLoadingService
+  @Autowired private lateinit var accessLoadingService: AccessLoadingService
 
-    @Test
-    fun `getAccessForUser() - no user found`() {
-        val result = accessLoadingService.getAccessForUser(1L)
-        result.shouldBeLeft(
-                AccessNotFoundException("Error getting access for User with ID: 1", AccessNotFoundException("Could not find User for ID: 1"))
-        )
-    }
+  @Test
+  fun `getAccessForUser() - no user found`() {
+    val result = accessLoadingService.getAccessForUser(1L)
+    result.shouldBeLeft(
+      AccessNotFoundException(
+        "Error getting access for User with ID: 1",
+        AccessNotFoundException("Could not find User for ID: 1")))
+  }
 
-    @Test
-    fun `getAccessForUser() - single client, no roles`() {
-        TODO("Finish this")
-    }
+  @Test
+  fun `getAccessForUser() - single client, no roles`() {
+    TODO("Finish this")
+  }
 
-    @Test
-    fun `getAccessForUser() - multiple clients, no roles`() {
-        TODO("Finish this")
-    }
+  @Test
+  fun `getAccessForUser() - multiple clients, no roles`() {
+    TODO("Finish this")
+  }
 
-    @Test
-    fun `getAccessForUser() - multiple clients, one of which has roles`() {
-        TODO("Finish this")
-    }
+  @Test
+  fun `getAccessForUser() - multiple clients, one of which has roles`() {
+    TODO("Finish this")
+  }
 
-    @Test
-    fun `getAccessForUser() - multiple clients, all of which have roles`() {
-        TODO("Finish this")
-    }
-
+  @Test
+  fun `getAccessForUser() - multiple clients, all of which have roles`() {
+    TODO("Finish this")
+  }
 }

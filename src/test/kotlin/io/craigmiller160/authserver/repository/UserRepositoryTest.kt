@@ -34,54 +34,50 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 @DataJpaTest
 class UserRepositoryTest {
 
-    @Autowired
-    private lateinit var userRepo: UserRepository
-    @Autowired
-    private lateinit var clientRepo: ClientRepository
-    @Autowired
-    private lateinit var clientUserRepo: ClientUserRepository
+  @Autowired private lateinit var userRepo: UserRepository
+  @Autowired private lateinit var clientRepo: ClientRepository
+  @Autowired private lateinit var clientUserRepo: ClientUserRepository
 
-    private lateinit var user: User
-    private lateinit var client: Client
-    private lateinit var clientUser: ClientUser
+  private lateinit var user: User
+  private lateinit var client: Client
+  private lateinit var clientUser: ClientUser
 
-    @BeforeEach
-    fun setup() {
-        user = userRepo.save(TestData.createUser())
-        client = clientRepo.save(TestData.createClient())
-        clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
-    }
+  @BeforeEach
+  fun setup() {
+    user = userRepo.save(TestData.createUser())
+    client = clientRepo.save(TestData.createClient())
+    clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
+  }
 
-    @AfterEach
-    fun clean() {
-        clientRepo.deleteAll()
-        clientRepo.deleteAll()
-        userRepo.deleteAll()
-    }
+  @AfterEach
+  fun clean() {
+    clientRepo.deleteAll()
+    clientRepo.deleteAll()
+    userRepo.deleteAll()
+  }
 
-    @Test
-    fun test_findByEmailAndClientId_found() {
-        val result = userRepo.findByEmailAndClientId(user.email, client.id)
-        assertNotNull(result)
-        assertEquals(user, result)
-    }
+  @Test
+  fun test_findByEmailAndClientId_found() {
+    val result = userRepo.findByEmailAndClientId(user.email, client.id)
+    assertNotNull(result)
+    assertEquals(user, result)
+  }
 
-    @Test
-    fun test_findByEmailAndClientId_notFound() {
-        val result = userRepo.findByEmailAndClientId(user.email, 0)
-        assertNull(result)
-    }
+  @Test
+  fun test_findByEmailAndClientId_notFound() {
+    val result = userRepo.findByEmailAndClientId(user.email, 0)
+    assertNull(result)
+  }
 
-    @Test
-    fun test_findEnabledByUserId() {
-        val disabledUser = userRepo.save(TestData.createUser().copy(email = "FooBar", enabled = false))
+  @Test
+  fun test_findEnabledByUserId() {
+    val disabledUser = userRepo.save(TestData.createUser().copy(email = "FooBar", enabled = false))
 
-        val nullResult = userRepo.findEnabledUserById(disabledUser.id)
-        assertNull(nullResult)
+    val nullResult = userRepo.findEnabledUserById(disabledUser.id)
+    assertNull(nullResult)
 
-        val actualResult = userRepo.findEnabledUserById(user.id)
-        assertNotNull(actualResult)
-        assertEquals(user, actualResult)
-    }
-
+    val actualResult = userRepo.findEnabledUserById(user.id)
+    assertNotNull(actualResult)
+    assertEquals(user, actualResult)
+  }
 }

@@ -25,11 +25,12 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ClientRepository : JpaRepository<Client,Long> {
+interface ClientRepository : JpaRepository<Client, Long> {
 
-    fun findByClientKey(clientKey: String): Client?
+  fun findByClientKey(clientKey: String): Client?
 
-    @Query("""SELECT c 
+  @Query(
+    """SELECT c 
         FROM Client c
         WHERE c.enabled = true
         AND c.id IN (
@@ -37,6 +38,5 @@ interface ClientRepository : JpaRepository<Client,Long> {
             FROM ClientUser cu
             WHERE cu.userId = :userId
         )""")
-    fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
-
+  fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 }

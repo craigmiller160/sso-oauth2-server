@@ -25,9 +25,10 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository : JpaRepository<User,Long> {
+interface UserRepository : JpaRepository<User, Long> {
 
-    @Query("""
+  @Query(
+    """
         SELECT u 
         FROM User u 
         WHERE u.email = :email
@@ -37,9 +38,10 @@ interface UserRepository : JpaRepository<User,Long> {
             WHERE cu.clientId = :clientId
         )
     """)
-    fun findByEmailAndClientId(email: String, clientId: Long): User?
+  fun findByEmailAndClientId(email: String, clientId: Long): User?
 
-    @Query("""
+  @Query(
+    """
         SELECT u
         FROM User u
         WHERE u.id = :userId
@@ -50,9 +52,8 @@ interface UserRepository : JpaRepository<User,Long> {
             AND cu.userId = :userId
         )
     """)
-    fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
+  fun findByUserIdAndClientId(userId: Long, clientId: Long): User?
 
-    @Query("SELECT u FROM User u WHERE u.id = :userId AND u.enabled = true")
-    fun findEnabledUserById(@Param("userId") userId: Long): User?
-
+  @Query("SELECT u FROM User u WHERE u.id = :userId AND u.enabled = true")
+  fun findEnabledUserById(@Param("userId") userId: Long): User?
 }

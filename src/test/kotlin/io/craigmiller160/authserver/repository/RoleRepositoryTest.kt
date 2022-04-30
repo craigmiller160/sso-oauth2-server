@@ -39,67 +39,62 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 @DataJpaTest
 class RoleRepositoryTest {
 
-    @Autowired
-    private lateinit var userRepo: UserRepository
-    @Autowired
-    private lateinit var clientRepo: ClientRepository
-    @Autowired
-    private lateinit var roleRepo: RoleRepository
-    @Autowired
-    private lateinit var clientUserRoleRepo: ClientUserRoleRepository
-    @Autowired
-    private lateinit var clientUserRepo: ClientUserRepository
+  @Autowired private lateinit var userRepo: UserRepository
+  @Autowired private lateinit var clientRepo: ClientRepository
+  @Autowired private lateinit var roleRepo: RoleRepository
+  @Autowired private lateinit var clientUserRoleRepo: ClientUserRoleRepository
+  @Autowired private lateinit var clientUserRepo: ClientUserRepository
 
-    private lateinit var user: User
-    private lateinit var client: Client
-    private lateinit var client2: Client
-    private lateinit var clientUser: ClientUser
-    private lateinit var clientUser2: ClientUser
-    private lateinit var role1: Role
-    private lateinit var role2: Role
-    private lateinit var role3: Role
-    private lateinit var clientUserRole1: ClientUserRole
-    private lateinit var clientUserRole2: ClientUserRole
-    private lateinit var clientUserRole3: ClientUserRole
+  private lateinit var user: User
+  private lateinit var client: Client
+  private lateinit var client2: Client
+  private lateinit var clientUser: ClientUser
+  private lateinit var clientUser2: ClientUser
+  private lateinit var role1: Role
+  private lateinit var role2: Role
+  private lateinit var role3: Role
+  private lateinit var clientUserRole1: ClientUserRole
+  private lateinit var clientUserRole2: ClientUserRole
+  private lateinit var clientUserRole3: ClientUserRole
 
-    @BeforeEach
-    fun setup() {
-        user = userRepo.save(TestData.createUser())
-        client = clientRepo.save(TestData.createClient())
-        client2 = clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
-        clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
-        clientUser2 = clientUserRepo.save(TestData.createClientUser(user.id, client2.id))
-        role1 = roleRepo.save(TestData.createRole1(client.id))
-        role2 = roleRepo.save(TestData.createRole2(client.id))
-        role3 = roleRepo.save(TestData.createRole3(client2.id))
-        clientUserRole1 = clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
-        clientUserRole2 = clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
-        clientUserRole3 = clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client2.id, role3.id))
-    }
+  @BeforeEach
+  fun setup() {
+    user = userRepo.save(TestData.createUser())
+    client = clientRepo.save(TestData.createClient())
+    client2 =
+      clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
+    clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
+    clientUser2 = clientUserRepo.save(TestData.createClientUser(user.id, client2.id))
+    role1 = roleRepo.save(TestData.createRole1(client.id))
+    role2 = roleRepo.save(TestData.createRole2(client.id))
+    role3 = roleRepo.save(TestData.createRole3(client2.id))
+    clientUserRole1 =
+      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
+    clientUserRole2 =
+      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
+    clientUserRole3 =
+      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client2.id, role3.id))
+  }
 
-    @AfterEach
-    fun clean() {
-        clientUserRoleRepo.deleteAll()
-        roleRepo.deleteAll()
-        clientRepo.deleteAll()
-        userRepo.deleteAll()
-    }
+  @AfterEach
+  fun clean() {
+    clientUserRoleRepo.deleteAll()
+    roleRepo.deleteAll()
+    clientRepo.deleteAll()
+    userRepo.deleteAll()
+  }
 
-    @Test
-    fun test_findAllByUserIdAndClientId() {
-        val results = roleRepo.findAllByUserIdAndClientId(user.id, client.id)
-        assertEquals(2, results.size)
-        assertTrue(results.contains(role1))
-        assertTrue(results.contains(role2))
-    }
+  @Test
+  fun test_findAllByUserIdAndClientId() {
+    val results = roleRepo.findAllByUserIdAndClientId(user.id, client.id)
+    assertEquals(2, results.size)
+    assertTrue(results.contains(role1))
+    assertTrue(results.contains(role2))
+  }
 
-    @Test
-    fun test_findAllByUserId() {
-        val results = roleRepo.findAllByUserId(user.id)
-        assertThat(results, allOf(
-                hasSize(3),
-                containsInAnyOrder(role1, role2, role3)
-        ))
-    }
-
+  @Test
+  fun test_findAllByUserId() {
+    val results = roleRepo.findAllByUserId(user.id)
+    assertThat(results, allOf(hasSize(3), containsInAnyOrder(role1, role2, role3)))
+  }
 }

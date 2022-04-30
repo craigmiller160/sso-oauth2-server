@@ -18,7 +18,6 @@
 
 package io.craigmiller160.authserver.service
 
-import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
 import org.hamcrest.MatcherAssert.assertThat
@@ -38,37 +37,36 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 @ExtendWith(MockitoExtension::class)
 class ClientUserDetailsServiceTest {
 
-    @Mock
-    private lateinit var clientRepo: ClientRepository
-    private val client = TestData.createClient()
+  @Mock private lateinit var clientRepo: ClientRepository
+  private val client = TestData.createClient()
 
-    @InjectMocks
-    private lateinit var clientUserDetailsService: ClientUserDetailsService
+  @InjectMocks private lateinit var clientUserDetailsService: ClientUserDetailsService
 
-    @Test
-    fun test_loadUserByUsername() {
-        val clientKey = "ABC"
-        `when`(clientRepo.findByClientKey(clientKey))
-                .thenReturn(client)
+  @Test
+  fun test_loadUserByUsername() {
+    val clientKey = "ABC"
+    `when`(clientRepo.findByClientKey(clientKey)).thenReturn(client)
 
-        val result = clientUserDetailsService.loadUserByUsername(clientKey)
-        assertThat(result, allOf(
-                hasProperty("enabled", equalTo(client.enabled)),
-                hasProperty("username", equalTo(client.clientKey)),
-                hasProperty("password", equalTo(client.clientSecret))
-        ))
-    }
+    val result = clientUserDetailsService.loadUserByUsername(clientKey)
+    assertThat(
+      result,
+      allOf(
+        hasProperty("enabled", equalTo(client.enabled)),
+        hasProperty("username", equalTo(client.clientKey)),
+        hasProperty("password", equalTo(client.clientSecret))))
+  }
 
-    @Test
-    fun test_loadUserByUsername_noClientKey() {
-        val ex = assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername(null) }
-        assertEquals("No Client Key to lookup", ex.message)
-    }
+  @Test
+  fun test_loadUserByUsername_noClientKey() {
+    val ex =
+      assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername(null) }
+    assertEquals("No Client Key to lookup", ex.message)
+  }
 
-    @Test
-    fun test_loadUserByUsername_userNotFound() {
-        val ex = assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername("ABC") }
-        assertEquals("No client found for Client Key ABC", ex.message)
-    }
-
+  @Test
+  fun test_loadUserByUsername_userNotFound() {
+    val ex =
+      assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername("ABC") }
+    assertEquals("No client found for Client Key ABC", ex.message)
+  }
 }

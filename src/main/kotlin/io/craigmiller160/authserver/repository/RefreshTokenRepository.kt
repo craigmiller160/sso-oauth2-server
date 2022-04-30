@@ -19,30 +19,29 @@
 package io.craigmiller160.authserver.repository
 
 import io.craigmiller160.authserver.entity.RefreshToken
+import java.time.ZonedDateTime
+import javax.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.time.ZonedDateTime
-import javax.transaction.Transactional
 
 @Repository
-interface RefreshTokenRepository : JpaRepository<RefreshToken,String> {
+interface RefreshTokenRepository : JpaRepository<RefreshToken, String> {
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM RefreshToken WHERE timestamp < :maxTimestamp")
-    fun removeOldTokens(@Param("maxTimestamp") maxTimestamp: ZonedDateTime): Int
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM RefreshToken WHERE timestamp < :maxTimestamp")
+  fun removeOldTokens(@Param("maxTimestamp") maxTimestamp: ZonedDateTime): Int
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId IS NULL")
-    fun removeClientOnlyRefresh(@Param("clientId") clientId: Long): Int
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId IS NULL")
+  fun removeClientOnlyRefresh(@Param("clientId") clientId: Long): Int
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId = :userId")
-    fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long): Int
-
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM RefreshToken WHERE clientId = :clientId AND userId = :userId")
+  fun removeClientUserRefresh(@Param("clientId") clientId: Long, @Param("userId") userId: Long): Int
 }

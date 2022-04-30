@@ -34,50 +34,50 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 class UIServiceTest {
 
-    @Mock
-    private lateinit var clientRepo: ClientRepository
+  @Mock private lateinit var clientRepo: ClientRepository
 
-    @InjectMocks
-    private lateinit var uiService: UIService
+  @InjectMocks private lateinit var uiService: UIService
 
-    @Test
-    fun test_validateRequest() {
-        val request = TestData.createPageRequest()
-        val client = TestData.createClient()
-                .copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
+  @Test
+  fun test_validateRequest() {
+    val request = TestData.createPageRequest()
+    val client =
+      TestData.createClient()
+        .copy(
+          clientRedirectUris =
+            listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
 
-        `when`(clientRepo.findByClientKey(request.client_id))
-                .thenReturn(client)
+    `when`(clientRepo.findByClientKey(request.client_id)).thenReturn(client)
 
-        uiService.validateRequest(request)
-        // No tests needed if an exception is not thrown
-    }
+    uiService.validateRequest(request)
+    // No tests needed if an exception is not thrown
+  }
 
-    @Test
-    fun test_validateRequest_invalidResponseType() {
-        val request = TestData.createPageRequest().copy(response_type = "other")
+  @Test
+  fun test_validateRequest_invalidResponseType() {
+    val request = TestData.createPageRequest().copy(response_type = "other")
 
-        val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
-        assertEquals("Invalid response type", ex.message)
-    }
+    val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
+    assertEquals("Invalid response type", ex.message)
+  }
 
-    @Test
-    fun test_validateRequest_badClient() {
-        val request = TestData.createPageRequest()
+  @Test
+  fun test_validateRequest_badClient() {
+    val request = TestData.createPageRequest()
 
-        val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
-        assertEquals("Client not supported", ex.message)
-    }
+    val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
+    assertEquals("Client not supported", ex.message)
+  }
 
-    @Test
-    fun test_validateRequest_authCodeNotAllowed() {
-        val request = TestData.createPageRequest()
+  @Test
+  fun test_validateRequest_authCodeNotAllowed() {
+    val request = TestData.createPageRequest()
 
-        `when`(clientRepo.findByClientKey(request.client_id))
-                .thenReturn(TestData.createClient().copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))))
+    `when`(clientRepo.findByClientKey(request.client_id))
+      .thenReturn(
+        TestData.createClient().copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))))
 
-        val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
-        assertEquals("Client does not support Auth Code", ex.message)
-    }
-
+    val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
+    assertEquals("Client does not support Auth Code", ex.message)
+  }
 }

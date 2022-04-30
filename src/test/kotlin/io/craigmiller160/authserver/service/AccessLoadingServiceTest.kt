@@ -7,18 +7,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.transaction.annotation.Transactional
 
-@ExtendWith(MockitoExtension::class)
+@SpringBootTest
+@ExtendWith(SpringExtension::class)
+@Transactional
 class AccessLoadingServiceTest {
 
-    @Mock
-    private lateinit var userRepo: UserRepository
-    @Mock
-    private lateinit var clientRepo: ClientRepository
-    @Mock
-    private lateinit var roleRepo: RoleRepository
-    @InjectMocks
+    @Autowired
     private lateinit var accessLoadingService: AccessLoadingService
 
     @Test

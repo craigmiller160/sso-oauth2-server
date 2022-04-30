@@ -11,13 +11,13 @@ import io.craigmiller160.authserver.repository.ClientUserRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.kotest.assertions.arrow.core.shouldBeLeft
 import io.kotest.assertions.arrow.core.shouldBeRight
+import java.util.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
@@ -25,32 +25,29 @@ import java.util.*
 class AccessLoadingServiceTest {
 
   @Autowired private lateinit var accessLoadingService: AccessLoadingService
-  @Autowired
-  private lateinit var userRepo: UserRepository
-  @Autowired
-  private lateinit var clientRepo: ClientRepository
-  @Autowired
-  private lateinit var clientUserRepo: ClientUserRepository
+  @Autowired private lateinit var userRepo: UserRepository
+  @Autowired private lateinit var clientRepo: ClientRepository
+  @Autowired private lateinit var clientUserRepo: ClientUserRepository
 
-  private fun createUser(): User = User(
-          id = 1,
-          email = "craig@gmail.com",
-          firstName = "Craig",
-          lastName = "Miller",
-          password = "password",
-          enabled = true
-  )
-  private fun createClient(): Client = Client(
-          id = 1,
-          name = "The Client",
-          clientKey = UUID.randomUUID().toString(),
-          clientSecret = UUID.randomUUID().toString(),
-          enabled = true,
-          accessTokenTimeoutSecs = 5,
-          refreshTokenTimeoutSecs = 5,
-          authCodeTimeoutSecs = 5,
-          clientRedirectUris = listOf()
-  )
+  private fun createUser(): User =
+    User(
+      id = 1,
+      email = "craig@gmail.com",
+      firstName = "Craig",
+      lastName = "Miller",
+      password = "password",
+      enabled = true)
+  private fun createClient(): Client =
+    Client(
+      id = 1,
+      name = "The Client",
+      clientKey = UUID.randomUUID().toString(),
+      clientSecret = UUID.randomUUID().toString(),
+      enabled = true,
+      accessTokenTimeoutSecs = 5,
+      refreshTokenTimeoutSecs = 5,
+      authCodeTimeoutSecs = 5,
+      clientRedirectUris = listOf())
 
   @Test
   fun `getAccessForUser() - no user found`() {
@@ -65,39 +62,33 @@ class AccessLoadingServiceTest {
   fun `getAccessForUser() - no clients for user`() {
     val user = userRepo.save(createUser())
     val result = accessLoadingService.getAccessForUser(user.id)
-    result.shouldBeRight(UserWithClientsAccess(
-            userId = user.id,
-            email = user.email,
-            firstName = user.firstName,
-            lastName = user.lastName,
-            clients = mapOf()
-    ))
+    result.shouldBeRight(
+      UserWithClientsAccess(
+        userId = user.id,
+        email = user.email,
+        firstName = user.firstName,
+        lastName = user.lastName,
+        clients = mapOf()))
   }
 
   @Test
   fun `getAccessForUser() - single client, no roles`() {
     val user = userRepo.save(createUser())
     val client = clientRepo.save(createClient())
-    val clientUser = clientUserRepo.save(ClientUser(
-            id = 1,
-            userId = user.id,
-            clientId = client.id
-    ))
+    val clientUser = clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client.id))
 
     val result = accessLoadingService.getAccessForUser(user.id)
-    result.shouldBeRight(UserWithClientsAccess(
-            userId = user.id,
-            email = user.email,
-            firstName = user.firstName,
-            lastName = user.lastName,
-            clients = mapOf(
-                    client.clientKey to ClientWithRolesAccess(
-                            clientId = client.id,
-                            clientName = client.name,
-                            roles = listOf()
-                    )
-            )
-    ))
+    result.shouldBeRight(
+      UserWithClientsAccess(
+        userId = user.id,
+        email = user.email,
+        firstName = user.firstName,
+        lastName = user.lastName,
+        clients =
+          mapOf(
+            client.clientKey to
+              ClientWithRolesAccess(
+                clientId = client.id, clientName = client.name, roles = listOf()))))
   }
 
   @Test

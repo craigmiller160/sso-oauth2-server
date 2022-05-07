@@ -37,6 +37,9 @@ class AuthorizationService(
   private val refreshTokenRepo: RefreshTokenRepository
 ) {
   companion object {
+    private const val ACCESS_TOKEN_COOKIE_NAME = "craigmiller160_access_token"
+    private const val REFRESH_TOKEN_COOKIE_NAME = "craigmiller160_refresh_token"
+
     // TODO move these to properties
     private const val ACCESS_TOKEN_TIMEOUT_SECS = 60 * 10
     private const val REFRESH_TOKEN_TIMEOUT_SECS = 60 * 60
@@ -60,8 +63,8 @@ class AuthorizationService(
       if (request.cookie) {
         ReturnUnion2.ofB(
           TokenCookieResponse(
-            CookieCreator.create("", accessToken),
-            CookieCreator.create("", refreshToken),
+            CookieCreator.create(ACCESS_TOKEN_COOKIE_NAME, accessToken),
+            CookieCreator.create(REFRESH_TOKEN_COOKIE_NAME, refreshToken),
             request.redirectUri))
       } else {
         ReturnUnion2.ofA(TokenResponse(accessToken, refreshToken, tokenId))

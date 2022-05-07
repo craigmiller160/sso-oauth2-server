@@ -47,13 +47,21 @@ class AuthorizationService(
       val user = validateCredentials(request).bind()
       val access = accessLoadingService.getAccessForUser(user.id).bind()
 
-      val accessToken = createAccessToken(access).bind()
+      val tokenId = UUID.randomUUID().toString()
+
+      val accessToken = createAccessToken(tokenId, access).bind()
+      val refreshToken = createRefreshToken(tokenId).bind()
       TODO("Finish this")
     }
 
-  private fun createAccessToken(access: UserWithClientsAccess): TryEither<String> {
+  private fun createRefreshToken(tokenId: String): TryEither<String> {
+    val claims = createDefaultClaims(tokenId, REFRESH_TOKEN_TIMEOUT_SECS).build()
+    return createToken(claims)
+  }
+
+  private fun createAccessToken(tokenId: String, access: UserWithClientsAccess): TryEither<String> {
     val claims =
-      createDefaultClaims(ACCESS_TOKEN_TIMEOUT_SECS)
+      createDefaultClaims(tokenId, ACCESS_TOKEN_TIMEOUT_SECS)
         .subject(access.email)
         .claim("userId", access.userId)
         .claim("firstName", access.firstName)
@@ -74,12 +82,12 @@ class AuthorizationService(
     }
   }
 
-  private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
+  private fun createDefaultClaims(tokenId: String, expSecs: Int): JWTClaimsSet.Builder {
     val now = generateNow()
     return JWTClaimsSet.Builder()
       .issueTime(now)
       .expirationTime(generateExp(expSecs))
-      .jwtID(UUID.randomUUID().toString())
+      .jwtID(tokenId)
       .notBeforeTime(now)
   }
 

@@ -1,9 +1,3 @@
 #!/bin/sh
 
-git stash -q --keep-index
 mvn spotless:apply
-RESULT=$?
-git add -u
-git stash pop -q
-
-exit $RESULT

@@ -55,6 +55,7 @@ import org.springframework.test.web.servlet.MockMvc
 abstract class AbstractControllerIntegrationTest {
 
   protected lateinit var oauth2ApiProcessor: ApiTestProcessor
+  protected lateinit var authApiProcessor: ApiTestProcessor
 
   @Autowired private lateinit var provMockMvc: MockMvc
 
@@ -97,6 +98,10 @@ abstract class AbstractControllerIntegrationTest {
         password = validClientSecret
         isSecure = true
       }
+    }
+    authApiProcessor = ApiTestProcessor {
+      mockMvc = provMockMvc
+      objectMapper = provObjMapper
     }
 
     val encodedSecret = bcryptEncoder.encode(validClientSecret)

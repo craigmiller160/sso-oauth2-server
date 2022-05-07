@@ -35,7 +35,12 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   private fun testAccessToken(tokenId: String, accessToken: String) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
-    assertThat(accessClaims.claims).containsEntry("jwtid", tokenId)
+    assertThat(accessClaims.claims)
+      .containsEntry("jti", tokenId)
+      .containsEntry("sub", authUser.email)
+      .containsEntry("userId", authUser.id)
+      .containsEntry("firstName", authUser.firstName)
+      .containsEntry("lastName", authUser.lastName)
     // TODO test more properties
   }
 

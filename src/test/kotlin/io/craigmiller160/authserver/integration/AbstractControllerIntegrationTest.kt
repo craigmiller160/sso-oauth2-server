@@ -59,7 +59,7 @@ abstract class AbstractControllerIntegrationTest {
 
   @Autowired private lateinit var provMockMvc: MockMvc
 
-  @Autowired private lateinit var provObjMapper: ObjectMapper
+  @Autowired protected lateinit var provObjMapper: ObjectMapper
 
   @Autowired private lateinit var userRepo: UserRepository
   @Autowired private lateinit var clientUserRepo: ClientUserRepository

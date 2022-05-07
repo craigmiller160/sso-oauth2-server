@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration
 
+import com.nimbusds.jose.shaded.json.JSONArray
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.TokenResponse
@@ -30,18 +31,20 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(tokenId, accessToken)
+    JSONArray
   }
 
   private fun testAccessToken(tokenId: String, accessToken: String) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
+
     assertThat(accessClaims.claims)
       .containsEntry("jti", tokenId)
       .containsEntry("sub", authUser.email)
       .containsEntry("userId", authUser.id)
       .containsEntry("firstName", authUser.firstName)
       .containsEntry("lastName", authUser.lastName)
-    // TODO test more properties
+      .containsKey("clients")
   }
 
   @Test

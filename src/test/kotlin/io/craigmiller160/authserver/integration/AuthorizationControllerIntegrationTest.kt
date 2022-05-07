@@ -1,8 +1,12 @@
 package io.craigmiller160.authserver.integration
 
+import io.craigmiller160.apitestprocessor.body.Json
+import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ExtendWith(SpringExtension::class)
@@ -10,7 +14,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `Valid credentials, create and return tokens to the caller`() {
-    TODO("Finish this")
+    val request = LoginTokenRequest(username = authUser.email, password = authUserPassword)
+    val result =
+      authApiProcessor
+        .call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/token"
+            body = Json(request)
+          }
+          response { status = 200 }
+        }
+        .convert(TokenResponse::class.java)
   }
 
   @Test

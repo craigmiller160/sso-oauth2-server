@@ -1,8 +1,10 @@
 package io.craigmiller160.authserver.integration
 
+import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -26,6 +28,15 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
           response { status = 200 }
         }
         .convert(TokenResponse::class.java)
+    val (accessToken, refreshToken, tokenId) = result
+    testAccessToken(tokenId, accessToken)
+  }
+
+  private fun testAccessToken(tokenId: String, accessToken: String) {
+    val accessJwt = SignedJWT.parse(accessToken)
+    val accessClaims = accessJwt.jwtClaimsSet
+    assertThat(accessClaims.claims).containsEntry("jwtid", tokenId)
+    // TODO test more properties
   }
 
   @Test

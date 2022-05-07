@@ -45,6 +45,9 @@ class AccessLoadingService(
           clients = userClientsMap)
       }
       .mapLeft { ex ->
-        AccessNotFoundException("Error getting access for User with ID: $userId: ${ex.message}", ex)
+        when (ex) {
+          is AccessNotFoundException -> ex
+          else -> AccessNotFoundException("Error getting access for User with ID: $userId", ex)
+        }
       }
 }

@@ -40,7 +40,7 @@ import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
-class JwtHandler(private val tokenConfig: TokenConfig) {
+class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
 
   private val legacyDateConverter = LegacyDateConverter()
 

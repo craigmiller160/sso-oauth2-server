@@ -20,6 +20,7 @@ import io.craigmiller160.authserver.function.rightOrNotFound
 import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.security.CookieCreator
 import io.craigmiller160.date.converter.LegacyDateConverter
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -57,8 +58,11 @@ class AuthorizationService(
       saveRefreshToken(refreshToken, tokenId, user.id).bind()
 
       if (request.cookie) {
-        // TODO create cookies
-        ReturnUnion2.ofB(TokenCookieResponse(accessToken, refreshToken, request.redirectUri))
+        ReturnUnion2.ofB(
+          TokenCookieResponse(
+            CookieCreator.create("", accessToken),
+            CookieCreator.create("", refreshToken),
+            request.redirectUri))
       } else {
         ReturnUnion2.ofA(TokenResponse(accessToken, refreshToken, tokenId))
       }

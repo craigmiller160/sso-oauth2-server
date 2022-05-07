@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.controller
 
+import arrow.core.getOrHandle
 import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.service.AuthorizationService
@@ -16,6 +17,7 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<*> =
     authorizationService
       .token(request)
+      .getOrHandle { throw it }
       .fold({ response -> ResponseEntity.ok(response) }, this::handleCookieResponse)
 
   private fun handleCookieResponse(

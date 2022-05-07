@@ -22,7 +22,7 @@ import io.craigmiller160.authserver.entity.Client
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-data class ClientUserDetails(val client: Client) : UserDetails {
+data class OAuth2ClientUserDetails(val client: Client) : UserDetails {
 
   override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
     return mutableListOf()

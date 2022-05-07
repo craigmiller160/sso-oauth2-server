@@ -52,7 +52,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
-class JwtHandlerTest {
+class OAuth2JwtHandlerTest {
 
   private val legacyDateConverter = LegacyDateConverter()
 
@@ -60,11 +60,11 @@ class JwtHandlerTest {
 
   private val client =
     TestData.createClient(accessTokenTimeoutSecs = 300, refreshTokenTimeoutSecs = 300)
-  private val clientUserDetails = ClientUserDetails(client)
+  private val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
   private val user = TestData.createUser().copy(id = 1)
   private val origTokenId = "origTokenId"
 
-  @InjectMocks private lateinit var jwtHandler: JwtHandler
+  @InjectMocks private lateinit var OAuth2JwtHandler: OAuth2JwtHandler
 
   private val accessExpSecs = 10
   private val refreshExpSecs = 20
@@ -80,7 +80,7 @@ class JwtHandlerTest {
 
   @Test
   fun test_createAccessToken_clientOnly() {
-    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -102,7 +102,7 @@ class JwtHandlerTest {
   fun test_createAccessToken_clientOnly_withExistingJwtId() {
     val existingId = UUID.randomUUID().toString()
     val (token, tokenId) =
-      jwtHandler.createAccessToken(clientUserDetails, null, listOf(), existingId)
+      OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, null, listOf(), existingId)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -124,7 +124,7 @@ class JwtHandlerTest {
 
   @Test
   fun test_createAccessToken_clientAndUser() {
-    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -151,7 +151,7 @@ class JwtHandlerTest {
     val role = Role(1L, "Role1", 1L)
     val roles = listOf(role)
 
-    val (token, tokenId) = jwtHandler.createAccessToken(clientUserDetails, user, roles)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user, roles)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -179,7 +179,7 @@ class JwtHandlerTest {
   @Test
   fun test_createRefreshToken() {
     val (token, tokenId) =
-      jwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
+      OAuth2JwtHandler.createRefreshToken(OAuth2ClientUserDetails, "password", 1L, origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")
@@ -200,7 +200,8 @@ class JwtHandlerTest {
   @Test
   fun test_createRefreshToken_noUser() {
     val (token, tokenId) =
-      jwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
+      OAuth2JwtHandler.createRefreshToken(
+        OAuth2ClientUserDetails, "password", tokenId = origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")
@@ -252,7 +253,7 @@ class JwtHandlerTest {
   fun test_parseRefreshToken() {
     val token = createJwt(false, 1000)
 
-    val data = jwtHandler.parseRefreshToken(token, client.id)
+    val data = OAuth2JwtHandler.parseRefreshToken(token, client.id)
 
     assertEquals("client_credentials", data.grantType)
     assertEquals(client.id, data.clientId)
@@ -264,7 +265,7 @@ class JwtHandlerTest {
   fun test_parseRefreshToken_withUser() {
     val token = createJwt(true, 1000)
 
-    val data = jwtHandler.parseRefreshToken(token, client.id)
+    val data = OAuth2JwtHandler.parseRefreshToken(token, client.id)
 
     assertEquals("password", data.grantType)
     assertEquals(client.id, data.clientId)
@@ -279,7 +280,9 @@ class JwtHandlerTest {
     val token = createJwt(true, 1000, keyPair)
 
     val ex =
-      assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+      assertThrows<InvalidRefreshTokenException> {
+        OAuth2JwtHandler.parseRefreshToken(token, client.id)
+      }
     assertEquals("Bad Signature", ex.message)
   }
 
@@ -288,7 +291,9 @@ class JwtHandlerTest {
     val token = createJwt(true, -1000)
 
     val ex =
-      assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, client.id) }
+      assertThrows<InvalidRefreshTokenException> {
+        OAuth2JwtHandler.parseRefreshToken(token, client.id)
+      }
     assertEquals("Expired", ex.message)
   }
 
@@ -296,7 +301,8 @@ class JwtHandlerTest {
   fun test_parseRefreshToken_badClientId() {
     val token = createJwt(true, 1000)
 
-    val ex = assertThrows<InvalidRefreshTokenException> { jwtHandler.parseRefreshToken(token, 20) }
+    val ex =
+      assertThrows<InvalidRefreshTokenException> { OAuth2JwtHandler.parseRefreshToken(token, 20) }
     assertEquals("Invalid Client ID", ex.message)
   }
 }

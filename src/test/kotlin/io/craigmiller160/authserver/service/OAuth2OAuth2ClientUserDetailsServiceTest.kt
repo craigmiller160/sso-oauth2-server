@@ -35,19 +35,19 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 @ExtendWith(MockitoExtension::class)
-class ClientUserDetailsServiceTest {
+class OAuth2OAuth2ClientUserDetailsServiceTest {
 
   @Mock private lateinit var clientRepo: ClientRepository
   private val client = TestData.createClient()
 
-  @InjectMocks private lateinit var clientUserDetailsService: ClientUserDetailsService
+  @InjectMocks private lateinit var OAuth2ClientUserDetailsService: OAuth2ClientUserDetailsService
 
   @Test
   fun test_loadUserByUsername() {
     val clientKey = "ABC"
     `when`(clientRepo.findByClientKey(clientKey)).thenReturn(client)
 
-    val result = clientUserDetailsService.loadUserByUsername(clientKey)
+    val result = OAuth2ClientUserDetailsService.loadUserByUsername(clientKey)
     assertThat(
       result,
       allOf(
@@ -59,14 +59,18 @@ class ClientUserDetailsServiceTest {
   @Test
   fun test_loadUserByUsername_noClientKey() {
     val ex =
-      assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername(null) }
+      assertThrows<UsernameNotFoundException> {
+        OAuth2ClientUserDetailsService.loadUserByUsername(null)
+      }
     assertEquals("No Client Key to lookup", ex.message)
   }
 
   @Test
   fun test_loadUserByUsername_userNotFound() {
     val ex =
-      assertThrows<UsernameNotFoundException> { clientUserDetailsService.loadUserByUsername("ABC") }
+      assertThrows<UsernameNotFoundException> {
+        OAuth2ClientUserDetailsService.loadUserByUsername("ABC")
+      }
     assertEquals("No client found for Client Key ABC", ex.message)
   }
 }

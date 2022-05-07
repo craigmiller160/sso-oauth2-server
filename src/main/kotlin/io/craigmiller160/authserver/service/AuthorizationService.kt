@@ -7,7 +7,7 @@ import io.craigmiller160.authserver.function.ReturnUnion2
 import org.springframework.stereotype.Service
 
 @Service
-class AuthorizationService {
+class AuthorizationService(private val accessLoadingService: AccessLoadingService) {
   fun token(request: LoginTokenRequest): ReturnUnion2<TokenResponse, TokenCookieResponse> {
     TODO("Finish this")
   }

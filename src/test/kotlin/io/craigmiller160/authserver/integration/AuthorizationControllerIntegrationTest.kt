@@ -1,9 +1,9 @@
 package io.craigmiller160.authserver.integration
 
-import com.nimbusds.jose.shaded.json.JSONArray
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,12 +31,16 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(tokenId, accessToken)
-    JSONArray
   }
 
   private fun testAccessToken(tokenId: String, accessToken: String) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
+    assertThat(accessClaims.claims).containsEntry("jti", tokenId)
+
+    val access = UserWithClientsAccess.fromClaims(accessClaims)
+    assertThat(access).hasFieldOrPropertyWithValue("userId", authUser.id)
+    // TODO test the rest of the object including the clients section
 
     assertThat(accessClaims.claims)
       .containsEntry("jti", tokenId)

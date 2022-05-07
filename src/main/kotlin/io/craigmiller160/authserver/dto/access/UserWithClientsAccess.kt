@@ -10,6 +10,7 @@ data class UserWithClientsAccess(
   val clients: Map<String, ClientWithRolesAccess>
 ) {
   companion object {
+    // TODO clean this up if it works
     fun fromClaims(claims: JWTClaimsSet): UserWithClientsAccess =
       UserWithClientsAccess(
         userId = claims.getLongClaim("userId"),

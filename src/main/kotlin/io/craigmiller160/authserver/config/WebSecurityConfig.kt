@@ -18,7 +18,7 @@
 
 package io.craigmiller160.authserver.config
 
-import io.craigmiller160.authserver.service.ClientUserDetailsService
+import io.craigmiller160.authserver.service.OAuth2ClientUserDetailsService
 import io.craigmiller160.webutils.security.AuthEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -35,7 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 class WebSecurityConfig(
-  private val clientUserDetailsService: ClientUserDetailsService,
+  private val OAuth2ClientUserDetailsService: OAuth2ClientUserDetailsService,
   private val authEntryPoint: AuthEntryPoint
 ) : WebSecurityConfigurerAdapter() {
 
@@ -69,7 +69,7 @@ class WebSecurityConfig(
 
   override fun configure(auth: AuthenticationManagerBuilder?) {
     auth?.let {
-      auth.userDetailsService(clientUserDetailsService).passwordEncoder(passwordEncoder())
+      auth.userDetailsService(OAuth2ClientUserDetailsService).passwordEncoder(passwordEncoder())
     }
   }
 

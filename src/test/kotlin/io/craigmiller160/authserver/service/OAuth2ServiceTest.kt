@@ -32,8 +32,8 @@ import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.RoleRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.AuthCodeHandler
-import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
+import io.craigmiller160.authserver.security.OAuth2ClientUserDetails
 import io.craigmiller160.authserver.security.OAuth2JwtHandler
 import io.craigmiller160.authserver.testutils.TestData
 import java.time.ZoneId
@@ -89,7 +89,7 @@ class OAuth2ServiceTest {
     TestData.createClient()
       .copy(
         clientRedirectUris = listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
-  private val clientUserDetails = ClientUserDetails(client)
+  private val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
   private val user =
     User(
       id = 1L,
@@ -106,7 +106,7 @@ class OAuth2ServiceTest {
 
   private fun setupSecurityContext() {
     `when`(securityContext.authentication).thenReturn(authentication)
-    `when`(authentication.principal).thenReturn(clientUserDetails)
+    `when`(authentication.principal).thenReturn(OAuth2ClientUserDetails)
   }
 
   @BeforeEach
@@ -122,11 +122,11 @@ class OAuth2ServiceTest {
   @Test
   fun test_clientCredentials() {
     setupSecurityContext()
-    `when`(OAuth2JwtHandler.createAccessToken(clientUserDetails))
+    `when`(OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails))
       .thenReturn(Pair(accessToken, tokenId))
     `when`(
         OAuth2JwtHandler.createRefreshToken(
-          clientUserDetails, GrantType.CLIENT_CREDENTIALS, tokenId = tokenId))
+          OAuth2ClientUserDetails, GrantType.CLIENT_CREDENTIALS, tokenId = tokenId))
       .thenReturn(Pair(refreshToken, tokenId))
 
     val result = oAuth2Service.clientCredentials()
@@ -138,11 +138,11 @@ class OAuth2ServiceTest {
   @Test
   fun test_password() {
     setupSecurityContext()
-    `when`(OAuth2JwtHandler.createAccessToken(clientUserDetails, user, roles))
+    `when`(OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user, roles))
       .thenReturn(Pair(accessToken, tokenId))
     `when`(
         OAuth2JwtHandler.createRefreshToken(
-          clientUserDetails, GrantType.PASSWORD, user.id, tokenId))
+          OAuth2ClientUserDetails, GrantType.PASSWORD, user.id, tokenId))
       .thenReturn(Pair(refreshToken, tokenId))
 
     `when`(userRepo.findByEmailAndClientId(user.email, client.id)).thenReturn(user)
@@ -191,11 +191,11 @@ class OAuth2ServiceTest {
     `when`(userRepo.findByUserIdAndClientId(user.id, client.id)).thenReturn(user)
     `when`(authCodeHandler.validateAuthCode(authCode)).thenReturn(Pair(client.id, user.id))
     `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id)).thenReturn(roles)
-    `when`(OAuth2JwtHandler.createAccessToken(clientUserDetails, user, roles))
+    `when`(OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user, roles))
       .thenReturn(Pair(accessToken, tokenId))
     `when`(
         OAuth2JwtHandler.createRefreshToken(
-          clientUserDetails, GrantType.AUTH_CODE, user.id, tokenId))
+          OAuth2ClientUserDetails, GrantType.AUTH_CODE, user.id, tokenId))
       .thenReturn(Pair(refreshToken, tokenId))
 
     val result = oAuth2Service.authCode(request)
@@ -273,11 +273,12 @@ class OAuth2ServiceTest {
     `when`(refreshTokenRepo.findById(tokenData.tokenId)).thenReturn(Optional.of(refreshTokenEntity))
     `when`(userRepo.findByUserIdAndClientId(tokenData.userId!!, client.id)).thenReturn(user)
     `when`(roleRepo.findAllByUserIdAndClientId(user.id, client.id)).thenReturn(roles)
-    `when`(OAuth2JwtHandler.createAccessToken(clientUserDetails, user, roles, tokenData.tokenId))
+    `when`(
+        OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user, roles, tokenData.tokenId))
       .thenReturn(Pair(accessToken, tokenId))
     `when`(
         OAuth2JwtHandler.createRefreshToken(
-          clientUserDetails, tokenData.grantType, user.id, tokenId))
+          OAuth2ClientUserDetails, tokenData.grantType, user.id, tokenId))
       .thenReturn(Pair(refreshToken, tokenData.tokenId))
 
     val result = oAuth2Service.refresh(refreshToken)
@@ -301,11 +302,11 @@ class OAuth2ServiceTest {
         tokenData.tokenId, refreshToken, client.id, null, ZonedDateTime.now(ZoneId.of("UTC")))
 
     `when`(refreshTokenRepo.findById(tokenData.tokenId)).thenReturn(Optional.of(refreshTokenEntity))
-    `when`(OAuth2JwtHandler.createAccessToken(clientUserDetails, null, listOf(), tokenId))
+    `when`(OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, null, listOf(), tokenId))
       .thenReturn(Pair(accessToken, tokenId))
     `when`(
         OAuth2JwtHandler.createRefreshToken(
-          clientUserDetails, tokenData.grantType, tokenId = tokenId))
+          OAuth2ClientUserDetails, tokenData.grantType, tokenId = tokenId))
       .thenReturn(Pair(refreshToken, tokenData.tokenId))
 
     val result = oAuth2Service.refresh(refreshToken)

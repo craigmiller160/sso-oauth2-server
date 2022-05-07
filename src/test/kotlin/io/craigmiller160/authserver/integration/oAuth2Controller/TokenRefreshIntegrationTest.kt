@@ -28,8 +28,8 @@ import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
-import io.craigmiller160.authserver.security.ClientUserDetails
 import io.craigmiller160.authserver.security.GrantType
+import io.craigmiller160.authserver.security.OAuth2ClientUserDetails
 import io.craigmiller160.authserver.security.OAuth2JwtHandler
 import io.craigmiller160.authserver.testutils.TestData
 import java.time.ZoneId
@@ -81,9 +81,10 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     client: Client = authClient,
     userId: Long = 0
   ): String {
-    val clientUserDetails = ClientUserDetails(client)
+    val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
     val refreshToken =
-      OAuth2JwtHandler.createRefreshToken(clientUserDetails, originalGrantType, userId, tokenId)
+      OAuth2JwtHandler.createRefreshToken(
+          OAuth2ClientUserDetails, originalGrantType, userId, tokenId)
         .first
     refreshTokenRepo.save(
       RefreshToken(tokenId, refreshToken, client.id, userId, ZonedDateTime.now(ZoneId.of("UTC"))))

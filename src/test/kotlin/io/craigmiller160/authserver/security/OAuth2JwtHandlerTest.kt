@@ -60,7 +60,7 @@ class OAuth2JwtHandlerTest {
 
   private val client =
     TestData.createClient(accessTokenTimeoutSecs = 300, refreshTokenTimeoutSecs = 300)
-  private val clientUserDetails = ClientUserDetails(client)
+  private val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
   private val user = TestData.createUser().copy(id = 1)
   private val origTokenId = "origTokenId"
 
@@ -80,7 +80,7 @@ class OAuth2JwtHandlerTest {
 
   @Test
   fun test_createAccessToken_clientOnly() {
-    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(clientUserDetails)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -102,7 +102,7 @@ class OAuth2JwtHandlerTest {
   fun test_createAccessToken_clientOnly_withExistingJwtId() {
     val existingId = UUID.randomUUID().toString()
     val (token, tokenId) =
-      OAuth2JwtHandler.createAccessToken(clientUserDetails, null, listOf(), existingId)
+      OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, null, listOf(), existingId)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -124,7 +124,7 @@ class OAuth2JwtHandlerTest {
 
   @Test
   fun test_createAccessToken_clientAndUser() {
-    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(clientUserDetails, user)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -151,7 +151,7 @@ class OAuth2JwtHandlerTest {
     val role = Role(1L, "Role1", 1L)
     val roles = listOf(role)
 
-    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(clientUserDetails, user, roles)
+    val (token, tokenId) = OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, user, roles)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -179,7 +179,7 @@ class OAuth2JwtHandlerTest {
   @Test
   fun test_createRefreshToken() {
     val (token, tokenId) =
-      OAuth2JwtHandler.createRefreshToken(clientUserDetails, "password", 1L, origTokenId)
+      OAuth2JwtHandler.createRefreshToken(OAuth2ClientUserDetails, "password", 1L, origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")
@@ -200,7 +200,8 @@ class OAuth2JwtHandlerTest {
   @Test
   fun test_createRefreshToken_noUser() {
     val (token, tokenId) =
-      OAuth2JwtHandler.createRefreshToken(clientUserDetails, "password", tokenId = origTokenId)
+      OAuth2JwtHandler.createRefreshToken(
+        OAuth2ClientUserDetails, "password", tokenId = origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")

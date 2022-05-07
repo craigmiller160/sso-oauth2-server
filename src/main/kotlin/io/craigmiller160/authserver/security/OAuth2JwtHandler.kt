@@ -56,7 +56,7 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
   }
 
   fun createAccessToken(
-    clientUserDetails: ClientUserDetails,
+    OAuth2ClientUserDetails: OAuth2ClientUserDetails,
     user: User? = null,
     roles: List<Role> = listOf(),
     existingTokenId: String? = null
@@ -64,9 +64,9 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
     val roleNames = roles.map { it.name }
 
     var claimBuilder =
-      createDefaultClaims(clientUserDetails.client.accessTokenTimeoutSecs)
-        .claim("clientKey", clientUserDetails.username)
-        .claim("clientName", clientUserDetails.client.name)
+      createDefaultClaims(OAuth2ClientUserDetails.client.accessTokenTimeoutSecs)
+        .claim("clientKey", OAuth2ClientUserDetails.username)
+        .claim("clientName", OAuth2ClientUserDetails.client.name)
         .claim("roles", roleNames)
 
     claimBuilder = existingTokenId?.let { claimBuilder.jwtID(existingTokenId) } ?: claimBuilder
@@ -80,7 +80,7 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
           .claim("firstName", user.firstName)
           .claim("lastName", user.lastName)
       }
-        ?: claimBuilder.subject(clientUserDetails.client.name)
+        ?: claimBuilder.subject(OAuth2ClientUserDetails.client.name)
 
     val claims = claimBuilder.build()
     val token = createToken(claims)
@@ -106,15 +106,15 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
   }
 
   fun createRefreshToken(
-    clientUserDetails: ClientUserDetails,
+    OAuth2ClientUserDetails: OAuth2ClientUserDetails,
     grantType: String,
     userId: Long = 0,
     tokenId: String
   ): Pair<String, String> {
     var claimBuilder =
-      createDefaultClaims(clientUserDetails.client.refreshTokenTimeoutSecs)
+      createDefaultClaims(OAuth2ClientUserDetails.client.refreshTokenTimeoutSecs)
         .claim("grantType", grantType)
-        .claim("clientId", clientUserDetails.client.id)
+        .claim("clientId", OAuth2ClientUserDetails.client.id)
         .jwtID(tokenId)
 
     if (userId > 0) {

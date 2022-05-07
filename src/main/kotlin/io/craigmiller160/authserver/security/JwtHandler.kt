@@ -31,7 +31,6 @@ import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.BadRequestException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
-import io.craigmiller160.authserver.service.AccessLoadingService
 import io.craigmiller160.date.converter.LegacyDateConverter
 import java.security.interfaces.RSAPublicKey
 import java.time.ZoneId
@@ -41,9 +40,7 @@ import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
-class JwtHandler(
-  private val tokenConfig: TokenConfig
-) {
+class JwtHandler(private val tokenConfig: TokenConfig) {
 
   private val legacyDateConverter = LegacyDateConverter()
 

@@ -57,6 +57,7 @@ class AuthorizationService(
       saveRefreshToken(refreshToken, tokenId, user.id).bind()
 
       if (request.cookie) {
+        // TODO create cookies
         ReturnUnion2.ofB(TokenCookieResponse(accessToken, refreshToken, request.redirectUri))
       } else {
         ReturnUnion2.ofA(TokenResponse(accessToken, refreshToken, tokenId))

@@ -204,6 +204,7 @@ abstract class AbstractControllerIntegrationTest {
     }
   }
 
+  // TODO this needs to be refactored for new token design
   private fun testAccessToken(accessToken: String, tokenId: String, isUser: Boolean) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet

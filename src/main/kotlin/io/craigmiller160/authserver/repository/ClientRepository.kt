@@ -20,10 +20,23 @@ package io.craigmiller160.authserver.repository
 
 import io.craigmiller160.authserver.entity.Client
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ClientRepository : JpaRepository<Client, Long> {
 
   fun findByClientKey(clientKey: String): Client?
+
+  @Query(
+    """SELECT c 
+        FROM Client c
+        WHERE c.enabled = true
+        AND c.id IN (
+            SELECT cu
+            FROM ClientUser cu
+            WHERE cu.userId = :userId
+        )""")
+  fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 }

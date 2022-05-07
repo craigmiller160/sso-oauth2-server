@@ -24,6 +24,10 @@ import io.craigmiller160.authserver.entity.ClientUserRole
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.testutils.TestData
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -43,29 +47,33 @@ class RoleRepositoryTest {
 
   private lateinit var user: User
   private lateinit var client: Client
+  private lateinit var client2: Client
   private lateinit var clientUser: ClientUser
+  private lateinit var clientUser2: ClientUser
   private lateinit var role1: Role
   private lateinit var role2: Role
+  private lateinit var role3: Role
   private lateinit var clientUserRole1: ClientUserRole
   private lateinit var clientUserRole2: ClientUserRole
+  private lateinit var clientUserRole3: ClientUserRole
 
   @BeforeEach
   fun setup() {
     user = userRepo.save(TestData.createUser())
-
     client = clientRepo.save(TestData.createClient())
-
+    client2 =
+      clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
     clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
-
+    clientUser2 = clientUserRepo.save(TestData.createClientUser(user.id, client2.id))
     role1 = roleRepo.save(TestData.createRole1(client.id))
-
     role2 = roleRepo.save(TestData.createRole2(client.id))
-
+    role3 = roleRepo.save(TestData.createRole3(client2.id))
     clientUserRole1 =
       clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
-
     clientUserRole2 =
       clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
+    clientUserRole3 =
+      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client2.id, role3.id))
   }
 
   @AfterEach
@@ -82,5 +90,11 @@ class RoleRepositoryTest {
     assertEquals(2, results.size)
     assertTrue(results.contains(role1))
     assertTrue(results.contains(role2))
+  }
+
+  @Test
+  fun test_findAllByUserId() {
+    val results = roleRepo.findAllByUserId(user.id)
+    assertThat(results, allOf(hasSize(3), containsInAnyOrder(role1, role2, role3)))
   }
 }

@@ -29,6 +29,11 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   }
 
   @Test
+  fun `User is disabled`() {
+    TODO("Finish this")
+  }
+
+  @Test
   fun `Invalid password`() {
     TODO("Finish this")
   }

@@ -11,12 +11,14 @@ import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.function.ReturnUnion2
 import io.craigmiller160.authserver.function.TryEither
 import io.craigmiller160.authserver.function.rightOrNotFound
 import io.craigmiller160.authserver.function.tryEither
+import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.date.converter.LegacyDateConverter
 import java.time.ZoneId
@@ -30,7 +32,8 @@ class AuthorizationService(
   private val accessLoadingService: AccessLoadingService,
   private val userRepo: UserRepository,
   private val passwordEncoder: PasswordEncoder,
-  private val tokenConfig: TokenConfig
+  private val tokenConfig: TokenConfig,
+  private val refreshTokenRepo: RefreshTokenRepository
 ) {
   companion object {
     // TODO move these to properties
@@ -51,8 +54,24 @@ class AuthorizationService(
 
       val accessToken = createAccessToken(tokenId, access).bind()
       val refreshToken = createRefreshToken(tokenId).bind()
-      TODO("Finish this")
+      saveRefreshToken(refreshToken, tokenId, user.id).bind()
+
+      if (request.cookie) {
+        ReturnUnion2.ofB(TokenCookieResponse(accessToken, refreshToken, request.redirectUri))
+      } else {
+        ReturnUnion2.ofA(TokenResponse(accessToken, refreshToken, tokenId))
+      }
     }
+
+  private fun saveRefreshToken(
+    refreshToken: String,
+    tokenId: String,
+    userId: Long
+  ): TryEither<Unit> {
+    val refreshTokenEntity =
+      RefreshToken(tokenId, refreshToken, null, userId, ZonedDateTime.now(ZoneId.of("UTC")))
+    return Either.catch { refreshTokenRepo.save(refreshTokenEntity) }
+  }
 
   private fun createRefreshToken(tokenId: String): TryEither<String> {
     val claims = createDefaultClaims(tokenId, REFRESH_TOKEN_TIMEOUT_SECS).build()

@@ -63,7 +63,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - password grant invalid client header`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -81,7 +81,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - password grant successful`() {
     val result =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -97,7 +97,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - password grant validation`() {
     val runTest = { body: Form ->
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/token"
           method = HttpMethod.POST
@@ -114,7 +114,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - password grant invalid credentials`() {
     val runTest = { body: Form ->
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/token"
           method = HttpMethod.POST
@@ -130,7 +130,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - password grant user not in client`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -142,7 +142,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - password grant with disabled client`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -159,7 +159,7 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - password grant with disabled user`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST

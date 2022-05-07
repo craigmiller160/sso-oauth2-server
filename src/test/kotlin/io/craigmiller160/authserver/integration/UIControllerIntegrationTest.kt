@@ -53,7 +53,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_getCss_bootstrap() {
     val result =
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request { path = "/ui/resources/css/bootstrap" }
         response { headers = mapOf("Content-Type" to "text/css") }
       }
@@ -63,7 +63,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_getCss_other() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request { path = "/ui/resources/css/other" }
       response { status = 404 }
     }
@@ -72,7 +72,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_getPage_login() {
     val result =
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path =
             "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
@@ -85,7 +85,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_getPage_noAuthCode() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path =
           "/ui/login?client_id=${client2.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
@@ -96,7 +96,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_getPage_other() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path =
           "/ui/foo?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
@@ -107,7 +107,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_getPage_badParams() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path =
           "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code2"
@@ -118,7 +118,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_getCsrf() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request { path = "/ui/csrf" }
       response { status = 204 }
     }

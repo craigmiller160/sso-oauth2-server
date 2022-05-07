@@ -54,7 +54,7 @@ import org.springframework.test.web.servlet.MockMvc
 @AutoConfigureMockMvc
 abstract class AbstractControllerIntegrationTest {
 
-  protected lateinit var apiProcessor: ApiTestProcessor
+  protected lateinit var oauth2ApiProcessor: ApiTestProcessor
 
   @Autowired private lateinit var provMockMvc: MockMvc
 
@@ -88,7 +88,7 @@ abstract class AbstractControllerIntegrationTest {
 
   @BeforeEach
   fun apiProcessorSetup() {
-    apiProcessor = ApiTestProcessor {
+    oauth2ApiProcessor = ApiTestProcessor {
       mockMvc = provMockMvc
       objectMapper = provObjMapper
       auth {

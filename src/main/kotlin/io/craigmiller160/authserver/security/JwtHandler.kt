@@ -42,8 +42,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class JwtHandler(
-  private val tokenConfig: TokenConfig,
-  private val accessLoadingService: AccessLoadingService
+  private val tokenConfig: TokenConfig
 ) {
 
   private val legacyDateConverter = LegacyDateConverter()

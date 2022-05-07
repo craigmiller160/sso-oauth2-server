@@ -35,7 +35,7 @@ class AuthorizationService(
       if (passwordEncoder.matches(request.password, user.password)) {
           Either.Right(user)
         } else {
-          Either.Left(InvalidLoginException(""))
+          Either.Left(InvalidLoginException("Invalid credentials"))
         }
         .bind()
     }

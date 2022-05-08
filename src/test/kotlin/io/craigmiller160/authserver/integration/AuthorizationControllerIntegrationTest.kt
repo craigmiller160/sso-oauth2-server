@@ -33,6 +33,8 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(tokenId, accessToken)
+    // TODO test refreshToken
+    // TODO test refreshToken in DB
   }
 
   private fun testAccessToken(tokenId: String, accessToken: String) {

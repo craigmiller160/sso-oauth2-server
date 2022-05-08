@@ -35,7 +35,7 @@ class AuthorizationService(
   fun token(
     request: LoginTokenRequest
   ): TryEither<ReturnUnion2<TokenResponse, TokenCookieResponse>> =
-    tryEither.eager<ReturnUnion2<TokenResponse, TokenCookieResponse>> {
+    tryEither.eager {
       val user = validateCredentials(request).bind()
       val access = accessLoadingService.getAccessForUser(user.id).bind()
 

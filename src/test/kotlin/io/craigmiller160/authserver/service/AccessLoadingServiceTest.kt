@@ -58,10 +58,7 @@ class AccessLoadingServiceTest {
   @Test
   fun `getAccessForUser() - no user found`() {
     val result = accessLoadingService.getAccessForUser(1L)
-    result.shouldBeLeft(
-      AccessNotFoundException(
-        "Error getting access for User with ID: 1: Could not find User for ID: 1",
-        AccessNotFoundException("Could not find User for ID: 1")))
+    result.shouldBeLeft(AccessNotFoundException("Could not find User for ID: 1"))
   }
 
   @Test

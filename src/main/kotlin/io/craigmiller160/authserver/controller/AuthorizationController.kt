@@ -1,10 +1,10 @@
 package io.craigmiller160.authserver.controller
 
-import arrow.core.Either
 import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.function.ReturnUnion2
+import io.craigmiller160.authserver.function.TryEither
 import io.craigmiller160.authserver.service.AuthorizationService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/authorization")
 class AuthorizationController(private val authorizationService: AuthorizationService) {
   @PostMapping("/token")
-  fun token(@RequestBody request: LoginTokenRequest): Either<Throwable, ResponseEntity<*>> =
+  fun token(@RequestBody request: LoginTokenRequest): TryEither<ResponseEntity<*>> =
     authorizationService.token(request).map(this::handleResponse)
 
   private fun handleResponse(

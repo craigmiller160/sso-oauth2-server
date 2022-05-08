@@ -6,4 +6,6 @@ data class UserWithClientsAccess(
   val firstName: String,
   val lastName: String,
   val clients: Map<String, ClientWithRolesAccess>
-)
+) {
+  companion object {}
+}

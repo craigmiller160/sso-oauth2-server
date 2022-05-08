@@ -30,6 +30,7 @@ import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
+import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.date.converter.LegacyDateConverter
@@ -46,24 +47,25 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 
-@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
+@AutoConfigureMockMvc
 abstract class AbstractControllerIntegrationTest {
 
-  protected lateinit var apiProcessor: ApiTestProcessor
+  protected lateinit var oauth2ApiProcessor: ApiTestProcessor
+  protected lateinit var authApiProcessor: ApiTestProcessor
 
   @Autowired private lateinit var provMockMvc: MockMvc
 
-  @Autowired private lateinit var provObjMapper: ObjectMapper
+  @Autowired protected lateinit var provObjMapper: ObjectMapper
 
-  @Autowired private lateinit var userRepo: UserRepository
-  @Autowired private lateinit var clientUserRepo: ClientUserRepository
-  @Autowired private lateinit var clientRepo: ClientRepository
+  @Autowired protected lateinit var userRepo: UserRepository
+  @Autowired protected lateinit var clientUserRepo: ClientUserRepository
+  @Autowired protected lateinit var clientRepo: ClientRepository
+  @Autowired protected lateinit var refreshTokenRepo: RefreshTokenRepository
   protected lateinit var authClient: Client
   protected lateinit var authUser: User
   private lateinit var authClientUser: ClientUser
@@ -89,7 +91,7 @@ abstract class AbstractControllerIntegrationTest {
 
   @BeforeEach
   fun apiProcessorSetup() {
-    apiProcessor = ApiTestProcessor {
+    oauth2ApiProcessor = ApiTestProcessor {
       mockMvc = provMockMvc
       objectMapper = provObjMapper
       auth {
@@ -98,6 +100,10 @@ abstract class AbstractControllerIntegrationTest {
         password = validClientSecret
         isSecure = true
       }
+    }
+    authApiProcessor = ApiTestProcessor {
+      mockMvc = provMockMvc
+      objectMapper = provObjMapper
     }
 
     val encodedSecret = bcryptEncoder.encode(validClientSecret)
@@ -149,6 +155,7 @@ abstract class AbstractControllerIntegrationTest {
 
   @AfterEach
   fun apiProcessorCleanup() {
+    refreshTokenRepo.deleteAll()
     clientUserRepo.delete(authClientUser)
     clientUserRepo.delete(disabledClientClientUser)
     clientUserRepo.delete(disabledUserClientUser)
@@ -203,8 +210,6 @@ abstract class AbstractControllerIntegrationTest {
       assertThat(refreshClaims.getClaim("userId"), nullValue())
     }
   }
-
-  // TODO this needs to be refactored for new token design
   private fun testAccessToken(accessToken: String, tokenId: String, isUser: Boolean) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet

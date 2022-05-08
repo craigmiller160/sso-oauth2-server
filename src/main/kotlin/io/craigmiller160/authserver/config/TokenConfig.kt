@@ -36,14 +36,16 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties(prefix = "security.token")
-class TokenConfig(
-  var keyStorePath: String = "",
-  var keyStoreType: String = "",
-  var keyStorePassword: String = "",
-  var keyStoreAlias: String = "",
-  var deleteOlderThanSecs: Long = 0
-) {
+class TokenConfig {
 
+  lateinit var keyStorePath: String
+  lateinit var keyStoreType: String
+  lateinit var keyStorePassword: String
+  lateinit var keyStoreAlias: String
+  var deleteOlderThanSecs: Long = 0
+  var authorization: TokenAuthorizationConfig = TokenAuthorizationConfig()
+
+  // Not Spring properties
   lateinit var publicKey: PublicKey
   lateinit var privateKey: PrivateKey
   lateinit var keyPair: KeyPair

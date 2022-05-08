@@ -4,4 +4,6 @@ data class ClientWithRolesAccess(
   val clientId: Long,
   val clientName: String,
   val roles: List<String>
-)
+) {
+  companion object {}
+}

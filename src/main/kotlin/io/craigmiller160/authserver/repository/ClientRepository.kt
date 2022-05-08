@@ -34,9 +34,11 @@ interface ClientRepository : JpaRepository<Client, Long> {
         FROM Client c
         WHERE c.enabled = true
         AND c.id IN (
-            SELECT cu
+            SELECT cu.clientId
             FROM ClientUser cu
+            JOIN User u ON cu.userId = u.id
             WHERE cu.userId = :userId
+            AND u.enabled = true
         )""")
   fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 }

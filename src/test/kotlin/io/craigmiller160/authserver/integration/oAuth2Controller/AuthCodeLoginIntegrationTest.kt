@@ -90,7 +90,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun test_authCodeLogin_invalidClientHeader() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/auth"
         method = HttpMethod.POST
@@ -108,7 +108,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_authCodeLogin() {
     val result =
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/auth"
           method = HttpMethod.POST
@@ -148,7 +148,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
       println("Testing Form: ${form["name"]}")
 
       val result =
-        apiProcessor.call {
+        oauth2ApiProcessor.call {
           request {
             path = "/oauth/auth"
             method = HttpMethod.POST
@@ -169,7 +169,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     form["password"] = "abc"
 
     val result =
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/auth"
           method = HttpMethod.POST
@@ -187,7 +187,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
   fun `authCodeLogin() - auth_code login with disabled client`() {
     val form = createLoginForm(disabledClient.clientKey)
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/auth"
         method = HttpMethod.POST
@@ -207,7 +207,7 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     val form = createLoginForm(user = disabledUser)
 
     val result =
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/auth"
           method = HttpMethod.POST

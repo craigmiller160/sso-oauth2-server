@@ -9,6 +9,7 @@ import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
+import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -111,12 +112,14 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
       COOKIE_REGEX.matchEntire(accessCookie)?.groups as? MatchNamedGroupCollection?
     assertThat(accessCookieGroups).isNotNull
     assertThat(accessCookieGroups!!["cookieName"]?.value).isEqualTo(ACCESS_TOKEN_COOKIE_NAME)
+    assertThat(accessCookieGroups["path"]?.value).isNull()
     val tokenId = testAccessToken(accessCookieGroups["cookieValue"]?.value ?: "")
 
     val refreshCookieGroups =
       COOKIE_REGEX.matchEntire(refreshCookie)?.groups as? MatchNamedGroupCollection?
     assertThat(refreshCookieGroups).isNotNull
     assertThat(refreshCookieGroups!!["cookieName"]?.value).isEqualTo(REFRESH_TOKEN_COOKIE_NAME)
+    assertThat(refreshCookieGroups["path"]?.value).isEqualTo(REFRESH_TOKEN_COOKIE_PATH)
     testRefreshToken(refreshCookieGroups["cookieValue"]?.value ?: "", tokenId)
     testRefreshTokenInDb(refreshCookieGroups["cookieValue"]?.value ?: "", tokenId)
   }

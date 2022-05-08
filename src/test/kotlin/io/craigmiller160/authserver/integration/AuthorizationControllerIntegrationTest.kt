@@ -7,6 +7,7 @@ import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,19 +33,19 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         }
         .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
-    testAccessToken(tokenId, accessToken)
-    testRefreshToken(tokenId, refreshToken)
+    testAccessToken(accessToken, tokenId)
+    testRefreshToken(refreshToken, tokenId)
     testRefreshTokenInDb(tokenId, refreshToken)
   }
 
-  private fun testRefreshTokenInDb(tokenId: String, refreshToken: String) {
+  private fun testRefreshTokenInDb(refreshToken: String, tokenId: String) {
     val dbRefreshToken = refreshTokenRepo.findById(tokenId).orElseThrow()
     assertThat(dbRefreshToken)
       .hasFieldOrPropertyWithValue("refreshToken", refreshToken)
       .hasFieldOrPropertyWithValue("userId", authUser.id)
   }
 
-  private fun testRefreshToken(tokenId: String, refreshToken: String) {
+  private fun testRefreshToken(refreshToken: String, tokenId: String) {
     val refreshJwt = SignedJWT.parse(refreshToken)
     val refreshClaims = refreshJwt.jwtClaimsSet
     assertThat(refreshClaims.claims)
@@ -54,14 +55,12 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
       .containsKey("nbf")
   }
 
-  private fun testAccessToken(tokenId: String, accessToken: String) {
+  private fun testAccessToken(accessToken: String, tokenId: String? = null): String {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
-    assertThat(accessClaims.claims)
-      .containsEntry("jti", tokenId)
-      .containsKey("iat")
-      .containsKey("exp")
-      .containsKey("nbf")
+    assertThat(accessClaims.claims).containsKey("iat").containsKey("exp").containsKey("nbf")
+    val actualTokenId = accessClaims.jwtid
+    tokenId?.let { assertThat(actualTokenId).isEqualTo(it) }
 
     val expectedClients =
       mapOf(
@@ -76,6 +75,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
       .hasFieldOrPropertyWithValue("firstName", authUser.firstName)
       .hasFieldOrPropertyWithValue("lastName", authUser.lastName)
       .hasFieldOrPropertyWithValue("clients", expectedClients)
+    return actualTokenId
   }
 
   @Test
@@ -92,7 +92,17 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         response { status = 204 }
       }
     assertThat(result.response.contentAsString).isEmpty()
-    // TODO need to validate the cookies
+    val cookies = result.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(cookies).hasSize(2)
+    validateCookies(cookies)
+  }
+
+  private fun validateCookies(cookies: List<String>) {
+    val (accessCookie, refreshCookie) =
+      cookies
+        .partition { it.startsWith(ACCESS_TOKEN_COOKIE_NAME) }
+        .let { Pair(it.first[0], it.second[0]) }
+    println("")
   }
 
   @Test

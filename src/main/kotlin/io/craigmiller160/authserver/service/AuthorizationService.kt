@@ -13,8 +13,11 @@ import io.craigmiller160.authserver.function.rightOrNotFound
 import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
+import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.AuthorizationJwtHandler
 import io.craigmiller160.authserver.security.CookieCreator
+import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
+import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -29,11 +32,6 @@ class AuthorizationService(
   private val refreshTokenRepo: RefreshTokenRepository,
   private val jwtHandler: AuthorizationJwtHandler
 ) {
-  companion object {
-    private const val ACCESS_TOKEN_COOKIE_NAME = "craigmiller160_access_token"
-    private const val REFRESH_TOKEN_COOKIE_NAME = "craigmiller160_refresh_token"
-    private const val REFRESH_TOKEN_COOKIE_PATH = "/authserver/authentication/refresh"
-  }
 
   fun token(
     request: LoginTokenRequest

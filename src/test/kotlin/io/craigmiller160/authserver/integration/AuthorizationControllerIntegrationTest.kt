@@ -151,7 +151,16 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `User does not exist`() {
-    TODO("Finish this")
+    val request = LoginTokenRequest(username = "abc@gmail.com", password = authUserPassword)
+    val result =
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
+        }
+        response { status = 401 }
+      }
   }
 
   @Test

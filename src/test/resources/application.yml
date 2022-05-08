@@ -15,3 +15,6 @@ security:
     key-store-password: password
     key-store-alias: jwt
     delete-older-than-secs: 86400
+    authorization:
+      access-token-exp: 600
+      refresh-token-exp: 3600

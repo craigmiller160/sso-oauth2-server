@@ -12,12 +12,6 @@ spring:
     username: postgres_root
     password: ${POSTGRES_ROOT_PASSWORD}
 
-security:
-  token:
-    authorization:
-      access-token-exp: 600
-      refresh-token-exp: 3600
-
 logging:
   level:
     io.craigmiller160.authserver: DEBUG

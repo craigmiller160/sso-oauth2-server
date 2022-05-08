@@ -36,7 +36,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
   @Test
   fun `token() - client_credentials grant invalid client header`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -53,7 +53,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
   @Test
   fun `token() - client_credentials not allowed`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -67,7 +67,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
   @Disabled
   fun `token() - client_credentials grant success`() {
     val tokenResponse =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -82,7 +82,7 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
 
   @Test
   fun `token() - client_credentials grant with disabled client`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST

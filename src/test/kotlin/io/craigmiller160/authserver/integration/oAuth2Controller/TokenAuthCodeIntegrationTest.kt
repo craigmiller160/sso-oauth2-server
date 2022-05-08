@@ -24,7 +24,6 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.testutils.TestData
@@ -43,8 +42,6 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
   private lateinit var otherUser: User
   private val otherUserPassword: String = "password"
-
-  @Autowired private lateinit var userRepo: UserRepository
 
   @Autowired private lateinit var authCodeHandler: AuthCodeHandler
 
@@ -72,7 +69,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - auth_code grant invalid client header`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -90,7 +87,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant success`() {
     val result =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -106,7 +103,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant validation rules`() {
     val runTest = { body: Form ->
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/token"
           method = HttpMethod.POST
@@ -124,7 +121,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant with invalid login`() {
     val runTest = { body: Form ->
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/token"
           method = HttpMethod.POST
@@ -143,7 +140,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - auth_code grant user not in client`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -161,7 +158,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
         clientId = disabledClient.clientKey,
         code = authCodeHandler.createAuthCode(disabledClient.id, authUser.id, 1000000))
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -181,7 +178,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     val form =
       createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, disabledUser.id, 100000))
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST

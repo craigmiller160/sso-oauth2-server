@@ -35,25 +35,11 @@ import io.craigmiller160.date.converter.LegacyDateConverter
 import java.security.interfaces.RSAPublicKey
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.Date
 import java.util.UUID
 import org.springframework.stereotype.Component
 
 @Component
 class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
-
-  private val legacyDateConverter = LegacyDateConverter()
-
-  private fun generateExp(expSecs: Int): Date {
-    val now = ZonedDateTime.now(ZoneId.of("UTC"))
-    val exp = now.plusSeconds(expSecs.toLong())
-    return legacyDateConverter.convertZonedDateTimeToDate(exp)
-  }
-
-  private fun generateNow(): Date {
-    val now = ZonedDateTime.now(ZoneId.of("UTC"))
-    return legacyDateConverter.convertZonedDateTimeToDate(now)
-  }
 
   fun createAccessToken(
     OAuth2ClientUserDetails: OAuth2ClientUserDetails,
@@ -88,10 +74,10 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
   }
 
   private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
-    val now = generateNow()
+    val now = JwtUtils.generateNow()
     return JWTClaimsSet.Builder()
       .issueTime(now)
-      .expirationTime(generateExp(expSecs))
+      .expirationTime(JwtUtils.generateExp(expSecs))
       .jwtID(UUID.randomUUID().toString())
       .notBeforeTime(now)
   }
@@ -137,7 +123,7 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
     val claims = jwt.jwtClaimsSet
     val now = ZonedDateTime.now(ZoneId.of("UTC"))
     val exp =
-      legacyDateConverter.convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
+      LegacyDateConverter().convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
     if (exp < now) {
       throw InvalidRefreshTokenException("Expired")
     }

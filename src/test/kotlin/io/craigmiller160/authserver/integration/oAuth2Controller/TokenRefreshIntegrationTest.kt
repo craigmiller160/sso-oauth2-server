@@ -26,8 +26,6 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.RefreshTokenRepository
-import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.OAuth2ClientUserDetails
 import io.craigmiller160.authserver.security.OAuth2JwtHandler
@@ -53,12 +51,8 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Autowired private lateinit var OAuth2JwtHandler: OAuth2JwtHandler
 
-  @Autowired private lateinit var refreshTokenRepo: RefreshTokenRepository
-
   private lateinit var otherUser: User
   private val otherUserPassword: String = "password"
-
-  @Autowired private lateinit var userRepo: UserRepository
 
   @BeforeEach
   fun setup() {
@@ -93,7 +87,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Test
   fun `token() - refresh_token grant invalid client header`() {
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -114,7 +108,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken()
 
     val result =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -133,7 +127,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken()
 
     val result1 =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -144,7 +138,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         .convert(TokenResponse::class.java)
 
     val result2 =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -162,7 +156,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   fun `token() - refresh_token grant for client only not allowed`() {
     val refreshToken = createToken()
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -177,7 +171,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
 
     val result =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -195,7 +189,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
 
     val result1 =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -206,7 +200,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
         .convert(TokenResponse::class.java)
 
     val result2 =
-      apiProcessor
+      oauth2ApiProcessor
         .call {
           request {
             path = "/oauth/token"
@@ -225,7 +219,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - refresh_token grant validations`() {
     val runTest = { body: Form ->
-      apiProcessor.call {
+      oauth2ApiProcessor.call {
         request {
           path = "/oauth/token"
           method = HttpMethod.POST
@@ -244,7 +238,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val tokenParts = initRefreshToken.split(".")
     val refreshToken = "${tokenParts[0]}.${tokenParts[1]}.ABCDEFG"
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -259,7 +253,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = authUser.id)
     refreshTokenRepo.deleteAll()
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -274,7 +268,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val client = authClient.copy(refreshTokenTimeoutSecs = -1000)
     val refreshToken = createToken(client = client)
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -288,7 +282,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   fun `token() - refresh_token grant with bad client ID`() {
     val refreshToken = createToken(client = authClient.copy(id = 10000))
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -302,7 +296,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   fun `token() - refresh_token grant user not in client`() {
     val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = otherUser.id)
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -316,7 +310,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   fun `token() - refresh_token grant with disabled client`() {
     val refreshToken = createToken(client = disabledClient)
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST
@@ -335,7 +329,7 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   fun `token() - refresh_token grant with disabled user`() {
     val refreshToken = createToken(originalGrantType = GrantType.PASSWORD, userId = disabledUser.id)
 
-    apiProcessor.call {
+    oauth2ApiProcessor.call {
       request {
         path = "/oauth/token"
         method = HttpMethod.POST

@@ -56,4 +56,7 @@ interface UserRepository : JpaRepository<User, Long> {
 
   @Query("SELECT u FROM User u WHERE u.id = :userId AND u.enabled = true")
   fun findEnabledUserById(@Param("userId") userId: Long): User?
+
+  @Query("SELECT u FROM User u WHERE u.email = :email AND u.enabled = true")
+  fun findEnabledUserByEmail(@Param("email") email: String): User?
 }

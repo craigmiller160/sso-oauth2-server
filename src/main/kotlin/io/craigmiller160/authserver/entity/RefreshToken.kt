@@ -30,7 +30,7 @@ import org.hibernate.annotations.Type
 data class RefreshToken(
   @Id val id: String,
   @Lob @Type(type = "org.hibernate.type.TextType") val refreshToken: String,
-  val clientId: Long,
+  val clientId: Long?,
   val userId: Long?,
   val timestamp: ZonedDateTime
 )

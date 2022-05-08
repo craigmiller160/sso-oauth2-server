@@ -17,4 +17,4 @@ fun UserWithClientsAccess.toClaims(): Map<String, Any> =
     "sub" to email,
     "firstName" to firstName,
     "lastName" to lastName,
-    "clients" to clients.map { entry -> entry.key to entry.value.toClaims() })
+    "clients" to clients.map { entry -> entry.key to entry.value.toClaims() }.toMap())

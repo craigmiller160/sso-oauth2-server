@@ -5,6 +5,7 @@ import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
+import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -68,7 +69,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
           ClientWithRolesAccess(
             clientId = authClient.id, clientName = authClient.name, roles = listOf()))
 
-    val access = UserWithClientsAccess.fromClaims(accessClaims)
+    val access = UserWithClientsAccess.fromClaims(accessClaims.claims)
     assertThat(access)
       .hasFieldOrPropertyWithValue("userId", authUser.id)
       .hasFieldOrPropertyWithValue("email", authUser.email)

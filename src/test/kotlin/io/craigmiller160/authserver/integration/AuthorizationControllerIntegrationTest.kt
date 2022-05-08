@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.integration
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import org.assertj.core.api.Assertions.assertThat
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
+  // TODO add more clients and roles to authUser
   @Test
   fun `Valid credentials, create and return tokens to the caller`() {
     val request = LoginTokenRequest(username = authUser.email, password = authUserPassword)
@@ -38,17 +40,19 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val accessClaims = accessJwt.jwtClaimsSet
     assertThat(accessClaims.claims).containsEntry("jti", tokenId)
 
-    val access = UserWithClientsAccess.fromClaims(accessClaims)
-    assertThat(access).hasFieldOrPropertyWithValue("userId", authUser.id)
-    // TODO test the rest of the object including the clients section
+    val expectedClients =
+      mapOf(
+        validClientKey to
+          ClientWithRolesAccess(
+            clientId = authClient.id, clientName = authClient.name, roles = listOf()))
 
-    assertThat(accessClaims.claims)
-      .containsEntry("jti", tokenId)
-      .containsEntry("sub", authUser.email)
-      .containsEntry("userId", authUser.id)
-      .containsEntry("firstName", authUser.firstName)
-      .containsEntry("lastName", authUser.lastName)
-      .containsKey("clients")
+    val access = UserWithClientsAccess.fromClaims(accessClaims)
+    assertThat(access)
+      .hasFieldOrPropertyWithValue("userId", authUser.id)
+      .hasFieldOrPropertyWithValue("email", authUser.email)
+      .hasFieldOrPropertyWithValue("firstName", authUser.firstName)
+      .hasFieldOrPropertyWithValue("lastName", authUser.lastName)
+      .hasFieldOrPropertyWithValue("clients", expectedClients)
   }
 
   @Test

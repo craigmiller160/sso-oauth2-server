@@ -14,21 +14,17 @@ import org.springframework.stereotype.Component
 
 @Component
 class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
-  companion object {
-    // TODO move these to properties
-    private const val ACCESS_TOKEN_TIMEOUT_SECS = 60 * 10
-    private const val REFRESH_TOKEN_TIMEOUT_SECS = 60 * 60
-  }
 
   fun createAccessToken(tokenId: String, access: UserWithClientsAccess): TryEither<String> {
     val claims =
       JWTClaimsSet.parse(
-        access.toClaims() + createDefaultClaims(tokenId, ACCESS_TOKEN_TIMEOUT_SECS))
+        access.toClaims() + createDefaultClaims(tokenId, tokenConfig.authorization.accessTokenExp))
     return createToken(claims)
   }
 
   fun createRefreshToken(tokenId: String): TryEither<String> {
-    val claims = JWTClaimsSet.parse(createDefaultClaims(tokenId, REFRESH_TOKEN_TIMEOUT_SECS))
+    val claims =
+      JWTClaimsSet.parse(createDefaultClaims(tokenId, tokenConfig.authorization.refreshTokenExp))
     return createToken(claims)
   }
 

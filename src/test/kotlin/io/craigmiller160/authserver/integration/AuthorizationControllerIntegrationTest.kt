@@ -41,7 +41,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(accessToken, tokenId)
     testRefreshToken(refreshToken, tokenId)
-    testRefreshTokenInDb(tokenId, refreshToken)
+    testRefreshTokenInDb(refreshToken, tokenId)
   }
 
   private fun testRefreshTokenInDb(refreshToken: String, tokenId: String) {

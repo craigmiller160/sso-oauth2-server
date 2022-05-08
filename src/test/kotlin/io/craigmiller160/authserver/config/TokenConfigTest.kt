@@ -38,7 +38,11 @@ class TokenConfigTest {
 
   @BeforeEach
   fun setup() {
-    tokenConfig = TokenConfig("", keyStoreType, keyStorePassword, keyStoreAlias)
+    tokenConfig = TokenConfig()
+    tokenConfig.keyStorePath = ""
+    tokenConfig.keyStoreType = keyStoreType
+    tokenConfig.keyStorePassword = keyStorePassword
+    tokenConfig.keyStoreAlias = keyStoreAlias
   }
 
   @Test

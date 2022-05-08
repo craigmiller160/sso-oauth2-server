@@ -43,6 +43,7 @@ class TokenConfig {
   lateinit var keyStorePassword: String
   lateinit var keyStoreAlias: String
   var deleteOlderThanSecs: Long = 0
+  // TODO need to make sure this gets populated
   lateinit var authorization: TokenAuthorizationConfig
 
   // Not Spring properties

@@ -156,11 +156,29 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `User is disabled`() {
-    TODO("Finish this")
+    val request = LoginTokenRequest(username = disabledUser.email, password = authUserPassword)
+    val result =
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
+        }
+        response { status = 401 }
+      }
   }
 
   @Test
   fun `Invalid password`() {
-    TODO("Finish this")
+    val request = LoginTokenRequest(username = authUser.email, password = "fooBar")
+    val result =
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
+        }
+        response { status = 401 }
+      }
   }
 }

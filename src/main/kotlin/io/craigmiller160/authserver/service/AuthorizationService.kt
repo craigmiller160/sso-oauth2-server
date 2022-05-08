@@ -9,7 +9,6 @@ import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.function.ReturnUnion2
 import io.craigmiller160.authserver.function.TryEither
-import io.craigmiller160.authserver.function.rightOrNotFound
 import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
@@ -81,5 +80,7 @@ class AuthorizationService(
     }
 
   private fun getUser(username: String): TryEither<User> =
-    TryEither.rightOrNotFound(userRepo.findEnabledUserByEmail(username), "User")
+    Either.fromNullable(userRepo.findEnabledUserByEmail(username)).mapLeft {
+      InvalidLoginException("User not found")
+    }
 }

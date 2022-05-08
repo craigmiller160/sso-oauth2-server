@@ -8,7 +8,7 @@ typealias TryEither<T> = Either<Throwable, T>
 
 typealias TryEitherCompanion = Either.Companion
 
-object tryEither {
+object runTryEither {
   inline fun <T> eager(
     crossinline c: suspend arrow.core.computations.RestrictedEitherEffect<Throwable, *>.() -> T
   ) = either.eager(c)

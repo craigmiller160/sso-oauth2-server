@@ -80,7 +80,19 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `Valid credentials, set cookie in response to caller`() {
-    TODO("Finish this")
+    val request =
+      LoginTokenRequest(username = authUser.email, password = authUserPassword, cookie = true)
+    val result =
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
+        }
+        response { status = 204 }
+      }
+    assertThat(result.response.contentAsString).isEmpty()
+    // TODO need to validate the cookies
   }
 
   @Test

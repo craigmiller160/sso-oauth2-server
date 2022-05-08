@@ -29,7 +29,6 @@ interface ClientRepository : JpaRepository<Client, Long> {
 
   fun findByClientKey(clientKey: String): Client?
 
-  // TODO add user enabled filter to this query
   @Query(
     """SELECT c 
         FROM Client c
@@ -37,7 +36,9 @@ interface ClientRepository : JpaRepository<Client, Long> {
         AND c.id IN (
             SELECT cu.clientId
             FROM ClientUser cu
+            JOIN User u ON cu.userId = u.id
             WHERE cu.userId = :userId
+            AND u.enabled = true
         )""")
   fun findAllEnabledClientsByUserId(@Param("userId") userId: Long): List<Client>
 }

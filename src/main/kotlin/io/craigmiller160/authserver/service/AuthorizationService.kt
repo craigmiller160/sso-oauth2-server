@@ -10,6 +10,7 @@ import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
+import io.craigmiller160.authserver.dto.access.toClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
@@ -85,19 +86,14 @@ class AuthorizationService(
   }
 
   private fun createRefreshToken(tokenId: String): TryEither<String> {
-    val claims = createDefaultClaims(tokenId, REFRESH_TOKEN_TIMEOUT_SECS).build()
+    val claims = JWTClaimsSet.parse(createDefaultClaims(tokenId, REFRESH_TOKEN_TIMEOUT_SECS))
     return createToken(claims)
   }
 
   private fun createAccessToken(tokenId: String, access: UserWithClientsAccess): TryEither<String> {
     val claims =
-      createDefaultClaims(tokenId, ACCESS_TOKEN_TIMEOUT_SECS)
-        .subject(access.email)
-        .claim("userId", access.userId)
-        .claim("firstName", access.firstName)
-        .claim("lastName", access.lastName)
-        .claim("clients", access.clients)
-        .build()
+      JWTClaimsSet.parse(
+        access.toClaims() + createDefaultClaims(tokenId, ACCESS_TOKEN_TIMEOUT_SECS))
     return createToken(claims)
   }
 
@@ -112,13 +108,10 @@ class AuthorizationService(
     }
   }
 
-  private fun createDefaultClaims(tokenId: String, expSecs: Int): JWTClaimsSet.Builder {
+  private fun createDefaultClaims(tokenId: String, expSecs: Int): Map<String, Any> {
     val now = generateNow()
-    return JWTClaimsSet.Builder()
-      .issueTime(now)
-      .expirationTime(generateExp(expSecs))
-      .jwtID(tokenId)
-      .notBeforeTime(now)
+    return mapOf(
+      "iat" to now.time, "exp" to generateExp(expSecs).time, "jti" to tokenId, "nbf" to now.time)
   }
 
   private fun generateExp(expSecs: Int): Date {

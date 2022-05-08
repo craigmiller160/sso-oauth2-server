@@ -14,7 +14,7 @@ fun UserWithClientsAccess.Companion.fromClaims(claims: Map<String, Any>): UserWi
 fun UserWithClientsAccess.toClaims(): Map<String, Any> =
   mapOf(
     "userId" to userId,
-    "email" to email,
+    "sub" to email,
     "firstName" to firstName,
     "lastName" to lastName,
     "clients" to clients.map { entry -> entry.key to entry.value.toClaims() })

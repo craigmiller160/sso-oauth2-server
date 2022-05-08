@@ -24,7 +24,6 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.AuthCodeHandler
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.testutils.TestData
@@ -43,8 +42,6 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
 
   private lateinit var otherUser: User
   private val otherUserPassword: String = "password"
-
-  @Autowired private lateinit var userRepo: UserRepository
 
   @Autowired private lateinit var authCodeHandler: AuthCodeHandler
 

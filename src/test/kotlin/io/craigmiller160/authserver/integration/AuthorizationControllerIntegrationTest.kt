@@ -34,7 +34,14 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(tokenId, accessToken)
     testRefreshToken(tokenId, refreshToken)
-    // TODO test refreshToken in DB
+    testRefreshTokenInDb(tokenId, refreshToken)
+  }
+
+  private fun testRefreshTokenInDb(tokenId: String, refreshToken: String) {
+    val dbRefreshToken = refreshTokenRepo.findById(tokenId).orElseThrow()
+    assertThat(dbRefreshToken)
+      .hasFieldOrPropertyWithValue("refreshToken", refreshToken)
+      .hasFieldOrPropertyWithValue("userId", authUser.id)
   }
 
   private fun testRefreshToken(tokenId: String, refreshToken: String) {

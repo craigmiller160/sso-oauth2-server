@@ -26,8 +26,6 @@ import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.RefreshTokenRepository
-import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.security.OAuth2ClientUserDetails
 import io.craigmiller160.authserver.security.OAuth2JwtHandler
@@ -53,12 +51,8 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
 
   @Autowired private lateinit var OAuth2JwtHandler: OAuth2JwtHandler
 
-  @Autowired private lateinit var refreshTokenRepo: RefreshTokenRepository
-
   private lateinit var otherUser: User
   private val otherUserPassword: String = "password"
-
-  @Autowired private lateinit var userRepo: UserRepository
 
   @BeforeEach
   fun setup() {

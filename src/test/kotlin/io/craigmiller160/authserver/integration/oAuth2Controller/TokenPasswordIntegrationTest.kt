@@ -24,14 +24,12 @@ import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
-import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -42,8 +40,6 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
 
   private lateinit var otherUser: User
   private val otherUserPassword: String = "password"
-
-  @Autowired private lateinit var userRepo: UserRepository
 
   private fun createTokenForm(
     username: String = authUser.email,

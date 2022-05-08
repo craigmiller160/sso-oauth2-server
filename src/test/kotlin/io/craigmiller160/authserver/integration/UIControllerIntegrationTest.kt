@@ -19,22 +19,18 @@
 package io.craigmiller160.authserver.integration
 
 import io.craigmiller160.authserver.entity.Client
-import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.testutils.TestData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
 class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
-
-  @Autowired private lateinit var clientRepo: ClientRepository
 
   private lateinit var client2: Client
 

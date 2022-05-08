@@ -30,6 +30,7 @@ import io.craigmiller160.authserver.entity.ClientUser
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.repository.ClientRepository
 import io.craigmiller160.authserver.repository.ClientUserRepository
+import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.testutils.TestData
 import io.craigmiller160.date.converter.LegacyDateConverter
@@ -61,9 +62,10 @@ abstract class AbstractControllerIntegrationTest {
 
   @Autowired protected lateinit var provObjMapper: ObjectMapper
 
-  @Autowired private lateinit var userRepo: UserRepository
-  @Autowired private lateinit var clientUserRepo: ClientUserRepository
-  @Autowired private lateinit var clientRepo: ClientRepository
+  @Autowired protected lateinit var userRepo: UserRepository
+  @Autowired protected lateinit var clientUserRepo: ClientUserRepository
+  @Autowired protected lateinit var clientRepo: ClientRepository
+  @Autowired protected lateinit var refreshTokenRepo: RefreshTokenRepository
   protected lateinit var authClient: Client
   protected lateinit var authUser: User
   private lateinit var authClientUser: ClientUser
@@ -153,6 +155,7 @@ abstract class AbstractControllerIntegrationTest {
 
   @AfterEach
   fun apiProcessorCleanup() {
+    refreshTokenRepo.deleteAll()
     clientUserRepo.delete(authClientUser)
     clientUserRepo.delete(disabledClientClientUser)
     clientUserRepo.delete(disabledUserClientUser)

@@ -22,6 +22,7 @@ import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.CookieCreator
+import io.craigmiller160.authserver.security.JwtUtils
 import io.craigmiller160.date.converter.LegacyDateConverter
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -109,20 +110,12 @@ class AuthorizationService(
   }
 
   private fun createDefaultClaims(tokenId: String, expSecs: Int): Map<String, Any> {
-    val now = generateNow()
+    val now = JwtUtils.generateNow()
     return mapOf(
-      "iat" to now.time, "exp" to generateExp(expSecs).time, "jti" to tokenId, "nbf" to now.time)
-  }
-
-  private fun generateExp(expSecs: Int): Date {
-    val now = ZonedDateTime.now(ZoneId.of("UTC"))
-    val exp = now.plusSeconds(expSecs.toLong())
-    return legacyDateConverter.convertZonedDateTimeToDate(exp)
-  }
-
-  private fun generateNow(): Date {
-    val now = ZonedDateTime.now(ZoneId.of("UTC"))
-    return legacyDateConverter.convertZonedDateTimeToDate(now)
+      "iat" to now.time,
+      "exp" to JwtUtils.generateExp(expSecs).time,
+      "jti" to tokenId,
+      "nbf" to now.time)
   }
 
   private fun validateCredentials(request: LoginTokenRequest): TryEither<User> =

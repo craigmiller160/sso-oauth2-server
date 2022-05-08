@@ -33,14 +33,28 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(tokenId, accessToken)
-    // TODO test refreshToken
+    testRefreshToken(tokenId, refreshToken)
     // TODO test refreshToken in DB
+  }
+
+  private fun testRefreshToken(tokenId: String, refreshToken: String) {
+    val refreshJwt = SignedJWT.parse(refreshToken)
+    val refreshClaims = refreshJwt.jwtClaimsSet
+    assertThat(refreshClaims.claims)
+      .containsEntry("jti", tokenId)
+      .containsKey("iat")
+      .containsKey("exp")
+      .containsKey("nbf")
   }
 
   private fun testAccessToken(tokenId: String, accessToken: String) {
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
-    assertThat(accessClaims.claims).containsEntry("jti", tokenId)
+    assertThat(accessClaims.claims)
+      .containsEntry("jti", tokenId)
+      .containsKey("iat")
+      .containsKey("exp")
+      .containsKey("nbf")
 
     val expectedClients =
       mapOf(

@@ -126,7 +126,27 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `Valid credentials, set cookie and send redirect in response to caller`() {
-    TODO("Finish this")
+    val redirectUri = "http://somewhere/over/rainbow"
+    val request =
+      LoginTokenRequest(
+        username = authUser.email,
+        password = authUserPassword,
+        cookie = true,
+        redirectUri = redirectUri)
+    val result =
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
+        }
+        response { status = 302 }
+      }
+    assertThat(result.response.contentAsString).isEmpty()
+    val cookies = result.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(result.response.getHeaderValue("Location")).isEqualTo(redirectUri)
+    assertThat(cookies).hasSize(2)
+    validateCookies(cookies)
   }
 
   @Test

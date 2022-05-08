@@ -16,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
-  // TODO add more clients and roles to authUser
   @Test
   fun `Valid credentials, create and return tokens to the caller`() {
     val request = LoginTokenRequest(username = authUser.email, password = authUserPassword)

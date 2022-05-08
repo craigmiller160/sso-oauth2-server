@@ -23,7 +23,6 @@ import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.CookieCreator
 import io.craigmiller160.authserver.security.JwtUtils
-import io.craigmiller160.date.converter.LegacyDateConverter
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -47,8 +46,6 @@ class AuthorizationService(
     private const val ACCESS_TOKEN_TIMEOUT_SECS = 60 * 10
     private const val REFRESH_TOKEN_TIMEOUT_SECS = 60 * 60
   }
-
-  private val legacyDateConverter = LegacyDateConverter()
 
   fun token(
     request: LoginTokenRequest

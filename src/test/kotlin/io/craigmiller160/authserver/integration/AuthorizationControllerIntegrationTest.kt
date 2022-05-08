@@ -21,7 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
   companion object {
     private val COOKIE_REGEX =
-      """^(?<cookieName>.*?)=(?<cookieValue>.*?); Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict;?\s?(Path=(?<path>.*?))?$""".toRegex()
+      """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
   }
   @Test
   fun `Valid credentials, create and return tokens to the caller`() {

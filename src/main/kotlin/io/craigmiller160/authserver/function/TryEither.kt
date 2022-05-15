@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.function
 
 import arrow.core.Either
 import arrow.core.computations.either
+import io.craigmiller160.authserver.dto.ExceptionConverter
 import io.craigmiller160.authserver.exception.NotFoundException
 import org.springframework.http.ResponseEntity
 
@@ -24,5 +25,5 @@ fun <T> TryEither<T>.toResponseEntity(
 ) =
   when (this) {
     is Either.Right<T> -> ResponseEntity.status(200).apply { builder(this) }.body(value)
-    is Either.Left<Throwable> -> ResponseEntity.status(500).build()
+    is Either.Left<Throwable> -> ExceptionConverter.toErrorResponseEntity(value)
   }

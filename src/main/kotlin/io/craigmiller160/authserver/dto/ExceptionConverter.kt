@@ -8,26 +8,26 @@ import org.springframework.web.context.request.ServletRequestAttributes
 
 object ExceptionConverter {
 
-  fun toErrorResponseEntity(ex: Exception): ResponseEntity<ErrorResponse> {
+  fun toErrorResponseEntity(ex: Throwable): ResponseEntity<ErrorResponse> {
     val response = toErrorResponse(ex)
     return ResponseEntity.status(response.status).body(response)
   }
-  fun toErrorResponse(ex: Exception): ErrorResponse =
+  fun toErrorResponse(ex: Throwable): ErrorResponse =
     when {
       isResponseStatusException(ex) -> handleResponseStatusException(ex)
       else -> defaultServerError(ex)
     }
 
-  private fun isResponseStatusException(ex: Exception): Boolean =
+  private fun isResponseStatusException(ex: Throwable): Boolean =
     ex.javaClass.getAnnotation(ResponseStatus::class.java) != null
 
-  private fun defaultServerError(ex: Exception): ErrorResponse {
+  private fun defaultServerError(ex: Throwable): ErrorResponse {
     val (method, uri) = getMethodAndUri()
     return ErrorResponse(
       timestamp = ZonedDateTime.now(), status = 500, message = ex.message ?: "", method, uri)
   }
 
-  private fun handleResponseStatusException(ex: Exception): ErrorResponse {
+  private fun handleResponseStatusException(ex: Throwable): ErrorResponse {
     val (method, uri) = getMethodAndUri()
     val statusAnnotation = ex.javaClass.getAnnotation(ResponseStatus::class.java)
     return ErrorResponse(

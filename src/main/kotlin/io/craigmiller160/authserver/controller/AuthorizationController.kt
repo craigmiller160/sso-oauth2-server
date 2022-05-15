@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/authorization")
 class AuthorizationController(private val authorizationService: AuthorizationService) {
+  // TODO what about the ResponseEntity type... I should have a way to type this here I hope
   @PostMapping("/token")
   fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<*> =
     authorizationService

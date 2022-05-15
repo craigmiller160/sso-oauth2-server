@@ -20,7 +20,7 @@ fun <T> TryEitherCompanion.rightOrNotFound(value: T?, itemName: String = ""): Tr
   value?.let { Either.Right(it) } ?: Either.Left(NotFoundException("$itemName Not Found"))
 
 fun <T> TryEither<T>.toResponseEntity(
-  builder: (ResponseEntity.BodyBuilder) -> ResponseEntity.BodyBuilder
+  builder: (ResponseEntity.BodyBuilder) -> ResponseEntity.BodyBuilder = { it }
 ) =
   when (this) {
     is Either.Right<T> -> ResponseEntity.status(200).apply { builder(this) }.body(value)

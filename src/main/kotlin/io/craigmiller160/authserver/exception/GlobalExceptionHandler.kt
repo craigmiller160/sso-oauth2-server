@@ -18,7 +18,8 @@ class GlobalExceptionHandler {
       null -> defaultServerError(ex)
       is JsonMappingException ->
         when {
-          isResponseStatusException(ex.cause!!.cause) -> handleResponseStatusException(ex)
+          isResponseStatusException(ex.cause!!.cause) ->
+            handleResponseStatusException(ex.cause!!.cause!!)
           else -> defaultServerError(ex)
         }
       else -> defaultServerError(ex)

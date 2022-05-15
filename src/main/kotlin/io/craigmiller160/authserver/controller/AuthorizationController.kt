@@ -31,4 +31,9 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
       .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
       .build()
   }
+
+  @PostMapping("/refresh")
+  fun refresh(): ResponseEntity<*> {
+    TODO("Finish this")
+  }
 }

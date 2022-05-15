@@ -1,12 +1,18 @@
 package io.craigmiller160.authserver.dto
 
 import java.time.ZonedDateTime
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
-object ExceptionToErrorResponse {
-  fun convert(ex: Exception): ErrorResponse =
+object ExceptionConverter {
+
+  fun toErrorResponseEntity(ex: Exception): ResponseEntity<ErrorResponse> {
+    val response = toErrorResponse(ex)
+    return ResponseEntity.status(response.status).body(response)
+  }
+  fun toErrorResponse(ex: Exception): ErrorResponse =
     when {
       isResponseStatusException(ex) -> handleResponseStatusException(ex)
       else -> defaultServerError(ex)

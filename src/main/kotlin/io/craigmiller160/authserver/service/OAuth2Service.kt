@@ -20,7 +20,7 @@ package io.craigmiller160.authserver.service
 
 import io.craigmiller160.authserver.dto.AuthCodeLogin
 import io.craigmiller160.authserver.dto.TokenRequest
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role
 import io.craigmiller160.authserver.entity.User

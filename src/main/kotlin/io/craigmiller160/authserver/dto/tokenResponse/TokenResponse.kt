@@ -16,6 +16,10 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.craigmiller160.authserver.dto
+package io.craigmiller160.authserver.dto.tokenResponse
 
-data class TokenResponse(val accessToken: String, val refreshToken: String, val tokenId: String)
+data class TokenResponse(
+  override val accessToken: String,
+  override val refreshToken: String,
+  override val tokenId: String
+) : TokenValues

@@ -1,10 +1,10 @@
 package io.craigmiller160.authserver.controller
 
-import arrow.core.getOrHandle
-import io.craigmiller160.authserver.dto.TokenCookieResponse
-import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
-import io.craigmiller160.authserver.function.ReturnUnion2
+import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
+import io.craigmiller160.authserver.function.toResponseEntity
 import io.craigmiller160.authserver.service.AuthorizationService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,23 +16,24 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/authorization")
 class AuthorizationController(private val authorizationService: AuthorizationService) {
   @PostMapping("/token")
-  fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<*> =
-    authorizationService.token(request).map(this::handleResponse).getOrHandle { throw it }
+  fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<TokenResponse> =
+    authorizationService.token(request).map(::buildResponse).toResponseEntity()
 
-  private fun handleResponse(
-    union: ReturnUnion2<TokenResponse, TokenCookieResponse>
-  ): ResponseEntity<*> =
-    union.fold({ response -> ResponseEntity.ok(response) }, this::handleCookieResponse)
+  private fun buildResponse(tokenValues: TokenValues): ResponseEntity<TokenResponse> =
+    when (tokenValues) {
+      is TokenResponse -> ResponseEntity.ok(tokenValues)
+      is TokenCookieResponse -> handleCookieResponse(tokenValues)
+    }
 
   private fun handleCookieResponse(
     tokenCookieResponse: TokenCookieResponse
-  ): ResponseEntity<Nothing> {
+  ): ResponseEntity<TokenResponse> {
     val responseEntityBuilder =
       tokenCookieResponse.redirectUri?.let { ResponseEntity.status(302).header("Location", it) }
-        ?: ResponseEntity.noContent()
+        ?: ResponseEntity.status(200)
     return responseEntityBuilder
       .header("Set-Cookie", tokenCookieResponse.accessTokenCookie)
       .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
-      .build()
+      .body(tokenCookieResponse.tokenResponse)
   }
 }

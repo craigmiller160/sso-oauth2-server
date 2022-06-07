@@ -20,7 +20,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.security.GrantType
 import org.junit.jupiter.api.Disabled

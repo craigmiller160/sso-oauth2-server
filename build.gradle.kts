@@ -7,6 +7,7 @@ plugins {
     application
     `maven-publish`
 }
+apply(plugin = "io.spring.dependency-management")
 
 repositories {
     mavenCentral()

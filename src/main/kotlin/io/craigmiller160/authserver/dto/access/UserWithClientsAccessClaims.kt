@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.dto.access
 
+@Suppress("UNCHECKED_CAST")
 fun UserWithClientsAccess.Companion.fromClaims(claims: Map<String, Any>): UserWithClientsAccess =
   UserWithClientsAccess(
     userId = claims["userId"] as Long,

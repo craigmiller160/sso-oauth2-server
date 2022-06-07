@@ -19,6 +19,7 @@ object tryEither {
 fun <T> TryEitherCompanion.rightOrNotFound(value: T?, itemName: String = ""): TryEither<T> =
   value?.let { Either.Right(it) } ?: Either.Left(NotFoundException("$itemName Not Found"))
 
+@Suppress("UNCHECKED_CAST")
 fun <T> TryEither<T>.toResponseEntity(
   builder: (ResponseEntity.BodyBuilder) -> ResponseEntity.BodyBuilder = { it }
 ): ResponseEntity<T> =
@@ -28,6 +29,7 @@ fun <T> TryEither<T>.toResponseEntity(
       ExceptionConverter.toErrorResponseEntity(value) as ResponseEntity<T>
   }
 
+@Suppress("UNCHECKED_CAST")
 fun <T> TryEither<ResponseEntity<T>>.toResponseEntity(): ResponseEntity<T> =
   when (this) {
     is Either.Right<ResponseEntity<T>> -> value

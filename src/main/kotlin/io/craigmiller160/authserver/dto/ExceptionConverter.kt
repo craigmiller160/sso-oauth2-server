@@ -42,7 +42,7 @@ object ExceptionConverter {
     RequestContextHolder.getRequestAttributes()
       ?.let {
         when (it) {
-          is ServletRequestAttributes -> it as ServletRequestAttributes
+          is ServletRequestAttributes -> it
           else -> null
         }
       }

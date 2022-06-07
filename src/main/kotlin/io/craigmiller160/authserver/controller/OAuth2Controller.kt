@@ -81,7 +81,7 @@ class OAuth2Controller(
   }
 
   @PostMapping("/auth")
-  fun authCodeLogin(login: AuthCodeLogin, req: HttpServletRequest, res: HttpServletResponse) {
+  fun authCodeLogin(login: AuthCodeLogin, res: HttpServletResponse) {
     logAuthCodeLogin(login)
     try {
       oAuth2Service.validateAuthCodeLogin(login)

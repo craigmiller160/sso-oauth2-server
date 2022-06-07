@@ -153,7 +153,7 @@ class OAuth2Service(
       throw AuthCodeException("Invalid credentials")
     }
 
-    return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!)
+    return authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs)
   }
 
   @Transactional
@@ -189,8 +189,7 @@ class OAuth2Service(
     val tokenData =
       OAuth2JwtHandler.parseRefreshToken(origRefreshToken, OAuth2ClientUserDetails.client.id)
 
-    val existingTokenEntity =
-      refreshTokenRepo.findById(tokenData.tokenId).orElseThrow {
+    refreshTokenRepo.findById(tokenData.tokenId).orElseThrow {
         InvalidRefreshTokenException("Refresh Token Revoked")
       }
 

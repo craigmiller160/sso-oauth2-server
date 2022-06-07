@@ -19,19 +19,21 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<TokenResponse> =
     authorizationService.token(request).map(::buildResponse).toResponseEntity()
 
-  private fun buildResponse(tokenValues: TokenValues): ResponseEntity<TokenResponse> {
-    TODO()
-  }
+  private fun buildResponse(tokenValues: TokenValues): ResponseEntity<TokenResponse> =
+    when (tokenValues) {
+      is TokenResponse -> ResponseEntity.ok(tokenValues)
+      is TokenCookieResponse -> handleCookieResponse(tokenValues)
+    }
 
   private fun handleCookieResponse(
     tokenCookieResponse: TokenCookieResponse
-  ): ResponseEntity<Nothing> {
+  ): ResponseEntity<TokenResponse> {
     val responseEntityBuilder =
       tokenCookieResponse.redirectUri?.let { ResponseEntity.status(302).header("Location", it) }
-        ?: ResponseEntity.noContent()
+        ?: ResponseEntity.status(200)
     return responseEntityBuilder
       .header("Set-Cookie", tokenCookieResponse.accessTokenCookie)
       .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
-      .build()
+      .body(tokenCookieResponse.tokenResponse)
   }
 }

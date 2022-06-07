@@ -1,7 +1,7 @@
 package io.craigmiller160.authserver.controller
 
-import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.function.toResponseEntity
 import io.craigmiller160.authserver.service.AuthorizationService
 import org.springframework.http.ResponseEntity

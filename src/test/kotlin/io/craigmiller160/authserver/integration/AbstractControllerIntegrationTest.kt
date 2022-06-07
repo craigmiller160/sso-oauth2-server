@@ -23,7 +23,7 @@ import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.ApiTestProcessor
 import io.craigmiller160.apitestprocessor.config.AuthType
 import io.craigmiller160.authserver.config.TokenConfig
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.ClientUser

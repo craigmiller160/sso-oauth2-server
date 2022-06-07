@@ -21,7 +21,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User

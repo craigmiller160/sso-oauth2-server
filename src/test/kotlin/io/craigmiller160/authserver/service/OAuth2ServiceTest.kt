@@ -19,7 +19,7 @@
 package io.craigmiller160.authserver.service
 
 import io.craigmiller160.authserver.dto.RefreshTokenData
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.ClientRedirectUri
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.Role

@@ -1,9 +1,9 @@
 package io.craigmiller160.authserver.service
 
 import arrow.core.Either
-import io.craigmiller160.authserver.dto.TokenCookieResponse
-import io.craigmiller160.authserver.dto.TokenResponse
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException

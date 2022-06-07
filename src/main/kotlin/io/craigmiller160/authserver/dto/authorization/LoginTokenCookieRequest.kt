@@ -1,7 +1,8 @@
 package io.craigmiller160.authserver.dto.authorization
 
 data class LoginTokenCookieRequest(
-  override val username: String,
-  override val password: String,
+  val username: String,
+  val password: String,
+  val cookie: Boolean = false,
   val redirectUri: String? = null
-) : LoginCredentials
+)

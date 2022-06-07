@@ -3,6 +3,7 @@ package io.craigmiller160.authserver.service
 import arrow.core.Either
 import io.craigmiller160.authserver.dto.TokenCookieResponse
 import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.authorization.LoginTokenCookieRequest
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
@@ -33,7 +34,7 @@ class AuthorizationService(
 ) {
 
   fun token(
-    request: LoginTokenRequest
+    request: LoginTokenCookieRequest
   ): TryEither<ReturnUnion2<TokenResponse, TokenCookieResponse>> =
     runTryEither.eager<ReturnUnion2<TokenResponse, TokenCookieResponse>> {
       val user = validateCredentials(request).bind()

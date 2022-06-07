@@ -22,14 +22,15 @@ import io.craigmiller160.authserver.service.OAuth2ClientUserDetailsService
 import io.craigmiller160.webutils.security.AuthEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
@@ -37,40 +38,43 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class WebSecurityConfig(
     private val OAuth2ClientUserDetailsService: OAuth2ClientUserDetailsService,
     private val authEntryPoint: AuthEntryPoint
-) : WebSecurityConfigurerAdapter() {
+) {
 
-  override fun configure(http: HttpSecurity?) {
-    http?.let {
-      http
-          .csrf()
-          .disable()
-          .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-          .and()
-          .requestMatchers()
-          .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
-          .and()
-          .authorizeRequests()
-          .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health")
-          .permitAll()
-          .anyRequest()
-          .fullyAuthenticated()
-          .and()
-          .requiresChannel()
-          .anyRequest()
-          .requiresSecure()
-          .and()
-          .httpBasic()
-          .and()
-          .exceptionHandling()
-          .authenticationEntryPoint(authEntryPoint)
-    }
+  @Bean
+  fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    http
+        .csrf()
+        .disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+        .and()
+        .requestMatchers()
+        .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
+        .and()
+        .authorizeRequests()
+        .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health")
+        .permitAll()
+        .anyRequest()
+        .fullyAuthenticated()
+        .and()
+        .requiresChannel()
+        .anyRequest()
+        .requiresSecure()
+        .and()
+        .httpBasic()
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint(authEntryPoint)
+    return http.build()
   }
 
-  override fun configure(auth: AuthenticationManagerBuilder?) {
-    auth?.let {
-      auth.userDetailsService(OAuth2ClientUserDetailsService).passwordEncoder(passwordEncoder())
-    }
+  @Bean
+  fun authenticationManager(
+      auth: AuthenticationManagerBuilder,
+      encoder: PasswordEncoder
+  ): AuthenticationManager {
+    auth.userDetailsService(OAuth2ClientUserDetailsService).passwordEncoder(passwordEncoder())
+    return auth.build()
   }
 
   @Bean

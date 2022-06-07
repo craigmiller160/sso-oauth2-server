@@ -1,7 +1,7 @@
 package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.dto.TokenCookieResponse
-import io.craigmiller160.authserver.dto.authorization.LoginTokenCookieRequest
+import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.function.toResponseEntity
 import io.craigmiller160.authserver.service.AuthorizationService
 import org.springframework.http.ResponseEntity
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthorizationController(private val authorizationService: AuthorizationService) {
   // TODO what about the ResponseEntity type... I should have a way to type this here I hope
   @PostMapping("/token")
-  fun token(@RequestBody request: LoginTokenCookieRequest): ResponseEntity<*> =
+  fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<*> =
     authorizationService
       .token(request)
       .map { it.fold({ response -> ResponseEntity.ok(response) }, this::handleCookieResponse) }

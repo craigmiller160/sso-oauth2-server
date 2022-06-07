@@ -22,8 +22,9 @@ fun <T> TryEitherCompanion.rightOrNotFound(value: T?, itemName: String = ""): Tr
 
 fun <T> TryEither<T>.toResponseEntity(
   builder: (ResponseEntity.BodyBuilder) -> ResponseEntity.BodyBuilder = { it }
-) =
+): ResponseEntity<T> =
   when (this) {
     is Either.Right<T> -> ResponseEntity.status(200).apply { builder(this) }.body(value)
-    is Either.Left<Throwable> -> ExceptionConverter.toErrorResponseEntity(value)
+    is Either.Left<Throwable> ->
+      ExceptionConverter.toErrorResponseEntity(value) as ResponseEntity<T>
   }

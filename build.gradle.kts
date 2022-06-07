@@ -52,15 +52,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
-tasks.named<BootRun>("bootRun") {
-    systemProperties = project.properties["jvmArguments"]
-        ?.toString()
-        ?.split(" ")
-        ?.asSequence()
-        ?.map {
-            val parts = it.split("=")
-            Pair(parts[0].substring(2), parts[1])
-        }
-        ?.toMap()
-        ?: mapOf()
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+
+    named<BootRun>("bootRun") {
+        systemProperties = project.properties["jvmArguments"]
+            ?.toString()
+            ?.split(" ")
+            ?.asSequence()
+            ?.map {
+                val parts = it.split("=")
+                Pair(parts[0].substring(2), parts[1])
+            }
+            ?.toMap()
+            ?: mapOf()
+    }
 }

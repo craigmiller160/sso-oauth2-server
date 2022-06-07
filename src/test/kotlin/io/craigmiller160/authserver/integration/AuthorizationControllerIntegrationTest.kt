@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
 import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
@@ -13,6 +14,7 @@ import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -20,6 +22,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
+
+  @Autowired private lateinit var objectMapper: ObjectMapper
   companion object {
     private val COOKIE_REGEX =
       """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
@@ -88,19 +92,25 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   fun `Valid credentials, set cookie in response to caller`() {
     val request =
       LoginTokenRequest(username = authUser.email, password = authUserPassword, cookie = true)
-    val result =
+    val mockResponse =
       authApiProcessor.call {
         request {
           method = HttpMethod.POST
           path = "/authorization/token"
           body = Json(request)
         }
-        response { status = 204 }
+        response { status = 200 }
       }
-    assertThat(result.response.contentAsString).isEmpty()
-    val cookies = result.response.getHeaderValues("Set-Cookie") as List<String>
+    val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(cookies).hasSize(2)
     validateCookies(cookies)
+
+    val result =
+      objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+    val (accessToken, refreshToken, tokenId) = result
+    testAccessToken(accessToken, tokenId)
+    testRefreshToken(refreshToken, tokenId)
+    testRefreshTokenInDb(refreshToken, tokenId)
   }
 
   private fun validateCookies(cookies: List<String>) {
@@ -133,7 +143,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         password = authUserPassword,
         cookie = true,
         redirectUri = redirectUri)
-    val result =
+    val mockResponse =
       authApiProcessor.call {
         request {
           method = HttpMethod.POST
@@ -142,11 +152,17 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         }
         response { status = 302 }
       }
-    assertThat(result.response.contentAsString).isEmpty()
-    val cookies = result.response.getHeaderValues("Set-Cookie") as List<String>
-    assertThat(result.response.getHeaderValue("Location")).isEqualTo(redirectUri)
+    val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(mockResponse.response.getHeaderValue("Location")).isEqualTo(redirectUri)
     assertThat(cookies).hasSize(2)
     validateCookies(cookies)
+
+    val result =
+      objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+    val (accessToken, refreshToken, tokenId) = result
+    testAccessToken(accessToken, tokenId)
+    testRefreshToken(refreshToken, tokenId)
+    testRefreshTokenInDb(refreshToken, tokenId)
   }
 
   @Test

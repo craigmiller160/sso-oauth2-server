@@ -7,4 +7,6 @@ data class TokenCookieResponse(
   val accessTokenCookie: String,
   val refreshTokenCookie: String,
   val redirectUri: String?
-) : TokenValues
+) : TokenValues {
+  val tokenResponse = TokenResponse(accessToken, refreshToken, tokenId)
+}

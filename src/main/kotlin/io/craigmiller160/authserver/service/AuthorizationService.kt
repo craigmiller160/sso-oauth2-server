@@ -4,10 +4,10 @@ import arrow.core.Either
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
-import io.craigmiller160.authserver.function.ReturnUnion2
 import io.craigmiller160.authserver.function.TryEither
 import io.craigmiller160.authserver.function.runTryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
@@ -32,10 +32,8 @@ class AuthorizationService(
   private val jwtHandler: AuthorizationJwtHandler
 ) {
 
-  fun token(
-    request: LoginTokenRequest
-  ): TryEither<ReturnUnion2<TokenResponse, TokenCookieResponse>> =
-    runTryEither.eager<ReturnUnion2<TokenResponse, TokenCookieResponse>> {
+  fun token(request: LoginTokenRequest): TryEither<TokenValues> =
+    runTryEither.eager<TokenValues> {
       val user = validateCredentials(request).bind()
       val access = accessLoadingService.getAccessForUser(user.id).bind()
 
@@ -51,10 +49,15 @@ class AuthorizationService(
           CookieCreator.create(REFRESH_TOKEN_COOKIE_NAME, refreshToken) {
             path = REFRESH_TOKEN_COOKIE_PATH
           }
-        ReturnUnion2.ofB(
-          TokenCookieResponse(accessTokenCookie, refreshTokenCookie, request.redirectUri))
+        TokenCookieResponse(
+          accessToken = accessToken,
+          refreshToken = refreshToken,
+          tokenId = tokenId,
+          accessTokenCookie = accessTokenCookie,
+          refreshTokenCookie = refreshTokenCookie,
+          redirectUri = request.redirectUri)
       } else {
-        ReturnUnion2.ofA(TokenResponse(accessToken, refreshToken, tokenId))
+        TokenResponse(accessToken, refreshToken, tokenId)
       }
     }
 

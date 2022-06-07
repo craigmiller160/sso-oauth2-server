@@ -2,7 +2,10 @@ group = "io.craigmiller160"
 version = "1.8.0-SNAPSHOT"
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    val kotlinVersion = "1.6.21"
+
+    kotlin("jvm") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.springframework.boot") version "2.7.0"
     application
     `maven-publish`

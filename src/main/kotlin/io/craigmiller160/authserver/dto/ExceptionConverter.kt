@@ -46,6 +46,6 @@ object ExceptionConverter {
           else -> null
         }
       }
-      ?.request?.let { request -> Pair(request.method, request.pathInfo) }
+      ?.request?.let { request -> Pair(request.method, request.requestURI) }
       ?: Pair("", "")
 }

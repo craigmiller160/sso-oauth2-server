@@ -21,7 +21,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.Client
 import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
@@ -71,17 +71,17 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
   }
 
   private fun createToken(
-    originalGrantType: String = GrantType.CLIENT_CREDENTIALS,
-    client: Client = authClient,
-    userId: Long = 0
+      originalGrantType: String = GrantType.CLIENT_CREDENTIALS,
+      client: Client = authClient,
+      userId: Long = 0
   ): String {
     val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
     val refreshToken =
-      OAuth2JwtHandler.createRefreshToken(
-          OAuth2ClientUserDetails, originalGrantType, userId, tokenId)
-        .first
+        OAuth2JwtHandler.createRefreshToken(
+                OAuth2ClientUserDetails, originalGrantType, userId, tokenId)
+            .first
     refreshTokenRepo.save(
-      RefreshToken(tokenId, refreshToken, client.id, userId, ZonedDateTime.now(ZoneId.of("UTC"))))
+        RefreshToken(tokenId, refreshToken, client.id, userId, ZonedDateTime.now(ZoneId.of("UTC"))))
     return refreshToken
   }
 
@@ -108,15 +108,15 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken()
 
     val result =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(result, GrantType.CLIENT_CREDENTIALS)
   }
@@ -127,26 +127,26 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken()
 
     val result1 =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     val result2 =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(result1, GrantType.CLIENT_CREDENTIALS)
     testTokenResponse(result2, GrantType.CLIENT_CREDENTIALS)
@@ -171,15 +171,15 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
 
     val result =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(result, GrantType.PASSWORD, isUser = true)
   }
@@ -189,26 +189,26 @@ class TokenRefreshIntegrationTest : AbstractControllerIntegrationTest() {
     val refreshToken = createToken(GrantType.PASSWORD, userId = authUser.id)
 
     val result1 =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     val result2 =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createForm(refreshToken)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createForm(refreshToken)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(result1, GrantType.PASSWORD, isUser = true)
     testTokenResponse(result2, GrantType.PASSWORD, isUser = true)

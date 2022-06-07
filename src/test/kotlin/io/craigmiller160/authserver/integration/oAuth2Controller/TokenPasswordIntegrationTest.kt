@@ -21,7 +21,7 @@ package io.craigmiller160.authserver.integration.oAuth2Controller
 import io.craigmiller160.apitestprocessor.body.Form
 import io.craigmiller160.apitestprocessor.body.formOf
 import io.craigmiller160.apitestprocessor.config.AuthType
-import io.craigmiller160.authserver.dto.TokenResponse
+import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.integration.AbstractControllerIntegrationTest
 import io.craigmiller160.authserver.security.GrantType
@@ -42,8 +42,8 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
   private val otherUserPassword: String = "password"
 
   private fun createTokenForm(
-    username: String = authUser.email,
-    password: String = authUserPassword
+      username: String = authUser.email,
+      password: String = authUserPassword
   ) = formOf("grant_type" to GrantType.PASSWORD, "username" to username, "password" to password)
 
   @BeforeEach
@@ -77,15 +77,15 @@ class TokenPasswordIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - password grant successful`() {
     val result =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = createTokenForm()
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = createTokenForm()
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(result, "password", isUser = true)
   }

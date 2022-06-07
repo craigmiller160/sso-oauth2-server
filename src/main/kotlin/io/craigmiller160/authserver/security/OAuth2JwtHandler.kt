@@ -42,31 +42,31 @@ import org.springframework.stereotype.Component
 class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
 
   fun createAccessToken(
-    OAuth2ClientUserDetails: OAuth2ClientUserDetails,
-    user: User? = null,
-    roles: List<Role> = listOf(),
-    existingTokenId: String? = null
+      OAuth2ClientUserDetails: OAuth2ClientUserDetails,
+      user: User? = null,
+      roles: List<Role> = listOf(),
+      existingTokenId: String? = null
   ): Pair<String, String> {
     val roleNames = roles.map { it.name }
 
     var claimBuilder =
-      createDefaultClaims(OAuth2ClientUserDetails.client.accessTokenTimeoutSecs)
-        .claim("clientKey", OAuth2ClientUserDetails.username)
-        .claim("clientName", OAuth2ClientUserDetails.client.name)
-        .claim("roles", roleNames)
+        createDefaultClaims(OAuth2ClientUserDetails.client.accessTokenTimeoutSecs)
+            .claim("clientKey", OAuth2ClientUserDetails.username)
+            .claim("clientName", OAuth2ClientUserDetails.client.name)
+            .claim("roles", roleNames)
 
     claimBuilder = existingTokenId?.let { claimBuilder.jwtID(existingTokenId) } ?: claimBuilder
 
     claimBuilder =
-      user?.let {
-        claimBuilder
-          .subject(user.email)
-          .claim("userId", user.id)
-          .claim("userEmail", user.email)
-          .claim("firstName", user.firstName)
-          .claim("lastName", user.lastName)
-      }
-        ?: claimBuilder.subject(OAuth2ClientUserDetails.client.name)
+        user?.let {
+          claimBuilder
+              .subject(user.email)
+              .claim("userId", user.id)
+              .claim("userEmail", user.email)
+              .claim("firstName", user.firstName)
+              .claim("lastName", user.lastName)
+        }
+            ?: claimBuilder.subject(OAuth2ClientUserDetails.client.name)
 
     val claims = claimBuilder.build()
     val token = createToken(claims)
@@ -76,10 +76,10 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
   private fun createDefaultClaims(expSecs: Int): JWTClaimsSet.Builder {
     val now = JwtUtils.generateNow()
     return JWTClaimsSet.Builder()
-      .issueTime(now)
-      .expirationTime(JwtUtils.generateExp(expSecs))
-      .jwtID(UUID.randomUUID().toString())
-      .notBeforeTime(now)
+        .issueTime(now)
+        .expirationTime(JwtUtils.generateExp(expSecs))
+        .jwtID(UUID.randomUUID().toString())
+        .notBeforeTime(now)
   }
 
   private fun createToken(claims: JWTClaimsSet): String {
@@ -92,16 +92,16 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
   }
 
   fun createRefreshToken(
-    OAuth2ClientUserDetails: OAuth2ClientUserDetails,
-    grantType: String,
-    userId: Long = 0,
-    tokenId: String
+      OAuth2ClientUserDetails: OAuth2ClientUserDetails,
+      grantType: String,
+      userId: Long = 0,
+      tokenId: String
   ): Pair<String, String> {
     var claimBuilder =
-      createDefaultClaims(OAuth2ClientUserDetails.client.refreshTokenTimeoutSecs)
-        .claim("grantType", grantType)
-        .claim("clientId", OAuth2ClientUserDetails.client.id)
-        .jwtID(tokenId)
+        createDefaultClaims(OAuth2ClientUserDetails.client.refreshTokenTimeoutSecs)
+            .claim("grantType", grantType)
+            .claim("clientId", OAuth2ClientUserDetails.client.id)
+            .jwtID(tokenId)
 
     if (userId > 0) {
       claimBuilder = claimBuilder.claim("userId", userId)
@@ -123,7 +123,7 @@ class OAuth2JwtHandler(private val tokenConfig: TokenConfig) {
     val claims = jwt.jwtClaimsSet
     val now = ZonedDateTime.now(ZoneId.of("UTC"))
     val exp =
-      LegacyDateConverter().convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
+        LegacyDateConverter().convertDateToZonedDateTime(claims.expirationTime, ZoneId.of("UTC"))
     if (exp < now) {
       throw InvalidRefreshTokenException("Expired")
     }

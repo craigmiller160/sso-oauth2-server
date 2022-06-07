@@ -36,24 +36,24 @@ class AccessLoadingServiceTest {
   @Autowired private lateinit var clientUserRoleRepo: ClientUserRoleRepository
 
   private fun createUser(): User =
-    User(
-      id = 0,
-      email = "craig@gmail.com",
-      firstName = "Craig",
-      lastName = "Miller",
-      password = "password",
-      enabled = true)
+      User(
+          id = 0,
+          email = "craig@gmail.com",
+          firstName = "Craig",
+          lastName = "Miller",
+          password = "password",
+          enabled = true)
   private fun createClient(): Client =
-    Client(
-      id = 0,
-      name = "The Client",
-      clientKey = UUID.randomUUID().toString(),
-      clientSecret = UUID.randomUUID().toString(),
-      enabled = true,
-      accessTokenTimeoutSecs = 5,
-      refreshTokenTimeoutSecs = 5,
-      authCodeTimeoutSecs = 5,
-      clientRedirectUris = listOf())
+      Client(
+          id = 0,
+          name = "The Client",
+          clientKey = UUID.randomUUID().toString(),
+          clientSecret = UUID.randomUUID().toString(),
+          enabled = true,
+          accessTokenTimeoutSecs = 5,
+          refreshTokenTimeoutSecs = 5,
+          authCodeTimeoutSecs = 5,
+          clientRedirectUris = listOf())
 
   @Test
   fun `getAccessForUser() - no user found`() {
@@ -66,12 +66,12 @@ class AccessLoadingServiceTest {
     val user = userRepo.save(createUser())
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-      UserWithClientsAccess(
-        userId = user.id,
-        email = user.email,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        clients = mapOf()))
+        UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients = mapOf()))
   }
 
   @Test
@@ -82,16 +82,16 @@ class AccessLoadingServiceTest {
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-      UserWithClientsAccess(
-        userId = user.id,
-        email = user.email,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        clients =
-          mapOf(
-            client.clientKey to
-              ClientWithRolesAccess(
-                clientId = client.id, clientName = client.name, roles = listOf()))))
+        UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients =
+                mapOf(
+                    client.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client.id, clientName = client.name, roles = listOf()))))
   }
 
   @Test
@@ -104,19 +104,19 @@ class AccessLoadingServiceTest {
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-      UserWithClientsAccess(
-        userId = user.id,
-        email = user.email,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        clients =
-          mapOf(
-            client1.clientKey to
-              ClientWithRolesAccess(
-                clientId = client1.id, clientName = client1.name, roles = listOf()),
-            client2.clientKey to
-              ClientWithRolesAccess(
-                clientId = client2.id, clientName = client2.name, roles = listOf()))))
+        UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients =
+                mapOf(
+                    client1.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client1.id, clientName = client1.name, roles = listOf()),
+                    client2.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client2.id, clientName = client2.name, roles = listOf()))))
   }
 
   @Test
@@ -129,23 +129,25 @@ class AccessLoadingServiceTest {
 
     val role = roleRepo.save(Role(id = 0, clientId = client1.id, name = "TheRole"))
     clientUserRoleRepo.save(
-      ClientUserRole(id = 0, clientId = client1.id, userId = user.id, roleId = role.id))
+        ClientUserRole(id = 0, clientId = client1.id, userId = user.id, roleId = role.id))
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-      UserWithClientsAccess(
-        userId = user.id,
-        email = user.email,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        clients =
-          mapOf(
-            client1.clientKey to
-              ClientWithRolesAccess(
-                clientId = client1.id, clientName = client1.name, roles = listOf(role.name)),
-            client2.clientKey to
-              ClientWithRolesAccess(
-                clientId = client2.id, clientName = client2.name, roles = listOf()))))
+        UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients =
+                mapOf(
+                    client1.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client1.id,
+                            clientName = client1.name,
+                            roles = listOf(role.name)),
+                    client2.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client2.id, clientName = client2.name, roles = listOf()))))
   }
 
   @Test
@@ -158,26 +160,30 @@ class AccessLoadingServiceTest {
 
     val role1 = roleRepo.save(Role(id = 0, clientId = client1.id, name = "TheRole"))
     clientUserRoleRepo.save(
-      ClientUserRole(id = 0, clientId = client1.id, userId = user.id, roleId = role1.id))
+        ClientUserRole(id = 0, clientId = client1.id, userId = user.id, roleId = role1.id))
 
     val role2 = roleRepo.save(Role(id = 0, clientId = client2.id, name = "TheRole2"))
     clientUserRoleRepo.save(
-      ClientUserRole(id = 0, clientId = client2.id, userId = user.id, roleId = role2.id))
+        ClientUserRole(id = 0, clientId = client2.id, userId = user.id, roleId = role2.id))
 
     val result = accessLoadingService.getAccessForUser(user.id)
     result.shouldBeRight(
-      UserWithClientsAccess(
-        userId = user.id,
-        email = user.email,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        clients =
-          mapOf(
-            client1.clientKey to
-              ClientWithRolesAccess(
-                clientId = client1.id, clientName = client1.name, roles = listOf(role1.name)),
-            client2.clientKey to
-              ClientWithRolesAccess(
-                clientId = client2.id, clientName = client2.name, roles = listOf(role2.name)))))
+        UserWithClientsAccess(
+            userId = user.id,
+            email = user.email,
+            firstName = user.firstName,
+            lastName = user.lastName,
+            clients =
+                mapOf(
+                    client1.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client1.id,
+                            clientName = client1.name,
+                            roles = listOf(role1.name)),
+                    client2.clientKey to
+                        ClientWithRolesAccess(
+                            clientId = client2.id,
+                            clientName = client2.name,
+                            roles = listOf(role2.name)))))
   }
 }

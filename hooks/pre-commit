@@ -1,4 +1,0 @@
-#!/bin/sh
-
-mvn spotless:apply
-git add -u

@@ -19,7 +19,7 @@
 package io.craigmiller160.authserver.dto.tokenResponse
 
 data class TokenResponse(
-  override val accessToken: String,
-  override val refreshToken: String,
-  override val tokenId: String
+    override val accessToken: String,
+    override val refreshToken: String,
+    override val tokenId: String
 ) : TokenValues

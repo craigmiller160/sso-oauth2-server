@@ -62,18 +62,18 @@ class RoleRepositoryTest {
     user = userRepo.save(TestData.createUser())
     client = clientRepo.save(TestData.createClient())
     client2 =
-      clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
+        clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
     clientUser = clientUserRepo.save(TestData.createClientUser(user.id, client.id))
     clientUser2 = clientUserRepo.save(TestData.createClientUser(user.id, client2.id))
     role1 = roleRepo.save(TestData.createRole1(client.id))
     role2 = roleRepo.save(TestData.createRole2(client.id))
     role3 = roleRepo.save(TestData.createRole3(client2.id))
     clientUserRole1 =
-      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
+        clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role1.id))
     clientUserRole2 =
-      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
+        clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client.id, role2.id))
     clientUserRole3 =
-      clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client2.id, role3.id))
+        clientUserRoleRepo.save(TestData.createClientUserRole(user.id, client2.id, role3.id))
   }
 
   @AfterEach

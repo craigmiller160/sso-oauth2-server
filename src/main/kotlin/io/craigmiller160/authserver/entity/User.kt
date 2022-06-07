@@ -27,10 +27,10 @@ import javax.persistence.Table
 @Entity
 @Table(name = "users")
 data class User(
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
-  val email: String,
-  val firstName: String,
-  val lastName: String,
-  val password: String,
-  val enabled: Boolean
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
+    val email: String,
+    val firstName: String,
+    val lastName: String,
+    val password: String,
+    val enabled: Boolean
 )

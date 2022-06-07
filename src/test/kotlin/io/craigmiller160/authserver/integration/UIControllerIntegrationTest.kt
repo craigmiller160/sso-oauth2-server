@@ -49,10 +49,10 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_getCss_bootstrap() {
     val result =
-      oauth2ApiProcessor.call {
-        request { path = "/ui/resources/css/bootstrap" }
-        response { headers = mapOf("Content-Type" to "text/css") }
-      }
+        oauth2ApiProcessor.call {
+          request { path = "/ui/resources/css/bootstrap" }
+          response { headers = mapOf("Content-Type" to "text/css") }
+        }
 
     assertTrue(result.response.contentAsString.isNotBlank())
   }
@@ -68,13 +68,13 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_getPage_login() {
     val result =
-      oauth2ApiProcessor.call {
-        request {
-          path =
-            "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
+        oauth2ApiProcessor.call {
+          request {
+            path =
+                "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
+          }
+          response { headers = mapOf("Content-Type" to "text/html") }
         }
-        response { headers = mapOf("Content-Type" to "text/html") }
-      }
 
     assertTrue(result.response.contentAsString.isNotBlank())
   }
@@ -84,7 +84,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     oauth2ApiProcessor.call {
       request {
         path =
-          "/ui/login?client_id=${client2.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
+            "/ui/login?client_id=${client2.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
       }
       response { status = 401 }
     }
@@ -95,7 +95,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     oauth2ApiProcessor.call {
       request {
         path =
-          "/ui/foo?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
+            "/ui/foo?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code"
       }
       response { status = 404 }
     }
@@ -106,7 +106,7 @@ class UIControllerIntegrationTest : AbstractControllerIntegrationTest() {
     oauth2ApiProcessor.call {
       request {
         path =
-          "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code2"
+            "/ui/login?client_id=${authClient.clientKey}&redirect_uri=${authClient.getRedirectUris()[0]}&response_type=code2"
       }
       response { status = 401 }
     }

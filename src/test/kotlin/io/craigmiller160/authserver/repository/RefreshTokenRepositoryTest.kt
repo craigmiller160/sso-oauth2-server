@@ -42,11 +42,19 @@ class RefreshTokenRepositoryTest {
   @BeforeEach
   fun setup() {
     token1 =
-      RefreshToken(
-        "1", "ABC", 1, null, ZonedDateTime.of(LocalDateTime.of(2020, 1, 1, 1, 1), ZoneId.of("UTC")))
+        RefreshToken(
+            "1",
+            "ABC",
+            1,
+            null,
+            ZonedDateTime.of(LocalDateTime.of(2020, 1, 1, 1, 1), ZoneId.of("UTC")))
     token2 =
-      RefreshToken(
-        "2", "DEF", 2, 1, ZonedDateTime.of(LocalDateTime.of(2020, 2, 2, 2, 2), ZoneId.of("UTC")))
+        RefreshToken(
+            "2",
+            "DEF",
+            2,
+            1,
+            ZonedDateTime.of(LocalDateTime.of(2020, 2, 2, 2, 2), ZoneId.of("UTC")))
     token3 = RefreshToken("3", "GHI", 2, 2, ZonedDateTime.now(ZoneId.of("UTC")))
     token4 = RefreshToken("4", "JKL", 1, 1, ZonedDateTime.now(ZoneId.of("UTC")))
 

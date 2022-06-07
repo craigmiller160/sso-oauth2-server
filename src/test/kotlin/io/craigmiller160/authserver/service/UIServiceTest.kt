@@ -42,10 +42,10 @@ class UIServiceTest {
   fun test_validateRequest() {
     val request = TestData.createPageRequest()
     val client =
-      TestData.createClient()
-        .copy(
-          clientRedirectUris =
-            listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
+        TestData.createClient()
+            .copy(
+                clientRedirectUris =
+                    listOf(ClientRedirectUri(0, 0, "http://somewhere.com/authcode/code")))
 
     `when`(clientRepo.findByClientKey(request.client_id)).thenReturn(client)
 
@@ -74,8 +74,8 @@ class UIServiceTest {
     val request = TestData.createPageRequest()
 
     `when`(clientRepo.findByClientKey(request.client_id))
-      .thenReturn(
-        TestData.createClient().copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))))
+        .thenReturn(
+            TestData.createClient().copy(clientRedirectUris = listOf(ClientRedirectUri(0, 0, ""))))
 
     val ex = assertThrows<AuthCodeException> { uiService.validateRequest(request) }
     assertEquals("Client does not support Auth Code", ex.message)

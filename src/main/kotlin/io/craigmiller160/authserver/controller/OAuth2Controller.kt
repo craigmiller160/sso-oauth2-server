@@ -26,7 +26,6 @@ import io.craigmiller160.authserver.exception.UnsupportedGrantTypeException
 import io.craigmiller160.authserver.security.GrantType
 import io.craigmiller160.authserver.service.OAuth2Service
 import io.craigmiller160.authserver.utils.encodeUriParams
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,16 +38,16 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/oauth")
 class OAuth2Controller(
-  private val oAuth2Service: OAuth2Service,
-  @Value("\${spring.profiles.active:}") private val profile: String
+    private val oAuth2Service: OAuth2Service,
+    @Value("\${spring.profiles.active:}") private val profile: String
 ) {
 
   private val log: Logger = LoggerFactory.getLogger(javaClass)
 
   @PostMapping(
-    "/token",
-    consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE],
-    produces = [MediaType.APPLICATION_JSON_VALUE])
+      "/token",
+      consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE],
+      produces = [MediaType.APPLICATION_JSON_VALUE])
   fun token(tokenRequest: TokenRequest): TokenResponse {
     logTokenRequest(tokenRequest)
     validateTokenRequest(tokenRequest)
@@ -62,21 +61,21 @@ class OAuth2Controller(
 
   private fun logTokenRequest(tokenRequest: TokenRequest) {
     val loggableRequest =
-      if (profile.contains("prod")) {
-        tokenRequest.copy(password = null, code = null)
-      } else {
-        tokenRequest
-      }
+        if (profile.contains("prod")) {
+          tokenRequest.copy(password = null, code = null)
+        } else {
+          tokenRequest
+        }
     log.debug("Received token request: $loggableRequest")
   }
 
   private fun logAuthCodeLogin(login: AuthCodeLogin) {
     val loggableLogin =
-      if (profile.contains("prod")) {
-        login.copy(password = "")
-      } else {
-        login
-      }
+        if (profile.contains("prod")) {
+          login.copy(password = "")
+        } else {
+          login
+        }
     log.debug("Attempting login with Authorization Code: $loggableLogin")
   }
 
@@ -93,13 +92,13 @@ class OAuth2Controller(
     } catch (ex: Exception) {
       log.error("Error during login", ex)
       val failParams =
-        encodeUriParams(
-          mapOf(
-            "response_type" to login.responseType,
-            "client_id" to login.clientId,
-            "redirect_uri" to login.redirectUri,
-            "state" to login.state,
-            "fail" to "true"))
+          encodeUriParams(
+              mapOf(
+                  "response_type" to login.responseType,
+                  "client_id" to login.clientId,
+                  "redirect_uri" to login.redirectUri,
+                  "state" to login.state,
+                  "fail" to "true"))
       val failRedirectUri = "${login.basePath}/ui/login?$failParams"
       res.status = 302
       res.addHeader("Location", failRedirectUri)
@@ -108,19 +107,19 @@ class OAuth2Controller(
 
   private fun validateTokenRequest(tokenRequest: TokenRequest) {
     if (GrantType.PASSWORD == tokenRequest.grant_type &&
-      (tokenRequest.username.isNullOrBlank() || tokenRequest.password.isNullOrBlank())) {
+        (tokenRequest.username.isNullOrBlank() || tokenRequest.password.isNullOrBlank())) {
       throw BadRequestException("Invalid token request")
     }
 
     if (GrantType.REFRESH_TOKEN == tokenRequest.grant_type &&
-      tokenRequest.refresh_token.isNullOrBlank()) {
+        tokenRequest.refresh_token.isNullOrBlank()) {
       throw BadRequestException("Invalid token request")
     }
 
     if (GrantType.AUTH_CODE == tokenRequest.grant_type &&
-      (tokenRequest.client_id.isNullOrBlank() ||
-        tokenRequest.code.isNullOrBlank() ||
-        tokenRequest.redirect_uri.isNullOrBlank())) {
+        (tokenRequest.client_id.isNullOrBlank() ||
+            tokenRequest.code.isNullOrBlank() ||
+            tokenRequest.redirect_uri.isNullOrBlank())) {
       throw BadRequestException("Invalid token request")
     }
   }

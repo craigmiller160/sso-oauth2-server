@@ -17,23 +17,23 @@ import org.springframework.web.bind.annotation.RestController
 class AuthorizationController(private val authorizationService: AuthorizationService) {
   @PostMapping("/token")
   fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<TokenResponse> =
-    authorizationService.token(request).map(::buildResponse).toResponseEntity()
+      authorizationService.token(request).map(::buildResponse).toResponseEntity()
 
   private fun buildResponse(tokenValues: TokenValues): ResponseEntity<TokenResponse> =
-    when (tokenValues) {
-      is TokenResponse -> ResponseEntity.ok(tokenValues)
-      is TokenCookieResponse -> handleCookieResponse(tokenValues)
-    }
+      when (tokenValues) {
+        is TokenResponse -> ResponseEntity.ok(tokenValues)
+        is TokenCookieResponse -> handleCookieResponse(tokenValues)
+      }
 
   private fun handleCookieResponse(
-    tokenCookieResponse: TokenCookieResponse
+      tokenCookieResponse: TokenCookieResponse
   ): ResponseEntity<TokenResponse> {
     val responseEntityBuilder =
-      tokenCookieResponse.redirectUri?.let { ResponseEntity.status(302).header("Location", it) }
-        ?: ResponseEntity.status(200)
+        tokenCookieResponse.redirectUri?.let { ResponseEntity.status(302).header("Location", it) }
+            ?: ResponseEntity.status(200)
     return responseEntityBuilder
-      .header("Set-Cookie", tokenCookieResponse.accessTokenCookie)
-      .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
-      .body(tokenCookieResponse.tokenResponse)
+        .header("Set-Cookie", tokenCookieResponse.accessTokenCookie)
+        .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
+        .body(tokenCookieResponse.tokenResponse)
   }
 }

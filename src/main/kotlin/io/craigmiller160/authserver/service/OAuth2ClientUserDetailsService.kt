@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class OAuth2ClientUserDetailsService(private val clientRepo: ClientRepository) :
-  UserDetailsService {
+    UserDetailsService {
 
   override fun loadUserByUsername(clientKey: String?): UserDetails {
     if (clientKey == null) {
@@ -36,8 +36,8 @@ class OAuth2ClientUserDetailsService(private val clientRepo: ClientRepository) :
     }
 
     val client =
-      clientRepo.findByClientKey(clientKey)
-        ?: throw UsernameNotFoundException("No client found for Client Key $clientKey")
+        clientRepo.findByClientKey(clientKey)
+            ?: throw UsernameNotFoundException("No client found for Client Key $clientKey")
     val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
     AccountStatusUserDetailsChecker().check(OAuth2ClientUserDetails)
     return OAuth2ClientUserDetails

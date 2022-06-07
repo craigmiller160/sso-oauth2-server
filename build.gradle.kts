@@ -14,6 +14,28 @@ plugins {
 }
 apply(plugin = "io.spring.dependency-management")
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = rootProject.name
+            version = project.version.toString()
+
+            from(components["kotlin"])
+        }
+    }
+    repositories {
+        maven {
+            val repo = if (project.version.toString().endsWith("-SNAPSHOT")) "maven-snapshots" else "maven-releases"
+            url = uri("https://craigmiller160.ddns.net:30003/repository/$repo")
+            credentials {
+                username = System.getenv("NEXUS_USER")
+                password = System.getenv("NEXUS_PASSWORD")
+            }
+        }
+    }
+}
+
 repositories {
     mavenCentral()
     maven {

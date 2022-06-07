@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 group = "io.craigmiller160"
 version = "1.8.0-SNAPSHOT"
 
@@ -5,10 +7,9 @@ plugins {
     val kotlinVersion = "1.6.21"
 
     kotlin("jvm") version kotlinVersion
-    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.springframework.boot") version "2.7.0"
-    application
     `maven-publish`
+    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
 }
 apply(plugin = "io.spring.dependency-management")
 
@@ -51,6 +52,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
-application {
-    mainClass.set("io.craigmiller160.authserver.AuthServerApplicationKt")
+tasks.named<BootRun>("bootRun") {
+    systemProperties = project.properties["jvmArguments"]
+        ?.toString()
+        ?.split(" ")
+        ?.asSequence()
+        ?.map {
+            val parts = it.split("=")
+            Pair(parts[0].substring(2), parts[1])
+        }
+        ?.toMap()
+        ?: mapOf()
 }

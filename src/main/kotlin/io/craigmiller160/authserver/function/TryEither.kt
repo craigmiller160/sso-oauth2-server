@@ -10,8 +10,7 @@ typealias TryEither<T> = Either<Throwable, T>
 
 typealias TryEitherCompanion = Either.Companion
 
-// TODO can this be renamed back to the original one?
-object runTryEither {
+object tryEither {
   inline fun <T> eager(
     crossinline c: suspend arrow.core.computations.RestrictedEitherEffect<Throwable, *>.() -> T
   ) = either.eager(c)

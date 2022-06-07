@@ -9,7 +9,7 @@ import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.entity.User
 import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.function.TryEither
-import io.craigmiller160.authserver.function.runTryEither
+import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
@@ -33,7 +33,7 @@ class AuthorizationService(
 ) {
 
   fun token(request: LoginTokenRequest): TryEither<TokenValues> =
-    runTryEither.eager<TokenValues> {
+    tryEither.eager<TokenValues> {
       val user = validateCredentials(request).bind()
       val access = accessLoadingService.getAccessForUser(user.id).bind()
 
@@ -72,7 +72,7 @@ class AuthorizationService(
   }
 
   private fun validateCredentials(request: LoginTokenRequest): TryEither<User> =
-    runTryEither.eager {
+    tryEither.eager {
       val user = getUser(request.username).bind()
       if (passwordEncoder.matches(request.password, user.password)) {
           Either.Right(user)

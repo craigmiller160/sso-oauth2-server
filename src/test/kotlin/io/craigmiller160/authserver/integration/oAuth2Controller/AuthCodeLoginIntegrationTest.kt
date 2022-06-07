@@ -45,26 +45,25 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
   private val basePath = "/oauth2"
 
   private fun createLoginForm(clientId: String = validClientKey, user: User = authUser) =
-    formOf(
-      "username" to user.email,
-      "password" to authUserPassword,
-      "clientId" to clientId,
-      "redirectUri" to authClient.getRedirectUris()[0],
-      "responseType" to responseType,
-      "state" to state,
-      "basePath" to basePath)
+      formOf(
+          "username" to user.email,
+          "password" to authUserPassword,
+          "clientId" to clientId,
+          "redirectUri" to authClient.getRedirectUris()[0],
+          "responseType" to responseType,
+          "state" to state,
+          "basePath" to basePath)
 
   private fun handleUrl(url: String): Pair<String, Map<String, String>> {
     val uri = url.split("?")[0]
     val query =
-      url
-        .split("?")[1]
-        .split("&")
-        .map { keyValue ->
-          val parts = keyValue.split("=")
-          Pair(parts[0], parts[1])
-        }
-        .toMap()
+        url.split("?")[1]
+            .split("&")
+            .map { keyValue ->
+              val parts = keyValue.split("=")
+              Pair(parts[0], parts[1])
+            }
+            .toMap()
     return Pair(uri, query)
   }
 
@@ -83,8 +82,8 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     assertThat(query["response_type"], equalTo(form["responseType"]))
     assertThat(query["client_id"], equalTo(form["clientId"]))
     assertThat(
-      query["redirect_uri"],
-      equalTo(URLEncoder.encode(form["redirectUri"], StandardCharsets.UTF_8)))
+        query["redirect_uri"],
+        equalTo(URLEncoder.encode(form["redirectUri"], StandardCharsets.UTF_8)))
     assertThat(query["fail"], equalTo("true"))
   }
 
@@ -108,14 +107,14 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun test_authCodeLogin() {
     val result =
-      oauth2ApiProcessor.call {
-        request {
-          path = "/oauth/auth"
-          method = HttpMethod.POST
-          body = createLoginForm()
+        oauth2ApiProcessor.call {
+          request {
+            path = "/oauth/auth"
+            method = HttpMethod.POST
+            body = createLoginForm()
+          }
+          response { status = 302 }
         }
-        response { status = 302 }
-      }
     val location = result.response.getHeader("Location")
     assertNotNull(location)
     validateSuccessLocation(location!!)
@@ -144,18 +143,18 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     badUserForm["name"] = "BadUserForm"
 
     listOf(noStateForm, badResponseTypeForm, badClientForm, badUserForm, badAuthCodeForm).forEach {
-      form ->
+        form ->
       println("Testing Form: ${form["name"]}")
 
       val result =
-        oauth2ApiProcessor.call {
-          request {
-            path = "/oauth/auth"
-            method = HttpMethod.POST
-            body = form
+          oauth2ApiProcessor.call {
+            request {
+              path = "/oauth/auth"
+              method = HttpMethod.POST
+              body = form
+            }
+            response { status = 302 }
           }
-          response { status = 302 }
-        }
 
       val location = result.response.getHeader("Location")
       assertNotNull(location)
@@ -169,14 +168,14 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     form["password"] = "abc"
 
     val result =
-      oauth2ApiProcessor.call {
-        request {
-          path = "/oauth/auth"
-          method = HttpMethod.POST
-          body = form
+        oauth2ApiProcessor.call {
+          request {
+            path = "/oauth/auth"
+            method = HttpMethod.POST
+            body = form
+          }
+          response { status = 302 }
         }
-        response { status = 302 }
-      }
 
     val location = result.response.getHeader("Location")
     assertNotNull(location)
@@ -207,14 +206,14 @@ class AuthCodeLoginIntegrationTest : AbstractControllerIntegrationTest() {
     val form = createLoginForm(user = disabledUser)
 
     val result =
-      oauth2ApiProcessor.call {
-        request {
-          path = "/oauth/auth"
-          method = HttpMethod.POST
-          body = form
+        oauth2ApiProcessor.call {
+          request {
+            path = "/oauth/auth"
+            method = HttpMethod.POST
+            body = form
+          }
+          response { status = 302 }
         }
-        response { status = 302 }
-      }
 
     val location = result.response.getHeader("Location")
     assertNotNull(location)

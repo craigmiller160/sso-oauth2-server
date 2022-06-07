@@ -67,15 +67,15 @@ class TokenClientCredentialsIntegrationTest : AbstractControllerIntegrationTest(
   @Disabled
   fun `token() - client_credentials grant success`() {
     val tokenResponse =
-      oauth2ApiProcessor
-        .call {
-          request {
-            path = "/oauth/token"
-            method = HttpMethod.POST
-            body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
-          }
-        }
-        .convert(TokenResponse::class.java)
+        oauth2ApiProcessor
+            .call {
+              request {
+                path = "/oauth/token"
+                method = HttpMethod.POST
+                body = formOf("grant_type" to GrantType.CLIENT_CREDENTIALS)
+              }
+            }
+            .convert(TokenResponse::class.java)
 
     testTokenResponse(tokenResponse, "client_credentials")
   }

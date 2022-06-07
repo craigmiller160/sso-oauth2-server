@@ -49,28 +49,28 @@ class OAuth2OAuth2ClientUserDetailsServiceTest {
 
     val result = OAuth2ClientUserDetailsService.loadUserByUsername(clientKey)
     assertThat(
-      result,
-      allOf(
-        hasProperty("enabled", equalTo(client.enabled)),
-        hasProperty("username", equalTo(client.clientKey)),
-        hasProperty("password", equalTo(client.clientSecret))))
+        result,
+        allOf(
+            hasProperty("enabled", equalTo(client.enabled)),
+            hasProperty("username", equalTo(client.clientKey)),
+            hasProperty("password", equalTo(client.clientSecret))))
   }
 
   @Test
   fun test_loadUserByUsername_noClientKey() {
     val ex =
-      assertThrows<UsernameNotFoundException> {
-        OAuth2ClientUserDetailsService.loadUserByUsername(null)
-      }
+        assertThrows<UsernameNotFoundException> {
+          OAuth2ClientUserDetailsService.loadUserByUsername(null)
+        }
     assertEquals("No Client Key to lookup", ex.message)
   }
 
   @Test
   fun test_loadUserByUsername_userNotFound() {
     val ex =
-      assertThrows<UsernameNotFoundException> {
-        OAuth2ClientUserDetailsService.loadUserByUsername("ABC")
-      }
+        assertThrows<UsernameNotFoundException> {
+          OAuth2ClientUserDetailsService.loadUserByUsername("ABC")
+        }
     assertEquals("No client found for Client Key ABC", ex.message)
   }
 }

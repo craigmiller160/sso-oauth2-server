@@ -109,14 +109,14 @@ abstract class AbstractControllerIntegrationTest {
     val encodedSecret = bcryptEncoder.encode(validClientSecret)
 
     authClient =
-      TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs)
-        .copy(
-          name = validClientName,
-          clientKey = validClientKey,
-          clientSecret = "{bcrypt}$encodedSecret")
+        TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs)
+            .copy(
+                name = validClientName,
+                clientKey = validClientKey,
+                clientSecret = "{bcrypt}$encodedSecret")
     authClient = clientRepo.save(authClient)
     val clientRedirectUri =
-      ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
+        ClientRedirectUri(0, authClient.id, "http://somewhere.com/authcode/code")
     authClient = authClient.copy(clientRedirectUris = listOf(clientRedirectUri))
     authClient = clientRepo.save(authClient)
 
@@ -126,27 +126,27 @@ abstract class AbstractControllerIntegrationTest {
     authClientUser = ClientUser(0, authUser.id, authClient.id)
     authUserPassword = authUser.password
     authUser =
-      userRepo.save(authUser.copy(password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}"))
+        userRepo.save(authUser.copy(password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}"))
     authClientUser = clientUserRepo.save(authClientUser)
 
     disabledClient =
-      TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs)
-        .copy(
-          name = "DisabledClient",
-          clientKey = "DisabledKey",
-          clientSecret = "{bcrypt}$encodedSecret",
-          enabled = false)
+        TestData.createClient(accessTokenTimeoutSecs, refreshTokenTimeoutSecs)
+            .copy(
+                name = "DisabledClient",
+                clientKey = "DisabledKey",
+                clientSecret = "{bcrypt}$encodedSecret",
+                enabled = false)
     disabledClient = clientRepo.save(disabledClient)
 
     disabledClientClientUser = ClientUser(0, authUser.id, disabledClient.id)
     disabledClientClientUser = clientUserRepo.save(disabledClientClientUser)
 
     disabledUser =
-      TestData.createUser()
-        .copy(
-          email = "disabled@gmail.com",
-          password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}",
-          enabled = false)
+        TestData.createUser()
+            .copy(
+                email = "disabled@gmail.com",
+                password = "{bcrypt}${bcryptEncoder.encode(authUserPassword)}",
+                enabled = false)
     disabledUser = userRepo.save(disabledUser)
 
     disabledUserClientUser = ClientUser(0, disabledUser.id, authClient.id)
@@ -173,9 +173,9 @@ abstract class AbstractControllerIntegrationTest {
   }
 
   protected fun testTokenResponse(
-    tokenResponse: TokenResponse,
-    grantType: String,
-    isUser: Boolean = false
+      tokenResponse: TokenResponse,
+      grantType: String,
+      isUser: Boolean = false
   ) {
     val (accessToken, refreshToken, tokenId) = tokenResponse
     MatcherAssert.assertThat(tokenId, CharSequenceLength.hasLength(Matchers.greaterThan(0)))
@@ -187,10 +187,10 @@ abstract class AbstractControllerIntegrationTest {
   }
 
   private fun testRefreshToken(
-    refreshToken: String,
-    tokenId: String,
-    grantType: String,
-    isUser: Boolean
+      refreshToken: String,
+      tokenId: String,
+      grantType: String,
+      isUser: Boolean
   ) {
     val refreshJwt = SignedJWT.parse(refreshToken)
     val refreshClaims = refreshJwt.jwtClaimsSet

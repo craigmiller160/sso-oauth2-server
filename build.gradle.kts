@@ -10,6 +10,7 @@ plugins {
     id("org.springframework.boot") version "2.7.0"
     `maven-publish`
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
 }
 apply(plugin = "io.spring.dependency-management")
 

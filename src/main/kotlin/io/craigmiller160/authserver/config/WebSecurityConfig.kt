@@ -23,6 +23,7 @@ import io.craigmiller160.webutils.security.AuthEntryPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.ObjectPostProcessor
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -70,9 +71,10 @@ class WebSecurityConfig(
 
   @Bean
   fun authenticationManager(
-      auth: AuthenticationManagerBuilder,
-      encoder: PasswordEncoder
+      encoder: PasswordEncoder,
+      postProcessor: ObjectPostProcessor<Any>
   ): AuthenticationManager {
+    val auth = AuthenticationManagerBuilder(postProcessor)
     auth.userDetailsService(OAuth2ClientUserDetailsService).passwordEncoder(passwordEncoder())
     return auth.build()
   }

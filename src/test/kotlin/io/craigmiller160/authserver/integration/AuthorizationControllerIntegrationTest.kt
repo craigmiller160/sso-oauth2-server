@@ -101,6 +101,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         }
         response { status = 200 }
       }
+    @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(cookies).hasSize(2)
     validateCookies(cookies)
@@ -152,6 +153,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
         }
         response { status = 302 }
       }
+    @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(mockResponse.response.getHeaderValue("Location")).isEqualTo(redirectUri)
     assertThat(cookies).hasSize(2)
@@ -168,8 +170,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   @Test
   fun `User does not exist`() {
     val request = LoginTokenRequest(username = "abc@gmail.com", password = authUserPassword)
-    val result =
-      authApiProcessor.call {
+    authApiProcessor.call {
         request {
           method = HttpMethod.POST
           path = "/authorization/token"
@@ -182,8 +183,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   @Test
   fun `User is disabled`() {
     val request = LoginTokenRequest(username = disabledUser.email, password = authUserPassword)
-    val result =
-      authApiProcessor.call {
+    authApiProcessor.call {
         request {
           method = HttpMethod.POST
           path = "/authorization/token"
@@ -196,8 +196,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   @Test
   fun `Invalid password`() {
     val request = LoginTokenRequest(username = authUser.email, password = "fooBar")
-    val result =
-      authApiProcessor.call {
+    authApiProcessor.call {
         request {
           method = HttpMethod.POST
           path = "/authorization/token"

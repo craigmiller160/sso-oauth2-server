@@ -353,7 +353,7 @@ class OAuth2ServiceTest {
           "password", "{bcrypt}\$2a\$10\$HYKpEK6BFUFH99fHm5yOhuk4hn1gFErtLveeonVSHW1G7n5bUhGUe"))
       .thenReturn(true)
 
-    `when`(authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs!!))
+    `when`(authCodeHandler.createAuthCode(client.id, user.id, client.authCodeTimeoutSecs))
       .thenReturn(authCode)
 
     val result = oAuth2Service.authCodeLogin(login)

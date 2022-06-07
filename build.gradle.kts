@@ -48,7 +48,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude("org.junit.vintage", "junit-vintage-engine")
     }
-    testImplementation("org.h2database:h2")
+    testImplementation("com.h2database:h2")
     implementation("org.springframework.boot:spring-boot-starter-security")
 }
 

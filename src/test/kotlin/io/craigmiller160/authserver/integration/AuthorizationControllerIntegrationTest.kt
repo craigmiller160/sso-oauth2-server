@@ -205,4 +205,19 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
       response { status = 401 }
     }
   }
+
+  @Test
+  fun `valid refresh token`() {
+    TODO("Finish this")
+  }
+
+  @Test
+  fun `expired refresh token`() {
+    TODO("Finish this")
+  }
+
+  @Test
+  fun `revoked refresh token`() {
+    TODO("Finish this")
+  }
 }

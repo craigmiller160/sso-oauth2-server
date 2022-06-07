@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
@@ -38,7 +39,8 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   }
 
   @PostMapping("/refresh")
-  fun refresh(): ResponseEntity<*> {
+  fun refresh(request: TokenRefreshRequest): ResponseEntity<*> {
+    authorizationService.refresh(request)
     TODO("Finish this")
   }
 }

@@ -2,6 +2,7 @@ package io.craigmiller160.authserver.service
 
 import arrow.core.Either
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
@@ -20,6 +21,7 @@ import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -32,8 +34,9 @@ class AuthorizationService(
     private val jwtHandler: AuthorizationJwtHandler
 ) {
 
+  @Transactional
   fun token(request: LoginTokenRequest): TryEither<TokenValues> =
-      tryEither.eager<TokenValues> {
+      tryEither.eager {
         val user = validateCredentials(request).bind()
         val access = accessLoadingService.getAccessForUser(user.id).bind()
 
@@ -60,6 +63,9 @@ class AuthorizationService(
           TokenResponse(accessToken, refreshToken, tokenId)
         }
       }
+
+  fun refresh(request: TokenRefreshRequest): TryEither<TokenValues> =
+      tryEither.eager { TODO("Finish this") }
 
   private fun saveRefreshToken(
       refreshToken: String,

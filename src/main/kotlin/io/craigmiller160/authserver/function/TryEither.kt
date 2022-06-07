@@ -28,3 +28,10 @@ fun <T> TryEither<T>.toResponseEntity(
     is Either.Left<Throwable> ->
       ExceptionConverter.toErrorResponseEntity(value) as ResponseEntity<T>
   }
+
+fun <T> TryEither<ResponseEntity<T>>.toResponseEntity(): ResponseEntity<T> =
+  when (this) {
+    is Either.Right<ResponseEntity<T>> -> value
+    is Either.Left<Throwable> ->
+      ExceptionConverter.toErrorResponseEntity(value) as ResponseEntity<T>
+  }

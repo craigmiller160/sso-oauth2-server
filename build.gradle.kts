@@ -1,4 +1,6 @@
 import org.springframework.boot.gradle.tasks.run.BootRun
+import com.diffplug.gradle.spotless.SpotlessExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "io.craigmiller160"
 version = "1.8.0-SNAPSHOT"
@@ -11,6 +13,7 @@ plugins {
     `maven-publish`
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
+    id("com.diffplug.spotless") version "6.6.1"
 }
 apply(plugin = "io.spring.dependency-management")
 
@@ -80,6 +83,10 @@ tasks {
         useJUnitPlatform()
     }
 
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
     named<BootRun>("bootRun") {
         systemProperties = project.properties["jvmArguments"]
             ?.toString()
@@ -91,5 +98,11 @@ tasks {
             }
             ?.toMap()
             ?: mapOf()
+    }
+}
+
+configure<SpotlessExtension> {
+    kotlin {
+        ktfmt()
     }
 }

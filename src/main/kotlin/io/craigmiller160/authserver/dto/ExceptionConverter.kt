@@ -1,14 +1,17 @@
 package io.craigmiller160.authserver.dto
 
 import java.time.ZonedDateTime
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 object ExceptionConverter {
+  private val log = LoggerFactory.getLogger(ExceptionConverter::class.java)
 
   fun toErrorResponseEntity(ex: Throwable): ResponseEntity<ErrorResponse> {
+    log.error(ex.message, ex)
     val response = toErrorResponse(ex)
     return ResponseEntity.status(response.status).body(response)
   }

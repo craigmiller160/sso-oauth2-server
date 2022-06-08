@@ -18,6 +18,7 @@ import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import java.time.ZonedDateTime
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -236,7 +237,11 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
               }
             }
             .convert(TokenResponse::class.java)
-    assertThat(result).hasFieldOrPropertyWithValue("tokenId", tokenId)
+    val (resultAccessToken, resultRefreshToken, resultTokenId) = result
+    assertEquals(tokenId, resultTokenId)
+    testAccessToken(resultAccessToken, resultTokenId)
+    testRefreshToken(resultRefreshToken, resultTokenId)
+    testRefreshTokenInDb(resultRefreshToken, resultTokenId)
   }
 
   @Test

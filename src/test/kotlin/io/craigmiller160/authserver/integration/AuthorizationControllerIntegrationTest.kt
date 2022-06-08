@@ -10,10 +10,12 @@ import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
+import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.AuthorizationJwtHandler
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
+import java.time.ZonedDateTime
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -215,6 +217,14 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   fun `valid refresh token`() {
     val tokenId = UUID.randomUUID().toString()
     val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
     val request = TokenRefreshRequest(refreshToken)
     val result =
         authApiProcessor

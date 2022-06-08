@@ -212,6 +212,11 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   }
 
   @Test
+  fun `valid refresh token, set cookies`() {
+    TODO("Finish this")
+  }
+
+  @Test
   fun `expired refresh token`() {
     TODO("Finish this")
   }

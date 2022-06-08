@@ -65,7 +65,12 @@ class AuthorizationService(
       }
 
   fun refresh(request: TokenRefreshRequest): TryEither<TokenValues> =
-      tryEither.eager { TODO("Finish this") }
+      tryEither.eager {
+
+        //          refreshTokenRepo.findById(request)
+
+        TODO("Finish this")
+      }
 
   private fun saveRefreshToken(
       refreshToken: String,

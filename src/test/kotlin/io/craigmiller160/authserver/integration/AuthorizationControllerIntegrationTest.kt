@@ -1,5 +1,6 @@
 package io.craigmiller160.authserver.integration
 
+import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
@@ -7,10 +8,13 @@ import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
+import io.craigmiller160.authserver.security.AuthorizationJwtHandler
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
+  @Autowired private lateinit var jwtHandler: AuthorizationJwtHandler
   @Autowired private lateinit var objectMapper: ObjectMapper
   companion object {
     private val COOKIE_REGEX =
@@ -208,7 +213,20 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `valid refresh token`() {
-    TODO("Finish this")
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor
+            .call {
+              request {
+                method = HttpMethod.POST
+                path = "/authorization/refresh"
+                body = Json(request)
+              }
+            }
+            .convert(TokenResponse::class.java)
+    assertThat(result).hasFieldOrPropertyWithValue("tokenId", tokenId)
   }
 
   @Test

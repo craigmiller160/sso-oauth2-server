@@ -39,8 +39,6 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   }
 
   @PostMapping("/refresh")
-  fun refresh(request: TokenRefreshRequest): ResponseEntity<*> {
-    authorizationService.refresh(request)
-    TODO("Finish this")
-  }
+  fun refresh(request: TokenRefreshRequest): ResponseEntity<TokenResponse> =
+      authorizationService.refresh(request).map(::buildResponse).toResponseEntity()
 }

@@ -41,4 +41,14 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   @PostMapping("/refresh")
   fun refresh(@RequestBody request: TokenRefreshRequest): ResponseEntity<TokenResponse> =
       authorizationService.refresh(request).map(::buildResponse).toResponseEntity()
+
+  @PostMapping("/logout")
+  fun logout(): ResponseEntity<Nothing> {
+    val cookies = authorizationService.logout()
+    return cookies
+        .fold(ResponseEntity.noContent()) { builder, cookie ->
+          builder.header("Set-Cookie", cookie)
+        }
+        .build()
+  }
 }

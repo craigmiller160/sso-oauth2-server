@@ -27,9 +27,10 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
     return createToken(claims)
   }
 
-  fun createRefreshToken(tokenId: String): TryEither<String> {
+  fun createRefreshToken(tokenId: String, overrideExp: Int? = null): TryEither<String> {
     val claims =
-        JWTClaimsSet.parse(createDefaultClaims(tokenId, tokenConfig.authorization.refreshTokenExp))
+        JWTClaimsSet.parse(
+            createDefaultClaims(tokenId, overrideExp ?: tokenConfig.authorization.refreshTokenExp))
     return createToken(claims)
   }
 

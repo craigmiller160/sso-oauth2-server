@@ -281,7 +281,26 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `expired refresh token`() {
-    TODO("Finish this")
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId, -1080).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+          response { status = 401 }
+        }
   }
 
   @Test

@@ -327,6 +327,17 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `revoked refresh token`() {
-    TODO("Finish this")
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+          response { status = 401 }
+        }
   }
 }

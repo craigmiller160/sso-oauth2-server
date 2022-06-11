@@ -1,17 +1,29 @@
 package io.craigmiller160.authserver.integration
 
+import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
+import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.access.fromClaims
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
+import io.craigmiller160.authserver.entity.RefreshToken
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
+import io.craigmiller160.authserver.security.AuthorizationJwtHandler
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
+import io.craigmiller160.date.converter.LegacyDateConverter
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +35,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
 
+  @Autowired private lateinit var jwtHandler: AuthorizationJwtHandler
   @Autowired private lateinit var objectMapper: ObjectMapper
+  @Autowired private lateinit var tokenConfig: TokenConfig
   companion object {
     private val COOKIE_REGEX =
         """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
@@ -58,6 +72,15 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   private fun testRefreshToken(refreshToken: String, tokenId: String) {
     val refreshJwt = SignedJWT.parse(refreshToken)
     val refreshClaims = refreshJwt.jwtClaimsSet
+
+    val expiration =
+        LegacyDateConverter()
+            .convertDateToZonedDateTime(refreshClaims.expirationTime, ZoneId.systemDefault())
+    assertThat(expiration)
+        .isCloseTo(
+            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.refreshTokenExp.toLong()),
+            within(10, ChronoUnit.SECONDS))
+
     assertThat(refreshClaims.claims)
         .containsEntry("jti", tokenId)
         .containsKey("iat")
@@ -69,6 +92,13 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
     assertThat(accessClaims.claims).containsKey("iat").containsKey("exp").containsKey("nbf")
+    val expiration =
+        LegacyDateConverter()
+            .convertDateToZonedDateTime(accessClaims.expirationTime, ZoneId.systemDefault())
+    assertThat(expiration)
+        .isCloseTo(
+            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.accessTokenExp.toLong()),
+            within(10, ChronoUnit.SECONDS))
     val actualTokenId = accessClaims.jwtid
     tokenId?.let { assertThat(actualTokenId).isEqualTo(it) }
 
@@ -204,5 +234,110 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
       }
       response { status = 401 }
     }
+  }
+
+  @Test
+  fun `valid refresh token`() {
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor
+            .call {
+              request {
+                method = HttpMethod.POST
+                path = "/authorization/refresh"
+                body = Json(request)
+              }
+            }
+            .convert(TokenResponse::class.java)
+    val (resultAccessToken, resultRefreshToken, resultTokenId) = result
+    assertEquals(tokenId, resultTokenId)
+    testAccessToken(resultAccessToken, resultTokenId)
+    testRefreshToken(resultRefreshToken, resultTokenId)
+    testRefreshTokenInDb(resultRefreshToken, resultTokenId)
+  }
+
+  @Test
+  fun `valid refresh token, set cookies`() {
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
+    val request = TokenRefreshRequest(refreshToken, true)
+    val mockResponse =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+        }
+    @Suppress("UNCHECKED_CAST")
+    val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(cookies).hasSize(2)
+    validateCookies(cookies)
+
+    val result =
+        objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+    val (resultAccessToken, resultRefreshToken, resultTokenId) = result
+    assertEquals(tokenId, resultTokenId)
+    testAccessToken(resultAccessToken, resultTokenId)
+    testRefreshToken(resultRefreshToken, resultTokenId)
+    testRefreshTokenInDb(resultRefreshToken, resultTokenId)
+  }
+
+  @Test
+  fun `expired refresh token`() {
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId, -100000).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+          response { status = 401 }
+        }
+  }
+
+  @Test
+  fun `revoked refresh token`() {
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val request = TokenRefreshRequest(refreshToken)
+    val result =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+          response { status = 401 }
+        }
   }
 }

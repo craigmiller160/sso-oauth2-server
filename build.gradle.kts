@@ -68,6 +68,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("com.nimbusds:nimbus-jose-jwt:$nimbusJoseVersion")
     implementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")

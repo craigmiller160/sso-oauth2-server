@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.controller
 
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
+import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
@@ -36,4 +37,8 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
         .header("Set-Cookie", tokenCookieResponse.refreshTokenCookie)
         .body(tokenCookieResponse.tokenResponse)
   }
+
+  @PostMapping("/refresh")
+  fun refresh(@RequestBody request: TokenRefreshRequest): ResponseEntity<TokenResponse> =
+      authorizationService.refresh(request).map(::buildResponse).toResponseEntity()
 }

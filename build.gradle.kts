@@ -1,4 +1,3 @@
-import org.springframework.boot.gradle.tasks.run.BootRun
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -86,19 +85,6 @@ tasks {
 
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
-    }
-
-    named<BootRun>("bootRun") {
-        systemProperties = project.properties["jvmArguments"]
-            ?.toString()
-            ?.split(" ")
-            ?.asSequence()
-            ?.map {
-                val parts = it.split("=")
-                Pair(parts[0].substring(2), parts[1])
-            }
-            ?.toMap()
-            ?: mapOf()
     }
 }
 

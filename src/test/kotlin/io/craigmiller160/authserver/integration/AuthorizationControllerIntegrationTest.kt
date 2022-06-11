@@ -4,6 +4,7 @@ import arrow.core.getOrHandle
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jwt.SignedJWT
 import io.craigmiller160.apitestprocessor.body.Json
+import io.craigmiller160.authserver.config.TokenConfig
 import io.craigmiller160.authserver.dto.access.ClientWithRolesAccess
 import io.craigmiller160.authserver.dto.access.UserWithClientsAccess
 import io.craigmiller160.authserver.dto.access.fromClaims
@@ -18,9 +19,10 @@ import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
 import io.craigmiller160.date.converter.LegacyDateConverter
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,10 +34,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
-  private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
   @Autowired private lateinit var jwtHandler: AuthorizationJwtHandler
   @Autowired private lateinit var objectMapper: ObjectMapper
+  @Autowired private lateinit var tokenConfig: TokenConfig
   companion object {
     private val COOKIE_REGEX =
         """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
@@ -74,8 +76,10 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val expiration =
         LegacyDateConverter()
             .convertDateToZonedDateTime(refreshClaims.expirationTime, ZoneId.systemDefault())
-    assertThat(FORMATTER.format(expiration))
-        .isEqualTo(FORMATTER.format(ZonedDateTime.now())) // TODO fix in the end
+    assertThat(expiration)
+        .isCloseTo(
+            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.refreshTokenExp.toLong()),
+            within(10, ChronoUnit.SECONDS))
 
     assertThat(refreshClaims.claims)
         .containsEntry("jti", tokenId)
@@ -91,8 +95,10 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val expiration =
         LegacyDateConverter()
             .convertDateToZonedDateTime(accessClaims.expirationTime, ZoneId.systemDefault())
-    assertThat(FORMATTER.format(expiration))
-        .isEqualTo(FORMATTER.format(ZonedDateTime.now())) // TODO fix in the end
+    assertThat(expiration)
+        .isCloseTo(
+            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.accessTokenExp.toLong()),
+            within(10, ChronoUnit.SECONDS))
     val actualTokenId = accessClaims.jwtid
     tokenId?.let { assertThat(actualTokenId).isEqualTo(it) }
 

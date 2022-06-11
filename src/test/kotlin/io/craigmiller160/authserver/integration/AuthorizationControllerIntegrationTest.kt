@@ -15,7 +15,10 @@ import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.AuthorizationJwtHandler
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_NAME
 import io.craigmiller160.authserver.security.REFRESH_TOKEN_COOKIE_PATH
+import io.craigmiller160.date.converter.LegacyDateConverter
+import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,6 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest() {
+  private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
   @Autowired private lateinit var jwtHandler: AuthorizationJwtHandler
   @Autowired private lateinit var objectMapper: ObjectMapper
@@ -77,6 +81,11 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val accessJwt = SignedJWT.parse(accessToken)
     val accessClaims = accessJwt.jwtClaimsSet
     assertThat(accessClaims.claims).containsKey("iat").containsKey("exp").containsKey("nbf")
+    val expiration =
+        LegacyDateConverter()
+            .convertDateToZonedDateTime(accessClaims.expirationTime, ZoneId.systemDefault())
+    assertThat(FORMATTER.format(expiration))
+        .isEqualTo(FORMATTER.format(ZonedDateTime.now())) // TODO fix in the end
     val actualTokenId = accessClaims.jwtid
     tokenId?.let { assertThat(actualTokenId).isEqualTo(it) }
 

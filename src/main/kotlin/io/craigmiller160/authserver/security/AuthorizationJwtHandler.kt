@@ -51,7 +51,7 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
     val now = JwtUtils.generateNow()
     return mapOf(
         "iat" to now.time,
-        "exp" to JwtUtils.generateExp(expSecs).time,
+        "exp" to JwtUtils.generateExp(expSecs).time / 1000,
         "jti" to tokenId,
         "nbf" to now.time)
   }

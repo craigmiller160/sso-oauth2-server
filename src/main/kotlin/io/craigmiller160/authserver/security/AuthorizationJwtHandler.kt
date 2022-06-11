@@ -36,7 +36,6 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
     return createToken(claims)
   }
 
-  // TODO need tests for all the fail conditions
   fun parseRefreshToken(refreshToken: String): TryEither<String> {
     val jwt = SignedJWT.parse(refreshToken)
     val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey)

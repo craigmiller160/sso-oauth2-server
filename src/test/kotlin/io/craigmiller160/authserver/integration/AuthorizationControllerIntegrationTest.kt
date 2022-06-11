@@ -304,7 +304,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   @Test
   fun `expired refresh token`() {
     val tokenId = UUID.randomUUID().toString()
-    val refreshToken = jwtHandler.createRefreshToken(tokenId, -1080).getOrHandle { throw it }
+    val refreshToken = jwtHandler.createRefreshToken(tokenId, -100000).getOrHandle { throw it }
     val refreshTokenEntity =
         RefreshToken(
             refreshToken = refreshToken,

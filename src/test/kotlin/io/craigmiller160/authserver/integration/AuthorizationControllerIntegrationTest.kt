@@ -246,7 +246,37 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `valid refresh token, set cookies`() {
-    TODO("Finish this")
+    val tokenId = UUID.randomUUID().toString()
+    val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
+    val refreshTokenEntity =
+        RefreshToken(
+            refreshToken = refreshToken,
+            id = tokenId,
+            userId = authUser.id,
+            clientId = null,
+            timestamp = ZonedDateTime.now())
+    refreshTokenRepo.save(refreshTokenEntity)
+    val request = TokenRefreshRequest(refreshToken, true)
+    val mockResponse =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+        }
+    @Suppress("UNCHECKED_CAST")
+    val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(cookies).hasSize(2)
+    validateCookies(cookies)
+
+    val result =
+        objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+    val (resultAccessToken, resultRefreshToken, resultTokenId) = result
+    assertEquals(tokenId, resultTokenId)
+    testAccessToken(resultAccessToken, resultTokenId)
+    testRefreshToken(resultRefreshToken, resultTokenId)
+    testRefreshTokenInDb(resultRefreshToken, resultTokenId)
   }
 
   @Test

@@ -70,6 +70,13 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   private fun testRefreshToken(refreshToken: String, tokenId: String) {
     val refreshJwt = SignedJWT.parse(refreshToken)
     val refreshClaims = refreshJwt.jwtClaimsSet
+
+    val expiration =
+        LegacyDateConverter()
+            .convertDateToZonedDateTime(refreshClaims.expirationTime, ZoneId.systemDefault())
+    assertThat(FORMATTER.format(expiration))
+        .isEqualTo(FORMATTER.format(ZonedDateTime.now())) // TODO fix in the end
+
     assertThat(refreshClaims.claims)
         .containsEntry("jti", tokenId)
         .containsKey("iat")

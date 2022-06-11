@@ -14,6 +14,8 @@ import io.craigmiller160.authserver.dto.access.toClaims
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.function.TryEither
 import java.security.interfaces.RSAPublicKey
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import org.springframework.stereotype.Component
 
 @Component
@@ -40,6 +42,11 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
     val verifier = RSASSAVerifier(tokenConfig.publicKey as RSAPublicKey)
     if (!jwt.verify(verifier)) {
       return Either.Left(InvalidRefreshTokenException("Bad signature"))
+    }
+
+    val expiration = jwt.jwtClaimsSet.expirationTime.toInstant().atZone(ZoneId.systemDefault())
+    if (expiration.isBefore(ZonedDateTime.now())) {
+      return Either.Left(InvalidRefreshTokenException("Refresh token expired"))
     }
 
     return jwt.jwtClaimsSet.jwtid.rightIfNotNull {

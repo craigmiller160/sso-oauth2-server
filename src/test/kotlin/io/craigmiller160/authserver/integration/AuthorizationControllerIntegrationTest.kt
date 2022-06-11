@@ -340,4 +340,9 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
           response { status = 401 }
         }
   }
+
+  @Test
+  fun `logout clears cookies`() {
+    TODO("Finish this")
+  }
 }

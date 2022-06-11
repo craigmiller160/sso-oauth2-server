@@ -96,6 +96,16 @@ class AuthorizationService(
         createTokenResponse(tokenId, accessToken, refreshToken, request.cookie)
       }
 
+  fun logout(): List<String> {
+    val accessTokenCookie = CookieCreator.create(ACCESS_TOKEN_COOKIE_NAME, "") { maxAgeSecs = 1 }
+    val refreshTokenCookie =
+        CookieCreator.create(REFRESH_TOKEN_COOKIE_NAME, "") {
+          maxAgeSecs = 1
+          path = REFRESH_TOKEN_COOKIE_PATH
+        }
+    return listOf(accessTokenCookie, refreshTokenCookie)
+  }
+
   private fun saveRefreshToken(
       refreshToken: String,
       tokenId: String,

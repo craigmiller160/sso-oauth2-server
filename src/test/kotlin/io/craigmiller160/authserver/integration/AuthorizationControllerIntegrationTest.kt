@@ -343,6 +343,21 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   @Test
   fun `logout clears cookies`() {
-    TODO("Finish this")
+    val mockResponse =
+        authApiProcessor.call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/logout"
+          }
+          response { status = 204 }
+        }
+    @Suppress("UNCHECKED_CAST")
+    val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
+    assertThat(cookies).hasSize(2)
+    val accessCookie = cookies.find { cookie -> cookie.startsWith(ACCESS_TOKEN_COOKIE_NAME) }
+    assertThat(accessCookie).startsWith("$ACCESS_TOKEN_COOKIE_NAME=;")
+
+    val refreshCookie = cookies.find { cookie -> cookie.startsWith(REFRESH_TOKEN_COOKIE_NAME) }
+    assertThat(refreshCookie).startsWith("$REFRESH_TOKEN_COOKIE_NAME=;")
   }
 }

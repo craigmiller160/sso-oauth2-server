@@ -5,7 +5,7 @@ import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
 import io.craigmiller160.authserver.dto.tokenResponse.TokenCookieResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenResponse
 import io.craigmiller160.authserver.dto.tokenResponse.TokenValues
-import io.craigmiller160.authserver.function.toResponseEntity
+import io.craigmiller160.authserver.function.TryEither
 import io.craigmiller160.authserver.service.AuthorizationService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/authorization")
 class AuthorizationController(private val authorizationService: AuthorizationService) {
   @PostMapping("/token")
-  fun token(@RequestBody request: LoginTokenRequest): ResponseEntity<TokenResponse> =
-      authorizationService.token(request).map(::buildResponse).toResponseEntity()
+  fun token(@RequestBody request: LoginTokenRequest): TryEither<ResponseEntity<TokenResponse>> =
+      authorizationService.token(request).map(::buildResponse)
 
   private fun buildResponse(tokenValues: TokenValues): ResponseEntity<TokenResponse> =
       when (tokenValues) {
@@ -39,8 +39,8 @@ class AuthorizationController(private val authorizationService: AuthorizationSer
   }
 
   @PostMapping("/refresh")
-  fun refresh(@RequestBody request: TokenRefreshRequest): ResponseEntity<TokenResponse> =
-      authorizationService.refresh(request).map(::buildResponse).toResponseEntity()
+  fun refresh(@RequestBody request: TokenRefreshRequest): TryEither<ResponseEntity<TokenResponse>> =
+      authorizationService.refresh(request).map(::buildResponse)
 
   @PostMapping("/logout")
   fun logout(): ResponseEntity<Nothing> {

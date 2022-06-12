@@ -1,6 +1,7 @@
 package io.craigmiller160.authserver.service
 
 import arrow.core.Either
+import arrow.core.computations.either
 import arrow.core.rightIfNotNull
 import io.craigmiller160.authserver.dto.authorization.LoginTokenRequest
 import io.craigmiller160.authserver.dto.authorization.TokenRefreshRequest
@@ -13,7 +14,6 @@ import io.craigmiller160.authserver.exception.InvalidLoginException
 import io.craigmiller160.authserver.exception.InvalidRefreshTokenException
 import io.craigmiller160.authserver.function.TryEither
 import io.craigmiller160.authserver.function.rightIfNotEmpty
-import io.craigmiller160.authserver.function.tryEither
 import io.craigmiller160.authserver.repository.RefreshTokenRepository
 import io.craigmiller160.authserver.repository.UserRepository
 import io.craigmiller160.authserver.security.ACCESS_TOKEN_COOKIE_NAME
@@ -39,7 +39,7 @@ class AuthorizationService(
 
   @Transactional
   fun token(request: LoginTokenRequest): TryEither<TokenValues> =
-      tryEither.eager {
+      either.eager {
         val user = validateCredentials(request).bind()
         val access = accessLoadingService.getAccessForUser(user.id).bind()
 
@@ -78,7 +78,7 @@ class AuthorizationService(
 
   @Transactional
   fun refresh(request: TokenRefreshRequest): TryEither<TokenValues> =
-      tryEither.eager {
+      either.eager {
         val tokenId = jwtHandler.parseRefreshToken(request.refreshToken).bind()
         val refreshTokenEntity =
             refreshTokenRepo
@@ -118,7 +118,7 @@ class AuthorizationService(
   }
 
   private fun validateCredentials(request: LoginTokenRequest): TryEither<User> =
-      tryEither.eager {
+      either.eager {
         val user = getUser(request.username).bind()
         if (passwordEncoder.matches(request.password, user.password)) {
               Either.Right(user)

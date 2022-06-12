@@ -76,6 +76,7 @@ class AuthorizationService(
         TokenResponse(accessToken, refreshToken, tokenId)
       }
 
+  @Transactional
   fun refresh(request: TokenRefreshRequest): TryEither<TokenValues> =
       tryEither.eager {
         val tokenId = jwtHandler.parseRefreshToken(request.refreshToken).bind()

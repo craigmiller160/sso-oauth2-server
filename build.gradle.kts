@@ -1,5 +1,7 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import java.time.temporal.ChronoUnit
 
 group = "io.craigmiller160"
 version = "1.8.0-SNAPSHOT"
@@ -15,6 +17,12 @@ plugins {
     id("com.diffplug.spotless") version "6.6.1"
 }
 apply(plugin = "io.spring.dependency-management")
+
+the<DependencyManagementExtension>().apply {
+    resolutionStrategy {
+        cacheChangingModulesFor(0, TimeUnit.SECONDS)
+    }
+}
 
 publishing {
     publications {

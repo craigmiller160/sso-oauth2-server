@@ -68,7 +68,7 @@ dependencies {
     val postgresVersion = "42.3.1"
     val nimbusJoseVersion = "9.22"
     val mockitoVersion = "4.0.0"
-    val springArrowKtVersion = "1.0.0-SNAPSHOT"
+    val springArrowKtVersion = "1.0.0"
 
     implementation("io.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")

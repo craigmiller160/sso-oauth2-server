@@ -18,6 +18,10 @@ plugins {
 }
 apply(plugin = "io.spring.dependency-management")
 
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
+
 the<DependencyManagementExtension>().apply {
     resolutionStrategy {
         cacheChangingModulesFor(0, TimeUnit.SECONDS)

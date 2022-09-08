@@ -4,7 +4,7 @@ import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import java.time.temporal.ChronoUnit
 
 group = "io.craigmiller160"
-version = "1.8.0-SNAPSHOT"
+version = "1.8.0"
 
 plugins {
     val kotlinVersion = "1.6.21"

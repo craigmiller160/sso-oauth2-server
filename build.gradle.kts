@@ -70,7 +70,7 @@ dependencies {
     val mockitoVersion = "4.0.0"
     val springArrowKtVersion = "1.0.1"
 
-    implementation("io.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
+    implementation("io.github.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
     implementation("io.kotest.extensions:kotest-assertions-arrow-jvm:$kotestArrowVersion")
     implementation("io.arrow-kt:arrow-core-jvm:$arrowVersion")

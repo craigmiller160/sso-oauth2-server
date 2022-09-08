@@ -5,6 +5,5 @@ metadata:
 data:
   spring.profiles.active: prod
   spring.config.location: classpath:/config/common/,classpath:/config/prod/
-  spring.datasource.host: postgres-service
+  spring.datasource.host: postgres.infra-prod
   spring.datasource.port: "5432"
-  spring.datasource.username: postgres_root

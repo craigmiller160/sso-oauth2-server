@@ -1,0 +1,25 @@
+app-deployment:
+  appName: sso-oauth2-server
+  deployment:
+    image: nexus-docker-craigmiller160.ddns.net/sso-oauth2-server:latest
+    configMaps:
+      - sso-oauth2-server-config
+    secrets:
+      - envVariable: spring.datasource.username
+        secretName: postgres-root-account
+        secretKey: username
+      - envVariable: spring.datasource.password
+        secretName: postgres-root-account
+        secretKey: password
+    livenessProbe:
+      httpGet:
+        path: /actuator/health
+        port: 8443
+        scheme: HTTPS
+    ports:
+      - 8443
+  service:
+    enable: true
+    type: ClusterIP
+    ports:
+      - containerPort: 8443

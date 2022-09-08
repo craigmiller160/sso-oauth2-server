@@ -35,7 +35,7 @@ publishing {
             artifactId = rootProject.name
             version = project.version.toString()
 
-            from(components["kotlin"])
+            artifact(tasks.named("bootJar"))
         }
     }
     repositories {

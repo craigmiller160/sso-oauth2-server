@@ -2,3 +2,7 @@ app-deployment:
   image: nexus-docker-craigmiller160.ddns.net/sso-oauth2-server:latest
   configMaps:
     - sso-oauth2-server-config
+  secrets:
+    - envVariable: spring.datasource.username
+      secretName: postgres-root-account
+      secretKey: username

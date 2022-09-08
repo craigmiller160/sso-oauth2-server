@@ -7,5 +7,3 @@ data:
   spring.config.location: classpath:/config/common/,classpath:/config/prod/
   spring.datasource.host: postgres.infra-prod
   spring.datasource.port: "5432"
-  # TODO move to secret
-  spring.datasource.username: postgres_root

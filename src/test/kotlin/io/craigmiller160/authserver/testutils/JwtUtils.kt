@@ -50,10 +50,10 @@ object JwtUtils {
 
   fun createJwkSet(keyPair: KeyPair): JWKSet {
     val builder =
-        RSAKey.Builder(keyPair.public as RSAPublicKey)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(JWSAlgorithm.RS256)
-            .keyID("oauth-jwt")
+      RSAKey.Builder(keyPair.public as RSAPublicKey)
+        .keyUse(KeyUse.SIGNATURE)
+        .algorithm(JWSAlgorithm.RS256)
+        .keyID("oauth-jwt")
     return JWKSet(builder.build())
   }
 
@@ -64,15 +64,15 @@ object JwtUtils {
     val expDate = Date.from(exp.toInstant())
 
     val claims =
-        JWTClaimsSet.Builder()
-            .jwtID("JWTID")
-            .issueTime(Date())
-            .subject(USERNAME)
-            .expirationTime(expDate)
-            .claim(ROLES_CLAIM, listOf(ROLE_1, ROLE_2))
-            .claim("clientKey", CLIENT_KEY)
-            .claim("clientName", CLIENT_NAME)
-            .build()
+      JWTClaimsSet.Builder()
+        .jwtID("JWTID")
+        .issueTime(Date())
+        .subject(USERNAME)
+        .expirationTime(expDate)
+        .claim(ROLES_CLAIM, listOf(ROLE_1, ROLE_2))
+        .claim("clientKey", CLIENT_KEY)
+        .claim("clientName", CLIENT_NAME)
+        .build()
     return SignedJWT(header, claims)
   }
 

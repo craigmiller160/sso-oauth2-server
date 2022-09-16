@@ -37,42 +37,42 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 class WebSecurityConfig(
-    private val OAuth2ClientUserDetailsService: OAuth2ClientUserDetailsService,
-    private val authEntryPoint: AuthEntryPoint
+  private val OAuth2ClientUserDetailsService: OAuth2ClientUserDetailsService,
+  private val authEntryPoint: AuthEntryPoint
 ) {
 
   @Bean
   fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
     http
-        .csrf()
-        .disable()
-        .sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-        .and()
-        .requestMatchers()
-        .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
-        .and()
-        .authorizeRequests()
-        .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health")
-        .permitAll()
-        .anyRequest()
-        .fullyAuthenticated()
-        .and()
-        .requiresChannel()
-        .anyRequest()
-        .requiresSecure()
-        .and()
-        .httpBasic()
-        .and()
-        .exceptionHandling()
-        .authenticationEntryPoint(authEntryPoint)
+      .csrf()
+      .disable()
+      .sessionManagement()
+      .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+      .and()
+      .requestMatchers()
+      .antMatchers("/oauth/**", "/jwk", "/ui/**", "/actuator/**")
+      .and()
+      .authorizeRequests()
+      .antMatchers("/jwk", "/ui/**", "/oauth/auth", "/actuator/health")
+      .permitAll()
+      .anyRequest()
+      .fullyAuthenticated()
+      .and()
+      .requiresChannel()
+      .anyRequest()
+      .requiresSecure()
+      .and()
+      .httpBasic()
+      .and()
+      .exceptionHandling()
+      .authenticationEntryPoint(authEntryPoint)
     return http.build()
   }
 
   @Bean
   fun authenticationManager(
-      encoder: PasswordEncoder,
-      postProcessor: ObjectPostProcessor<Any>
+    encoder: PasswordEncoder,
+    postProcessor: ObjectPostProcessor<Any>
   ): AuthenticationManager {
     val auth = AuthenticationManagerBuilder(postProcessor)
     auth.userDetailsService(OAuth2ClientUserDetailsService).passwordEncoder(passwordEncoder())

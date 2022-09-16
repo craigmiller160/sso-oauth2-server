@@ -59,7 +59,7 @@ class OAuth2JwtHandlerTest {
   @Mock private lateinit var tokenConfig: TokenConfig
 
   private val client =
-      TestData.createClient(accessTokenTimeoutSecs = 300, refreshTokenTimeoutSecs = 300)
+    TestData.createClient(accessTokenTimeoutSecs = 300, refreshTokenTimeoutSecs = 300)
   private val OAuth2ClientUserDetails = OAuth2ClientUserDetails(client)
   private val user = TestData.createUser().copy(id = 1)
   private val origTokenId = "origTokenId"
@@ -102,7 +102,7 @@ class OAuth2JwtHandlerTest {
   fun test_createAccessToken_clientOnly_withExistingJwtId() {
     val existingId = UUID.randomUUID().toString()
     val (token, tokenId) =
-        OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, null, listOf(), existingId)
+      OAuth2JwtHandler.createAccessToken(OAuth2ClientUserDetails, null, listOf(), existingId)
     val parts = token.split(".")
     val header = String(Base64.getDecoder().decode(parts[0]))
     val body = String(Base64.getDecoder().decode(parts[1]))
@@ -179,7 +179,7 @@ class OAuth2JwtHandlerTest {
   @Test
   fun test_createRefreshToken() {
     val (token, tokenId) =
-        OAuth2JwtHandler.createRefreshToken(OAuth2ClientUserDetails, "password", 1L, origTokenId)
+      OAuth2JwtHandler.createRefreshToken(OAuth2ClientUserDetails, "password", 1L, origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")
@@ -200,8 +200,8 @@ class OAuth2JwtHandlerTest {
   @Test
   fun test_createRefreshToken_noUser() {
     val (token, tokenId) =
-        OAuth2JwtHandler.createRefreshToken(
-            OAuth2ClientUserDetails, "password", tokenId = origTokenId)
+      OAuth2JwtHandler.createRefreshToken(
+        OAuth2ClientUserDetails, "password", tokenId = origTokenId)
     assertEquals(origTokenId, tokenId)
 
     val parts = token.split(".")
@@ -223,11 +223,11 @@ class OAuth2JwtHandlerTest {
 
     val grantType = if (withUser) "password" else "client_credentials"
     var claimBuilder =
-        JWTClaimsSet.Builder()
-            .claim("clientId", client.id)
-            .claim("grantType", grantType)
-            .expirationTime(generateExp(exp))
-            .jwtID(tokenId)
+      JWTClaimsSet.Builder()
+        .claim("clientId", client.id)
+        .claim("grantType", grantType)
+        .expirationTime(generateExp(exp))
+        .jwtID(tokenId)
 
     if (withUser) {
       claimBuilder = claimBuilder.claim("userId", user.id)
@@ -280,9 +280,9 @@ class OAuth2JwtHandlerTest {
     val token = createJwt(true, 1000, keyPair)
 
     val ex =
-        assertThrows<InvalidRefreshTokenException> {
-          OAuth2JwtHandler.parseRefreshToken(token, client.id)
-        }
+      assertThrows<InvalidRefreshTokenException> {
+        OAuth2JwtHandler.parseRefreshToken(token, client.id)
+      }
     assertEquals("Bad Signature", ex.message)
   }
 
@@ -291,9 +291,9 @@ class OAuth2JwtHandlerTest {
     val token = createJwt(true, -1000)
 
     val ex =
-        assertThrows<InvalidRefreshTokenException> {
-          OAuth2JwtHandler.parseRefreshToken(token, client.id)
-        }
+      assertThrows<InvalidRefreshTokenException> {
+        OAuth2JwtHandler.parseRefreshToken(token, client.id)
+      }
     assertEquals("Expired", ex.message)
   }
 
@@ -302,7 +302,7 @@ class OAuth2JwtHandlerTest {
     val token = createJwt(true, 1000)
 
     val ex =
-        assertThrows<InvalidRefreshTokenException> { OAuth2JwtHandler.parseRefreshToken(token, 20) }
+      assertThrows<InvalidRefreshTokenException> { OAuth2JwtHandler.parseRefreshToken(token, 20) }
     assertEquals("Invalid Client ID", ex.message)
   }
 }

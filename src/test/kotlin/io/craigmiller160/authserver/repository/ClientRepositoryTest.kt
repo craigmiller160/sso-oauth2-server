@@ -53,10 +53,10 @@ class ClientRepositoryTest {
   fun setup() {
     client1 = clientRepo.save(TestData.createClient())
     client2 =
-        clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
+      clientRepo.save(TestData.createClient().copy(name = "FooBar", clientKey = "FooBarKey"))
     client3 =
-        clientRepo.save(
-            TestData.createClient().copy(name = "abc", clientKey = "abcKey", enabled = false))
+      clientRepo.save(
+        TestData.createClient().copy(name = "abc", clientKey = "abcKey", enabled = false))
     user = userRepo.save(TestData.createUser())
     clientUser1 = clientUserRepo.save(ClientUser(id = 1, userId = user.id, clientId = client1.id))
     clientUser2 = clientUserRepo.save(ClientUser(id = 2, userId = user.id, clientId = client2.id))

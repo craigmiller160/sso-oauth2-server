@@ -23,16 +23,15 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
 
   fun createAccessToken(tokenId: String, access: UserWithClientsAccess): TryEither<String> {
     val claims =
-        JWTClaimsSet.parse(
-            access.toClaims() +
-                createDefaultClaims(tokenId, tokenConfig.authorization.accessTokenExp))
+      JWTClaimsSet.parse(
+        access.toClaims() + createDefaultClaims(tokenId, tokenConfig.authorization.accessTokenExp))
     return createToken(claims)
   }
 
   fun createRefreshToken(tokenId: String, overrideExp: Int? = null): TryEither<String> {
     val claims =
-        JWTClaimsSet.parse(
-            createDefaultClaims(tokenId, overrideExp ?: tokenConfig.authorization.refreshTokenExp))
+      JWTClaimsSet.parse(
+        createDefaultClaims(tokenId, overrideExp ?: tokenConfig.authorization.refreshTokenExp))
     return createToken(claims)
   }
 
@@ -56,10 +55,10 @@ class AuthorizationJwtHandler(private val tokenConfig: TokenConfig) {
   private fun createDefaultClaims(tokenId: String, expSecs: Int): Map<String, Any> {
     val now = JwtUtils.generateNow()
     return mapOf(
-        "iat" to now.time,
-        "exp" to JwtUtils.generateExp(expSecs).time / 1000,
-        "jti" to tokenId,
-        "nbf" to now.time)
+      "iat" to now.time,
+      "exp" to JwtUtils.generateExp(expSecs).time / 1000,
+      "jti" to tokenId,
+      "nbf" to now.time)
   }
 
   private fun createToken(claims: JWTClaimsSet): TryEither<String> {

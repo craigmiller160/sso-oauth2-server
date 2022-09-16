@@ -27,7 +27,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "client_users")
 data class ClientUser(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
-    val userId: Long,
-    val clientId: Long
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
+  val userId: Long,
+  val clientId: Long
 )

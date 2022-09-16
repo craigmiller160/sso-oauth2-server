@@ -25,6 +25,7 @@
         <postgres.version>42.3.1</postgres.version>
         <nimbus.jose.version>9.22</nimbus.jose.version>
         <mockito.version>4.0.0</mockito.version>
+        <h2.version>2.1.214</h2.version>
     </properties>
 
     <dependencies>
@@ -111,8 +112,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.h2</groupId>
+            <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

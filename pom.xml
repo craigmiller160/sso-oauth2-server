@@ -14,6 +14,7 @@
     </parent>
 
     <properties>
+        <spotless.version>2.26.0</spotless.version>
         <spring.arrow.kt.version>1.0.1</spring.arrow.kt.version>
         <assertj.version>3.22.0</assertj.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
@@ -115,4 +116,14 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

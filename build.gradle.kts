@@ -71,7 +71,7 @@ dependencies {
     val springArrowKtVersion = "1.0.1"
 
     implementation("io.github.craigmiller160:spring-arrow-kt:$springArrowKtVersion")
-    testImplementation("org.assertj:assertj-core:$assertjVersion")
+    testImplementation("org.assertj:org.assertj:$assertjVersion")
     implementation("io.kotest.extensions:kotest-assertions-arrow-jvm:$kotestArrowVersion")
     implementation("io.arrow-kt:arrow-core-jvm:$arrowVersion")
     implementation("io.craigmiller160:legacy-date-converter:$legacyDateVersion")

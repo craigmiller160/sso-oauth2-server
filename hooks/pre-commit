@@ -1,0 +1,19 @@
+#!/bin/sh
+# New version
+
+echo "Running spotless check..."
+
+files=$(git diff --name-only --staged)
+
+mvnd spotless:apply
+status=$?
+
+if [ $status -ne 0 ]; then
+  exit 1
+fi
+
+for file in $files; do
+  git add $file
+done
+
+exit 0

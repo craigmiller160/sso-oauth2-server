@@ -13,7 +13,19 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotln.version}</version>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <properties>
+        <kotln.version>1.7.10</kotln.version>
         <spotless.version>2.26.0</spotless.version>
         <spring.arrow.kt.version>1.0.1</spring.arrow.kt.version>
         <assertj.version>3.22.0</assertj.version>
@@ -29,6 +41,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotln.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.github.craigmiller160</groupId>
             <artifactId>spring-arrow-kt</artifactId>

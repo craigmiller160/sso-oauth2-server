@@ -20,9 +20,23 @@
                 <artifactId>kotlin-bom</artifactId>
                 <version>${kotln.version}</version>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <kotln.version>1.7.10</kotln.version>
@@ -165,6 +179,31 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=strict</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>spring</plugin>
+                        <plugin>jpa</plugin>
+                    </compilerPlugins>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-allopen</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

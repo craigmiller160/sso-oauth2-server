@@ -1,19 +1,30 @@
 #!/bin/sh
-# New version
 
-echo "Running spotless check..."
+function mvn_or_mvnd {
+  which mvnd 1>/dev/null 2>/dev/null
+  if [ $? -eq 0 ]; then
+    echo "mvnd"
+  else
+    echo "mvn"
+  fi
+}
 
-files=$(git diff --name-only --staged)
+function run {
+  echo "Running spotless check..."
 
-mvnd spotless:apply
-status=$?
+  files=$(git diff --name-only --staged)
+  command=$(mvn_or_mvnd)
 
-if [ $status -ne 0 ]; then
-  exit 1
-fi
+  $command spotless:apply
+  status=$?
 
-for file in $files; do
-  git add $file
-done
+  if [ $status -ne 0 ]; then
+    exit 1
+  fi
 
-exit 0
+  for file in $files; do
+    git add $file
+  done
+}
+
+run

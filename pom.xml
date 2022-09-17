@@ -125,6 +125,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>io.craigmiller160.authserver.AuthServerApplicationKt</mainClass>
                     <arguments>
                         <argument>spring.config.location=classpath:/config/common/,classpath:/config/dev/</argument>
                         <argument>spring.profiles.active=dev</argument>

@@ -219,7 +219,7 @@
                 <version>3.3.0</version>
                 <configuration>
                     <installHooks>
-                        <pre-commit>./hooks/pre-commit</pre-commit>
+                        <pre-commit>spotless-apply</pre-commit>
                     </installHooks>
                 </configuration>
                 <executions>
@@ -229,6 +229,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.craigmiller160</groupId>
+                        <artifactId>maven-git-hooks</artifactId>
+                        <version>1.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

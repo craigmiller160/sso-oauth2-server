@@ -46,15 +46,15 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Autowired private lateinit var authCodeHandler: AuthCodeHandler
 
   private fun createTokenForm(
-      clientId: String = validClientKey,
-      redirectUri: String = authClient.getRedirectUris()[0],
-      code: String = authCodeHandler.createAuthCode(authClient.id, authUser.id, 1000000)
+    clientId: String = validClientKey,
+    redirectUri: String = authClient.getRedirectUris()[0],
+    code: String = authCodeHandler.createAuthCode(authClient.id, authUser.id, 1000000)
   ) =
-      formOf(
-          "grant_type" to GrantType.AUTH_CODE,
-          "client_id" to clientId,
-          "code" to code,
-          "redirect_uri" to redirectUri)
+    formOf(
+      "grant_type" to GrantType.AUTH_CODE,
+      "client_id" to clientId,
+      "code" to code,
+      "redirect_uri" to redirectUri)
 
   @BeforeEach
   fun setup() {
@@ -87,15 +87,15 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant success`() {
     val result =
-        oauth2ApiProcessor
-            .call {
-              request {
-                path = "/oauth/token"
-                method = HttpMethod.POST
-                body = createTokenForm()
-              }
-            }
-            .convert(TokenResponse::class.java)
+      oauth2ApiProcessor
+        .call {
+          request {
+            path = "/oauth/token"
+            method = HttpMethod.POST
+            body = createTokenForm()
+          }
+        }
+        .convert(TokenResponse::class.java)
 
     testTokenResponse(result, "authorization_code", isUser = true)
   }
@@ -135,7 +135,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
     runTest(createTokenForm(redirectUri = "abc"))
     runTest(createTokenForm(code = "abc"))
     runTest(
-        createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, authUser.id, -1000)))
+      createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, authUser.id, -1000)))
   }
 
   @Test
@@ -145,8 +145,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
         path = "/oauth/token"
         method = HttpMethod.POST
         this.body =
-            createTokenForm(
-                code = authCodeHandler.createAuthCode(authClient.id, otherUser.id, 10000))
+          createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, otherUser.id, 10000))
       }
       response { status = 401 }
     }
@@ -155,9 +154,9 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant with disabled client`() {
     val form =
-        createTokenForm(
-            clientId = disabledClient.clientKey,
-            code = authCodeHandler.createAuthCode(disabledClient.id, authUser.id, 1000000))
+      createTokenForm(
+        clientId = disabledClient.clientKey,
+        code = authCodeHandler.createAuthCode(disabledClient.id, authUser.id, 1000000))
 
     oauth2ApiProcessor.call {
       request {
@@ -177,8 +176,7 @@ class TokenAuthCodeIntegrationTest : AbstractControllerIntegrationTest() {
   @Test
   fun `token() - auth_code grant with disabled user`() {
     val form =
-        createTokenForm(
-            code = authCodeHandler.createAuthCode(authClient.id, disabledUser.id, 100000))
+      createTokenForm(code = authCodeHandler.createAuthCode(authClient.id, disabledUser.id, 100000))
 
     oauth2ApiProcessor.call {
       request {

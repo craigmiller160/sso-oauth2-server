@@ -11,5 +11,5 @@ class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception::class)
   fun exception(ex: Exception): ResponseEntity<ErrorResponse> =
-      ExceptionConverter.toErrorResponseEntity(ex)
+    ExceptionConverter.toErrorResponseEntity(ex)
 }

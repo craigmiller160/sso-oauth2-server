@@ -27,7 +27,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "roles")
 data class Role(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
-    val name: String,
-    val clientId: Long
+  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long,
+  val name: String,
+  val clientId: Long
 )

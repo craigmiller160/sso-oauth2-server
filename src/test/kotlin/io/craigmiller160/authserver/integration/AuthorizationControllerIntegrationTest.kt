@@ -40,22 +40,22 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   @Autowired private lateinit var tokenConfig: TokenConfig
   companion object {
     private val COOKIE_REGEX =
-        """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
+      """^(?<cookieName>.*?)=(?<cookieValue>.*?); (Path=(?<path>.*?); )?Max-Age=(?<maxAge>.*?); Expires=(?<expires>.*?); Secure; HttpOnly; SameSite=strict$""".toRegex()
   }
   @Test
   fun `Valid credentials, create and return tokens to the caller`() {
     val request = LoginTokenRequest(username = authUser.email, password = authUserPassword)
     val result =
-        authApiProcessor
-            .call {
-              request {
-                method = HttpMethod.POST
-                path = "/authorization/token"
-                body = Json(request)
-              }
-              response { status = 200 }
-            }
-            .convert(TokenResponse::class.java)
+      authApiProcessor
+        .call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/token"
+            body = Json(request)
+          }
+          response { status = 200 }
+        }
+        .convert(TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(accessToken, tokenId)
     testRefreshToken(refreshToken, tokenId)
@@ -65,8 +65,8 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   private fun testRefreshTokenInDb(refreshToken: String, tokenId: String) {
     val dbRefreshToken = refreshTokenRepo.findById(tokenId).orElseThrow()
     assertThat(dbRefreshToken)
-        .hasFieldOrPropertyWithValue("refreshToken", refreshToken)
-        .hasFieldOrPropertyWithValue("userId", authUser.id)
+      .hasFieldOrPropertyWithValue("refreshToken", refreshToken)
+      .hasFieldOrPropertyWithValue("userId", authUser.id)
   }
 
   private fun testRefreshToken(refreshToken: String, tokenId: String) {
@@ -74,18 +74,18 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val refreshClaims = refreshJwt.jwtClaimsSet
 
     val expiration =
-        LegacyDateConverter()
-            .convertDateToZonedDateTime(refreshClaims.expirationTime, ZoneId.systemDefault())
+      LegacyDateConverter()
+        .convertDateToZonedDateTime(refreshClaims.expirationTime, ZoneId.systemDefault())
     assertThat(expiration)
-        .isCloseTo(
-            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.refreshTokenExp.toLong()),
-            within(10, ChronoUnit.SECONDS))
+      .isCloseTo(
+        ZonedDateTime.now().plusSeconds(tokenConfig.authorization.refreshTokenExp.toLong()),
+        within(10, ChronoUnit.SECONDS))
 
     assertThat(refreshClaims.claims)
-        .containsEntry("jti", tokenId)
-        .containsKey("iat")
-        .containsKey("exp")
-        .containsKey("nbf")
+      .containsEntry("jti", tokenId)
+      .containsKey("iat")
+      .containsKey("exp")
+      .containsKey("nbf")
   }
 
   private fun testAccessToken(accessToken: String, tokenId: String? = null): String {
@@ -93,51 +93,51 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val accessClaims = accessJwt.jwtClaimsSet
     assertThat(accessClaims.claims).containsKey("iat").containsKey("exp").containsKey("nbf")
     val expiration =
-        LegacyDateConverter()
-            .convertDateToZonedDateTime(accessClaims.expirationTime, ZoneId.systemDefault())
+      LegacyDateConverter()
+        .convertDateToZonedDateTime(accessClaims.expirationTime, ZoneId.systemDefault())
     assertThat(expiration)
-        .isCloseTo(
-            ZonedDateTime.now().plusSeconds(tokenConfig.authorization.accessTokenExp.toLong()),
-            within(10, ChronoUnit.SECONDS))
+      .isCloseTo(
+        ZonedDateTime.now().plusSeconds(tokenConfig.authorization.accessTokenExp.toLong()),
+        within(10, ChronoUnit.SECONDS))
     val actualTokenId = accessClaims.jwtid
     tokenId?.let { assertThat(actualTokenId).isEqualTo(it) }
 
     val expectedClients =
-        mapOf(
-            validClientKey to
-                ClientWithRolesAccess(
-                    clientId = authClient.id, clientName = authClient.name, roles = listOf()))
+      mapOf(
+        validClientKey to
+          ClientWithRolesAccess(
+            clientId = authClient.id, clientName = authClient.name, roles = listOf()))
 
     val access = UserWithClientsAccess.fromClaims(accessClaims.claims)
     assertThat(access)
-        .hasFieldOrPropertyWithValue("userId", authUser.id)
-        .hasFieldOrPropertyWithValue("email", authUser.email)
-        .hasFieldOrPropertyWithValue("firstName", authUser.firstName)
-        .hasFieldOrPropertyWithValue("lastName", authUser.lastName)
-        .hasFieldOrPropertyWithValue("clients", expectedClients)
+      .hasFieldOrPropertyWithValue("userId", authUser.id)
+      .hasFieldOrPropertyWithValue("email", authUser.email)
+      .hasFieldOrPropertyWithValue("firstName", authUser.firstName)
+      .hasFieldOrPropertyWithValue("lastName", authUser.lastName)
+      .hasFieldOrPropertyWithValue("clients", expectedClients)
     return actualTokenId
   }
 
   @Test
   fun `Valid credentials, set cookie in response to caller`() {
     val request =
-        LoginTokenRequest(username = authUser.email, password = authUserPassword, cookie = true)
+      LoginTokenRequest(username = authUser.email, password = authUserPassword, cookie = true)
     val mockResponse =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/token"
-            body = Json(request)
-          }
-          response { status = 200 }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
         }
+        response { status = 200 }
+      }
     @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(cookies).hasSize(2)
     validateCookies(cookies)
 
     val result =
-        objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+      objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(accessToken, tokenId)
     testRefreshToken(refreshToken, tokenId)
@@ -146,18 +146,18 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
 
   private fun validateCookies(cookies: List<String>) {
     val (accessCookie, refreshCookie) =
-        cookies
-            .partition { it.startsWith(ACCESS_TOKEN_COOKIE_NAME) }
-            .let { Pair(it.first[0], it.second[0]) }
+      cookies
+        .partition { it.startsWith(ACCESS_TOKEN_COOKIE_NAME) }
+        .let { Pair(it.first[0], it.second[0]) }
     val accessCookieGroups =
-        COOKIE_REGEX.matchEntire(accessCookie)?.groups as? MatchNamedGroupCollection?
+      COOKIE_REGEX.matchEntire(accessCookie)?.groups as? MatchNamedGroupCollection?
     assertThat(accessCookieGroups).isNotNull
     assertThat(accessCookieGroups!!["cookieName"]?.value).isEqualTo(ACCESS_TOKEN_COOKIE_NAME)
     assertThat(accessCookieGroups["path"]?.value).isNull()
     val tokenId = testAccessToken(accessCookieGroups["cookieValue"]?.value ?: "")
 
     val refreshCookieGroups =
-        COOKIE_REGEX.matchEntire(refreshCookie)?.groups as? MatchNamedGroupCollection?
+      COOKIE_REGEX.matchEntire(refreshCookie)?.groups as? MatchNamedGroupCollection?
     assertThat(refreshCookieGroups).isNotNull
     assertThat(refreshCookieGroups!!["cookieName"]?.value).isEqualTo(REFRESH_TOKEN_COOKIE_NAME)
     assertThat(refreshCookieGroups["path"]?.value).isEqualTo(REFRESH_TOKEN_COOKIE_PATH)
@@ -169,20 +169,20 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
   fun `Valid credentials, set cookie and send redirect in response to caller`() {
     val redirectUri = "http://somewhere/over/rainbow"
     val request =
-        LoginTokenRequest(
-            username = authUser.email,
-            password = authUserPassword,
-            cookie = true,
-            redirectUri = redirectUri)
+      LoginTokenRequest(
+        username = authUser.email,
+        password = authUserPassword,
+        cookie = true,
+        redirectUri = redirectUri)
     val mockResponse =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/token"
-            body = Json(request)
-          }
-          response { status = 302 }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/token"
+          body = Json(request)
         }
+        response { status = 302 }
+      }
     @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(mockResponse.response.getHeaderValue("Location")).isEqualTo(redirectUri)
@@ -190,7 +190,7 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     validateCookies(cookies)
 
     val result =
-        objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+      objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
     val (accessToken, refreshToken, tokenId) = result
     testAccessToken(accessToken, tokenId)
     testRefreshToken(refreshToken, tokenId)
@@ -241,24 +241,24 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val tokenId = UUID.randomUUID().toString()
     val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
     val refreshTokenEntity =
-        RefreshToken(
-            refreshToken = refreshToken,
-            id = tokenId,
-            userId = authUser.id,
-            clientId = null,
-            timestamp = ZonedDateTime.now())
+      RefreshToken(
+        refreshToken = refreshToken,
+        id = tokenId,
+        userId = authUser.id,
+        clientId = null,
+        timestamp = ZonedDateTime.now())
     refreshTokenRepo.save(refreshTokenEntity)
     val request = TokenRefreshRequest(refreshToken)
     val result =
-        authApiProcessor
-            .call {
-              request {
-                method = HttpMethod.POST
-                path = "/authorization/refresh"
-                body = Json(request)
-              }
-            }
-            .convert(TokenResponse::class.java)
+      authApiProcessor
+        .call {
+          request {
+            method = HttpMethod.POST
+            path = "/authorization/refresh"
+            body = Json(request)
+          }
+        }
+        .convert(TokenResponse::class.java)
     val (resultAccessToken, resultRefreshToken, resultTokenId) = result
     assertEquals(tokenId, resultTokenId)
     testAccessToken(resultAccessToken, resultTokenId)
@@ -271,29 +271,29 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val tokenId = UUID.randomUUID().toString()
     val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
     val refreshTokenEntity =
-        RefreshToken(
-            refreshToken = refreshToken,
-            id = tokenId,
-            userId = authUser.id,
-            clientId = null,
-            timestamp = ZonedDateTime.now())
+      RefreshToken(
+        refreshToken = refreshToken,
+        id = tokenId,
+        userId = authUser.id,
+        clientId = null,
+        timestamp = ZonedDateTime.now())
     refreshTokenRepo.save(refreshTokenEntity)
     val request = TokenRefreshRequest(refreshToken, true)
     val mockResponse =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/refresh"
-            body = Json(request)
-          }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/refresh"
+          body = Json(request)
         }
+      }
     @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(cookies).hasSize(2)
     validateCookies(cookies)
 
     val result =
-        objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
+      objectMapper.readValue(mockResponse.response.contentAsString, TokenResponse::class.java)
     val (resultAccessToken, resultRefreshToken, resultTokenId) = result
     assertEquals(tokenId, resultTokenId)
     testAccessToken(resultAccessToken, resultTokenId)
@@ -306,23 +306,23 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val tokenId = UUID.randomUUID().toString()
     val refreshToken = jwtHandler.createRefreshToken(tokenId, -100000).getOrHandle { throw it }
     val refreshTokenEntity =
-        RefreshToken(
-            refreshToken = refreshToken,
-            id = tokenId,
-            userId = authUser.id,
-            clientId = null,
-            timestamp = ZonedDateTime.now())
+      RefreshToken(
+        refreshToken = refreshToken,
+        id = tokenId,
+        userId = authUser.id,
+        clientId = null,
+        timestamp = ZonedDateTime.now())
     refreshTokenRepo.save(refreshTokenEntity)
     val request = TokenRefreshRequest(refreshToken)
     val result =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/refresh"
-            body = Json(request)
-          }
-          response { status = 401 }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/refresh"
+          body = Json(request)
         }
+        response { status = 401 }
+      }
   }
 
   @Test
@@ -331,26 +331,26 @@ class AuthorizationControllerIntegrationTest : AbstractControllerIntegrationTest
     val refreshToken = jwtHandler.createRefreshToken(tokenId).getOrHandle { throw it }
     val request = TokenRefreshRequest(refreshToken)
     val result =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/refresh"
-            body = Json(request)
-          }
-          response { status = 401 }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/refresh"
+          body = Json(request)
         }
+        response { status = 401 }
+      }
   }
 
   @Test
   fun `logout clears cookies`() {
     val mockResponse =
-        authApiProcessor.call {
-          request {
-            method = HttpMethod.POST
-            path = "/authorization/logout"
-          }
-          response { status = 204 }
+      authApiProcessor.call {
+        request {
+          method = HttpMethod.POST
+          path = "/authorization/logout"
         }
+        response { status = 204 }
+      }
     @Suppress("UNCHECKED_CAST")
     val cookies = mockResponse.response.getHeaderValues("Set-Cookie") as List<String>
     assertThat(cookies).hasSize(2)

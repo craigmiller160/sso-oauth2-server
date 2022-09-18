@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class RefreshTokenCleanupService(
-    private val refreshTokenRepo: RefreshTokenRepository,
-    private val tokenConfig: TokenConfig
+  private val refreshTokenRepo: RefreshTokenRepository,
+  private val tokenConfig: TokenConfig
 ) {
 
   private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -39,7 +39,7 @@ class RefreshTokenCleanupService(
   fun cleanupRefreshTokens() {
     log.info("Cleaning up refresh tokens older than ${tokenConfig.deleteOlderThanSecs} seconds")
     val maxTimestamp =
-        ZonedDateTime.now(ZoneId.of("UTC")).minusSeconds(tokenConfig.deleteOlderThanSecs)
+      ZonedDateTime.now(ZoneId.of("UTC")).minusSeconds(tokenConfig.deleteOlderThanSecs)
     refreshTokenRepo.removeOldTokens(maxTimestamp)
   }
 }

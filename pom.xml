@@ -44,7 +44,7 @@
         <spring.arrow.kt.version>1.0.2</spring.arrow.kt.version>
         <assertj.version>3.22.0</assertj.version>
         <kotest.arrow.version>1.2.5</kotest.arrow.version>
-        <legacy.date.version>1.1.2</legacy.date.version>
+        <legacy.date.version>1.1.3</legacy.date.version>
         <hamcrest.date.version>2.0.7</hamcrest.date.version>
         <api.test.processor.version>1.2.3</api.test.processor.version>
         <web.utils.version>1.1.3</web.utils.version>

@@ -22,4 +22,4 @@ app_deployment:
       port: 8443
       scheme: HTTPS
   ports:
-    - 8443
+    - containerPort: 8443

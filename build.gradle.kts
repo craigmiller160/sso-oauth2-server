@@ -61,7 +61,7 @@ dependencies {
     val assertjVersion = "3.22.0"
     val kotestArrowVersion = "1.2.5"
     val arrowVersion = "1.0.1"
-    val legacyDateVersion = "1.1.2"
+    val legacyDateVersion = "1.1.3"
     val hamcrestDateVersion = "2.0.7"
     val apiTestProcessorVersion = "1.2.2"
     val webUtilsVersion = "1.1.3"

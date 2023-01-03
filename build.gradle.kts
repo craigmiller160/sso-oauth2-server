@@ -64,7 +64,7 @@ dependencies {
     val legacyDateVersion = "1.1.3"
     val hamcrestDateVersion = "2.0.7"
     val apiTestProcessorVersion = "1.2.2"
-    val webUtilsVersion = "1.1.3"
+    val webUtilsVersion = "1.1.4"
     val postgresVersion = "42.3.1"
     val nimbusJoseVersion = "9.22"
     val mockitoVersion = "4.0.0"

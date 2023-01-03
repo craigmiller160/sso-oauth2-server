@@ -23,3 +23,12 @@ app_deployment:
       scheme: HTTPS
   ports:
     - containerPort: 8443
+  secure_ingress:
+    name: sso-oauth2-server-ingress
+    backendIsHttps: true
+    hosts:
+      - name: apps-craigmiller160.ddns.net
+        services:
+          - path: /oauth2/(.*)?
+            serviceName: sso-oauth2-server
+            portNumber: 8443

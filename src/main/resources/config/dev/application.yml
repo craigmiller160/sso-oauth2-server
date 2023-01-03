@@ -8,7 +8,7 @@ spring:
         default_schema: dev
   datasource:
     host: craigmiller160.ddns.net
-    port: 30001
+    port: 30019
     username: postgres_root
     password: ${POSTGRES_ROOT_PASSWORD}
 

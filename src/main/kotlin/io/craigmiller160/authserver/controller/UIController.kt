@@ -39,7 +39,7 @@ class UIController(private val uiService: UIService) {
       res.contentType = "text/css"
       resourceStream.copyTo(res.outputStream)
     }
-        ?: res.apply { status = 404 }
+      ?: res.apply { status = 404 }
   }
 
   @GetMapping("/{pageName}")
@@ -49,6 +49,6 @@ class UIController(private val uiService: UIService) {
       res.contentType = "text/html"
       pageStream.copyTo(res.outputStream)
     }
-        ?: res.apply { status = 404 }
+      ?: res.apply { status = 404 }
   }
 }

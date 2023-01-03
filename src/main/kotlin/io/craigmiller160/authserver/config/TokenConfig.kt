@@ -53,11 +53,11 @@ class TokenConfig {
   @PostConstruct
   fun loadKeys() {
     val keyStore =
-        evaluatePath().use { stream ->
-          val store = KeyStore.getInstance(keyStoreType)
-          store.load(stream, keyStorePassword.toCharArray())
-          store
-        }
+      evaluatePath().use { stream ->
+        val store = KeyStore.getInstance(keyStoreType)
+        store.load(stream, keyStorePassword.toCharArray())
+        store
+      }
     privateKey = keyStore.getKey(keyStoreAlias, keyStorePassword.toCharArray()) as PrivateKey
     publicKey = keyStore.getCertificate(keyStoreAlias).publicKey
     keyPair = KeyPair(publicKey, privateKey)
@@ -67,7 +67,7 @@ class TokenConfig {
     if (keyStorePath.startsWith("classpath:")) {
       val path = keyStorePath.replace(Regex("^classpath:"), "")
       return javaClass.classLoader.getResourceAsStream(path)
-          ?: throw FileNotFoundException(keyStorePath)
+        ?: throw FileNotFoundException(keyStorePath)
     }
 
     val file = File(keyStorePath)
@@ -80,10 +80,10 @@ class TokenConfig {
 
   fun jwkSet(): JWKSet {
     val builder =
-        RSAKey.Builder(publicKey as RSAPublicKey)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(JWSAlgorithm.RS256)
-            .keyID("oauth-jwt")
+      RSAKey.Builder(publicKey as RSAPublicKey)
+        .keyUse(KeyUse.SIGNATURE)
+        .algorithm(JWSAlgorithm.RS256)
+        .keyID("oauth-jwt")
     return JWKSet(builder.build())
   }
 }

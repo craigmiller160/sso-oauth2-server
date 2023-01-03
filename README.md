@@ -61,3 +61,7 @@ The client key/secret are provided via Basic Auth. Otherwise, the grant type is 
 The `refresh_token` grant type is used to refresh a token. All authentication flows provide refresh tokens, which will be used after the access token expires.
 
 The client key/secret are provided via Basic Auth. Otherwise, the grant type is set to "refresh_token", and the refresh token itself must be included in the urlencoded body.
+
+## Git Hooks
+
+To ensure the Spotless git hook works, run `mvnd install`

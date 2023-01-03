@@ -46,11 +46,11 @@ class AuthCodeHandler(private val tokenConfig: TokenConfig) {
     cipher.init(Cipher.DECRYPT_MODE, tokenConfig.publicKey)
 
     val decryptedBytes =
-        try {
-          cipher.doFinal(encryptedBytes)
-        } catch (ex: GeneralSecurityException) {
-          throw AuthCodeException("Invalid Auth Code encryption", ex)
-        }
+      try {
+        cipher.doFinal(encryptedBytes)
+      } catch (ex: GeneralSecurityException) {
+        throw AuthCodeException("Invalid Auth Code encryption", ex)
+      }
 
     val rawToken = String(decryptedBytes)
     val (clientId, userId, exp) = rawToken.split(delimiter)

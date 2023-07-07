@@ -51,7 +51,7 @@
         <postgres.version>42.3.1</postgres.version>
         <nimbus.jose.version>9.22</nimbus.jose.version>
         <mockito.kotlin.version>4.0.0</mockito.kotlin.version>
-        <h2.version>2.1.214</h2.version>
+        <h2.version>2.2.220</h2.version>
         <arrow.kt.version>1.1.2</arrow.kt.version>
         <maven.git.hooks.version>1.0.1</maven.git.hooks.version>
         <git.hooks.plugin.version>3.3.0</git.hooks.plugin.version>
